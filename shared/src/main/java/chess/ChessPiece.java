@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Represents a single chess piece
@@ -9,8 +11,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
+    private final PieceType pieceType;
+    private final ChessGame.TeamColor pieceColor;
+
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceType = type;
+        this.pieceColor = pieceColor;
     }
 
     /**
@@ -29,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return pieceType;
     }
 
     /**
@@ -47,6 +54,34 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        PieceMovesCalculatorInterface calculator;
+        System.out.println("-----Piece Type: " + getPieceType());
+        switch (getPieceType()) {
+            case BISHOP:
+                calculator = new BishopMovesCalculater();
+                break;
+            case KING:
+                calculator = new KingMovesCalculater();
+                break;
+            case KNIGHT:
+                calculator = new KnightMovesCalculater();
+                break;
+            case PAWN:
+                calculator = new PawnMovesCalculater();
+                break;
+            case QUEEN:
+                calculator = new QueenMovesCalculater();
+                break;
+            case ROOK:
+                calculator = new RookMovesCalculater();
+                break;
+
+            default:
+                return Collections.emptyList();
+        }
+        //        call to PieceMovesCalculator to return legal pieceMoves
+
+        return calculator.PiceMovesCalculator(board, myPosition);
+
     }
 }

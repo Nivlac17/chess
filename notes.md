@@ -9,4 +9,15 @@ Java is hybrid, compiled/interpreted language
 
 Java Code:
 Specifically an Object Oriented language
+/** is javadoc which is a tool that allows you to export a javadoc file automatically
+Strings Are ALWAYS immutable!
+
+
+
+
+
+
+Chess Project:
+We need to build an interface to code the pieces -> most efficient and somewhat easier for future 
+
 

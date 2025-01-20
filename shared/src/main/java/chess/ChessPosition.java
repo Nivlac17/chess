@@ -31,8 +31,8 @@ public class ChessPosition {
     }
 
     public ChessPosition(int row, int col) {
-        this.row = row;
-        this.col = col;
+        this.row  = row;
+        this.col  = col;
     }
 
     /**
@@ -40,7 +40,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return row;
+        return row - 1;
     }
 
     /**
@@ -48,6 +48,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return col;
+        return col - 1;
     }
 }
