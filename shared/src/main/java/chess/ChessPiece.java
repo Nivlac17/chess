@@ -73,7 +73,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceMovesCalculatorInterface pieceCalculator;
-        System.out.println("-----Piece Type: " + getPieceType());
+//        System.out.println("-----Piece Type: " + getPieceType());
         switch (getPieceType()) {
             case BISHOP:
                 pieceCalculator = new BishopMovesCalculater();
