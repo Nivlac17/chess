@@ -14,6 +14,9 @@ Strings Are ALWAYS immutable!
 
 Which is more efficient: string Builder or printf string? String Concatination i.e.  ("asd" + "asd") = "asdasd" is least efficient
 
+TryWithResources is a very powerful method which allows you to auto close in file io by using try(openfile;){code using example;}   File will then auto close.
+
+
 
 
 
@@ -24,4 +27,6 @@ Which is more efficient: string Builder or printf string? String Concatination i
 Chess Project:
 We need to build an interface to code the pieces -> most efficient and somewhat easier for future 
 
+
+Look into Records lecture to avoid toString() and @Override methods
 

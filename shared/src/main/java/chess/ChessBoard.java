@@ -9,28 +9,11 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    public ChessPiece[][] squares = new ChessPiece[9][9];
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessBoard that = (ChessBoard) o;
-        return Arrays.equals(squares, that.squares);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(squares);
-    }
-
+    public ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
         
     }
+
 
     /**
      * Adds a chess piece to the chessboard
@@ -39,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -50,8 +33,9 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow()-1][position.getColumn()-1];
     }
+
 
     /**
      * Sets the board to the default starting board
@@ -75,9 +59,9 @@ public class ChessBoard {
         addPiece(new ChessPosition(1,4), new ChessPiece(ChessGame.TeamColor.WHITE ,ChessPiece.PieceType.QUEEN));
         addPiece(new ChessPosition(1,5), new ChessPiece(ChessGame.TeamColor.WHITE ,ChessPiece.PieceType.KING));
 
-        for (int j = 1; j < 9; j++){
-            addPiece(new ChessPosition(2,j), new ChessPiece(ChessGame.TeamColor.WHITE ,ChessPiece.PieceType.PAWN));
-
+        for (int j = 1; j < 9; j++) {
+            addPiece(new ChessPosition(2, j), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        }
 // Black
             addPiece(new ChessPosition(8,1), new ChessPiece(ChessGame.TeamColor.BLACK ,ChessPiece.PieceType.ROOK));
             addPiece(new ChessPosition(8,8), new ChessPiece(ChessGame.TeamColor.BLACK ,ChessPiece.PieceType.ROOK));
@@ -93,11 +77,28 @@ public class ChessBoard {
 
             for (int k = 1; k < 9; k++){
                 addPiece(new ChessPosition(7,k), new ChessPiece(ChessGame.TeamColor.BLACK ,ChessPiece.PieceType.PAWN));
-}
-
-
             }
 
 
+
+
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(squares, that.squares); // deepequals fixed most issues
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(squares);
     }
 }

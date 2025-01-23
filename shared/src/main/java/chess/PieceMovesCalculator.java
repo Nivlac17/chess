@@ -133,10 +133,18 @@ int futureRow;
             if (pieceInFuturePosition == null) {
                 if (IsWhite && futureRow == 8){
                     chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));
+
+
+
                 }
                 else if (!IsWhite && futureRow == 1) {
                     chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
-                }
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));                }
                 else{
                     chessMoves.add(new ChessMove(position, futurePosistion, null));
                 }
@@ -180,10 +188,15 @@ int futureRow;
                 if (pieceInFuturePosition != null && currentPiece.getTeamColor() != pieceInFuturePosition.getTeamColor()) {
                     if (IsWhite && futureRow == 8){
                         chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));
                     }
                     else if (!IsWhite && futureRow == 1) {
                         chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
-                    }
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));                    }
                     else{
                         chessMoves.add(new ChessMove(position, futurePosistion, null));
                     }                }
@@ -201,9 +214,15 @@ int futureRow;
                 if (pieceInFuturePosition != null && currentPiece.getTeamColor() != pieceInFuturePosition.getTeamColor()) {
                     if (IsWhite && futureRow == 8){
                         chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));
                     }
                     else if (!IsWhite && futureRow == 1) {
                         chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.ROOK));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.KNIGHT));
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.BISHOP));
                     }
                     else{
                         chessMoves.add(new ChessMove(position, futurePosistion, null));
@@ -214,9 +233,6 @@ int futureRow;
             return chessMoves;
         }
     }
-
-
-
 
 
 class QueenMovesCalculater extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
