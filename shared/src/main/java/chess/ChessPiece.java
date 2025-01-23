@@ -54,26 +54,26 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculatorInterface calculator;
+        PieceMovesCalculatorInterface pieceCalculator;
         System.out.println("-----Piece Type: " + getPieceType());
         switch (getPieceType()) {
             case BISHOP:
-                calculator = new BishopMovesCalculater();
+                pieceCalculator = new BishopMovesCalculater();
                 break;
             case KING:
-                calculator = new KingMovesCalculater();
+                pieceCalculator = new KingMovesCalculater();
                 break;
             case KNIGHT:
-                calculator = new KnightMovesCalculater();
+                pieceCalculator = new KnightMovesCalculater();
                 break;
             case PAWN:
-                calculator = new PawnMovesCalculater();
+                pieceCalculator = new PawnMovesCalculater();
                 break;
             case QUEEN:
-                calculator = new QueenMovesCalculater();
+                pieceCalculator = new QueenMovesCalculater();
                 break;
             case ROOK:
-                calculator = new RookMovesCalculater();
+                pieceCalculator = new RookMovesCalculater();
                 break;
 
             default:
@@ -81,7 +81,7 @@ public class ChessPiece {
         }
         //        call to PieceMovesCalculator to return legal pieceMoves
 
-        return calculator.PiceMovesCalculator(board, myPosition);
+        return pieceCalculator.PiceMovesCalculator(board, myPosition);
 
     }
 }

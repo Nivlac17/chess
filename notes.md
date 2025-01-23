@@ -12,6 +12,10 @@ Specifically an Object Oriented language
 /** is javadoc which is a tool that allows you to export a javadoc file automatically
 Strings Are ALWAYS immutable!
 
+Which is more efficient: string Builder or printf string? String Concatination i.e.  ("asd" + "asd") = "asdasd" is least efficient
+
+
+
 
 
 
