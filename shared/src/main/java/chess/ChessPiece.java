@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -97,7 +96,6 @@ public class ChessPiece {
                 return Collections.emptyList();
         }
         //        call to PieceMovesCalculator to return legal pieceMoves
-
         return pieceCalculator.PiceMovesCalculator(board, myPosition);
 
     }

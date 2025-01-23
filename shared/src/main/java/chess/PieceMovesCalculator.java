@@ -5,7 +5,6 @@ import java.util.Collection;
 
 interface PieceMovesCalculatorInterface{
     Collection<ChessMove> PiceMovesCalculator(ChessBoard board , ChessPosition position);
-
 }
 public class PieceMovesCalculator {
     int row;

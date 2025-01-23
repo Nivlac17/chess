@@ -14,7 +14,6 @@ public class ChessBoard {
         
     }
 
-
     /**
      * Adds a chess piece to the chessboard
      *
@@ -78,11 +77,6 @@ public class ChessBoard {
             for (int k = 1; k < 9; k++){
                 addPiece(new ChessPosition(7,k), new ChessPiece(ChessGame.TeamColor.BLACK ,ChessPiece.PieceType.PAWN));
             }
-
-
-
-
-
     }
 
     @Override
