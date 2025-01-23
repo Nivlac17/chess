@@ -49,8 +49,6 @@ class BishopMovesCalculater extends PieceMovesCalculator implements PieceMovesCa
 }
 
 
-
-
 class KingMovesCalculater extends PieceMovesCalculator implements PieceMovesCalculatorInterface {
 
     public Collection<ChessMove> PiceMovesCalculator(ChessBoard board, ChessPosition position) {
@@ -77,7 +75,6 @@ class KingMovesCalculater extends PieceMovesCalculator implements PieceMovesCalc
         return chessMoves;
     }
 }
-
 
 
 class KnightMovesCalculater extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
@@ -108,10 +105,12 @@ class KnightMovesCalculater extends PieceMovesCalculator implements PieceMovesCa
     }
 }
 
+
 class PawnMovesCalculater extends PieceMovesCalculator implements PieceMovesCalculatorInterface {
 
     @Override
     public Collection<ChessMove> PiceMovesCalculator(ChessBoard board, ChessPosition position) {
+//        ChessPiece promotionalType = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
         this.row = position.getRow();
         this.col = position.getColumn();
         ChessPiece currentPiece = board.getPiece(position);
@@ -133,10 +132,10 @@ int futureRow;
             ChessPiece pieceInFuturePosition = board.getPiece(futurePosistion);
             if (pieceInFuturePosition == null) {
                 if (IsWhite && futureRow == 8){
-                    chessMoves.add(new ChessMove(position, futurePosistion, null));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
                 }
                 else if (!IsWhite && futureRow == 1) {
-                    chessMoves.add(new ChessMove(position, futurePosistion, null));
+                    chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
                 }
                 else{
                     chessMoves.add(new ChessMove(position, futurePosistion, null));
@@ -179,8 +178,15 @@ int futureRow;
                 ChessPosition futurePosistion = new ChessPosition(futureRow, futureCol);
                 ChessPiece pieceInFuturePosition = board.getPiece(futurePosistion);
                 if (pieceInFuturePosition != null && currentPiece.getTeamColor() != pieceInFuturePosition.getTeamColor()) {
-                    chessMoves.add(new ChessMove(position, futurePosistion, null));
-                }
+                    if (IsWhite && futureRow == 8){
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                    }
+                    else if (!IsWhite && futureRow == 1) {
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                    }
+                    else{
+                        chessMoves.add(new ChessMove(position, futurePosistion, null));
+                    }                }
             }
 
 //            Attack left
@@ -193,8 +199,15 @@ int futureRow;
                 ChessPosition futurePosistion = new ChessPosition(futureRow, futureCol);
                 ChessPiece pieceInFuturePosition = board.getPiece(futurePosistion);
                 if (pieceInFuturePosition != null && currentPiece.getTeamColor() != pieceInFuturePosition.getTeamColor()) {
-                    chessMoves.add(new ChessMove(position, futurePosistion, null));
-                }
+                    if (IsWhite && futureRow == 8){
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                    }
+                    else if (!IsWhite && futureRow == 1) {
+                        chessMoves.add(new ChessMove(position, futurePosistion, ChessPiece.PieceType.QUEEN));
+                    }
+                    else{
+                        chessMoves.add(new ChessMove(position, futurePosistion, null));
+                    }                }
             }
 
 
