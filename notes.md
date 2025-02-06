@@ -14,10 +14,14 @@ Strings Are ALWAYS immutable!
 
 Which is more efficient: string Builder or printf string? String Concatination i.e.  ("asd" + "asd") = "asdasd" is least efficient
 
-TryWithResources is a very powerful method which allows you to auto close in file io by using try(openfile;){code using example;}   File will then auto close.
+TryWithResources is a very powerful method which allows you to auto close in file io by using try(openfile;){code using example;}   File will then auto close. ------- usefull!
 
+Collections cannot store primatives. To store those, you will need to store them as objects. i.e. integer class and long class.
 
+DeepCopy vs ShallowCopy: Shallow copy is  a copy of references. e.x. copy references of a linked list will miss the first, which will point a reference to the original item.
 
+Cloneable to make a copy of an object. Cloneable is an interface so to use we do: public class MyClass implements Cloneable{}
+	if that is not working, we will have to iterate ofer the list to make a deep copy of the list.
 
 
 
@@ -30,3 +34,4 @@ We need to build an interface to code the pieces -> most efficient and somewhat 
 
 Look into Records lecture to avoid toString() and @Override methods
 
+use Cloneable to check if king is in check.
