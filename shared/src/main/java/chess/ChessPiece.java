@@ -11,13 +11,29 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final PieceType pieceType;
-    private final ChessGame.TeamColor pieceColor;
-
+    ChessGame.TeamColor color;
+    ChessPiece.PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.color = pieceColor;
         this.pieceType = type;
-        this.pieceColor = pieceColor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece piece = (ChessPiece) o;
+        return color == piece.color && pieceType == piece.pieceType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, pieceType);
     }
 
     /**
@@ -36,31 +52,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return pieceColor;
+        return this.color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return pieceType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessPiece that = (ChessPiece) o;
-        return pieceType == that.pieceType && pieceColor == that.pieceColor;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pieceType, pieceColor);
+        return this.pieceType;
     }
 
     /**
@@ -71,32 +70,17 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculatorInterface pieceCalculator;
-        switch (getPieceType()) {
-            case BISHOP:
-                pieceCalculator = new BishopMovesCalculater();
-                break;
-            case KING:
-                pieceCalculator = new KingMovesCalculater();
-                break;
-            case KNIGHT:
-                pieceCalculator = new KnightMovesCalculater();
-                break;
-            case PAWN:
-                pieceCalculator = new PawnMovesCalculater();
-                break;
-            case QUEEN:
-                pieceCalculator = new QueenMovesCalculater();
-                break;
-            case ROOK:
-                pieceCalculator = new RookMovesCalculater();
-                break;
+        PieceMovesCalculatorInterface moves;
+        switch(getPieceType()){
+            case BISHOP -> moves = new BishopMovesCalculator();
+            case KING -> moves = new KingMovesCalculator();
+            case KNIGHT -> moves = new KnightMovesCalculator();
+            case ROOK -> moves = new RookMovesCalculator();
+            case QUEEN -> moves = new QueenMovesCalculator();
+            case PAWN -> moves = new PawnMovesCalculator();
 
-            default:
-                return Collections.emptyList();
+            default -> {return Collections.emptyList();}
         }
-        //        call to PieceMovesCalculator to return legal pieceMoves
-        return pieceCalculator.PiceMovesCalculator(board, myPosition);
-
+        return moves.PieceMovesCalculaterInterface(board, myPosition);
     }
 }
