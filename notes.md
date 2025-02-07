@@ -7,6 +7,8 @@ References instead of pointers -> Safer and easyier than worrying about pointers
 Classes dynamically linked at runtime
 Java is hybrid, compiled/interpreted language
 
+
+
 Java Code:
 Specifically an Object Oriented language
 /** is javadoc which is a tool that allows you to export a javadoc file automatically
@@ -26,6 +28,11 @@ Cloneable to make a copy of an object. Cloneable is an interface so to use we do
 
 
 
+JSON:
+[...] is an array
+{...} is an object
+
+
 
 
 Chess Project:
@@ -34,4 +41,4 @@ We need to build an interface to code the pieces -> most efficient and somewhat 
 
 Look into Records lecture to avoid toString() and @Override methods
 
-use Cloneable to check if king is in check.
+use Cloneable to check if king is in checkmate, take all of your moves, apply to a cloneable if move gets you out of check, return false i.e. your not in checkmate.
