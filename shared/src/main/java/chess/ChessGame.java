@@ -10,6 +10,7 @@ import java.util.Collection;
  */
 public class ChessGame {
     ChessBoard thisBoard = new ChessBoard();
+    int turnTracker = 0;
 
     public ChessGame() {
         thisBoard.resetBoard();
@@ -19,7 +20,11 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        if((this.turnTracker % 2) == 0){
+            return TeamColor.WHITE;
+        } else {
+            return TeamColor.BLACK;
+        }
     }
 
     /**
@@ -57,6 +62,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        turnTracker += 1;
         throw new RuntimeException("Not implemented");
     }
 
