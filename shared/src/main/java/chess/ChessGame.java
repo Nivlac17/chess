@@ -98,20 +98,20 @@ public class ChessGame {
         int kingRow = kingPosition.getRow();
         int kingCol = kingPosition.getColumn();
         for (int i = 1; i <= 8; i++){
-                for (int j = 1; j <= 8; j++) {
-                    ChessPiece threat = thisBoard.getPiece(new ChessPosition(i, j));
-                    if (threat != null && threat.getTeamColor() != teamColor) {
-                        ChessPosition threatPosition = new ChessPosition(i, j);
-                        Collection<ChessMove> threatPossibleMoves = validMoves(threatPosition);
-                        for (ChessMove possibleMove : threatPossibleMoves){
-                            if (kingRow == possibleMove.endPosition.getRow() && kingCol == possibleMove.endPosition.getColumn()) {
-                                checkBool = true;
-                                break;
-                            }
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece threat = thisBoard.getPiece(new ChessPosition(i, j));
+                if (threat != null && threat.getTeamColor() != teamColor) {
+                    ChessPosition threatPosition = new ChessPosition(i, j);
+                    Collection<ChessMove> threatPossibleMoves = validMoves(threatPosition);
+                    for (ChessMove possibleMove : threatPossibleMoves){
+                        if (kingRow == possibleMove.endPosition.getRow() && kingCol == possibleMove.endPosition.getColumn()) {
+                            checkBool = true;
+                            break;
                         }
                     }
                 }
-                if(checkBool){break;}
+            }
+            if(checkBool){break;}
         }
         return checkBool;
     }
