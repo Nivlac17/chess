@@ -112,7 +112,11 @@ public class ChessGame implements Cloneable{
             if (movePiece.getTeamColor() != getTeamTurn() || (!validMoves(move.startPosition).contains(move))) {
                 throw new InvalidMoveException();
             }
-            thisBoard.addPiece(move.getEndPosition(), movePiece);
+            if (move.getPromotionPiece() == null) {
+                thisBoard.addPiece(move.getEndPosition(), movePiece);
+            } else {
+                thisBoard.addPiece(move.getEndPosition(), new ChessPiece(movePiece.getTeamColor(),move.getPromotionPiece()));
+            }
             thisBoard.addPiece(move.getStartPosition(), null);
             turnTracker += 1;
         } catch (NullPointerException e) {
