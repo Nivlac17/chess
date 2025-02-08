@@ -64,7 +64,7 @@ public class ChessGame implements Cloneable{
             Collection<ChessMove> tempMovesHolder = currentPiece.pieceMoves(thisBoard,startPosition);
             Collection<ChessMove> movesHolder = new ArrayList<>();
             for (ChessMove singleMove : tempMovesHolder){
-                if (placesKingInCheck(singleMove)){
+                if (!placesKingInCheck(singleMove)){
                     movesHolder.add(singleMove);
                 }
             }
@@ -74,25 +74,26 @@ public class ChessGame implements Cloneable{
     }
 
 
-//    @Override
-//    public ChessGame clone(){
-//        try{
-//            ChessGame clone = (ChessGame) super.clone();
-//
-//            ChessBoard clonedChessBoard = (ChessBoard) getBoard().clone();
-//            clone.setBoard(clonedChessBoard);
-//
-//            return clone;
-//        } catch (CloneNotSupportedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
+    @Override
+    public ChessGame clone(){
+        try{
+            ChessGame clone = (ChessGame) super.clone();
+
+            ChessBoard clonedChessBoard = (ChessBoard) getBoard().clone();
+            clone.setBoard(clonedChessBoard);
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
     public boolean placesKingInCheck(ChessMove move){
         ChessBoard tempBoard = thisBoard.clone();
-        
+//        thoughts: clone chess game w/ chess board makeMove. return boolean iskingincheck
+
         return true;
     }
 
@@ -104,6 +105,11 @@ public class ChessGame implements Cloneable{
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece movePiece = thisBoard.getPiece(move.getStartPosition());
+        if(movePiece.getTeamColor() != getTeamTurn() || (!validMoves(move.startPosition).contains(move))){
+            throw new InvalidMoveException();
+        }
+        thisBoard.addPiece(move.getEndPosition(), movePiece);
         turnTracker += 1;
     }
 
