@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame implements Cloneable{
     ChessBoard thisBoard = new ChessBoard();
     int turnTracker = 0;
 
@@ -58,9 +59,43 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = thisBoard.getPiece(startPosition);
         if (currentPiece != null) {
-            return currentPiece.pieceMoves(thisBoard,startPosition);
+
+//            for move in possibleMoves, if move not placesKingInCheck add to returned collection
+            Collection<ChessMove> tempMovesHolder = currentPiece.pieceMoves(thisBoard,startPosition);
+            Collection<ChessMove> movesHolder = new ArrayList<>();
+            for (ChessMove singleMove : tempMovesHolder){
+                if (placesKingInCheck(singleMove)){
+                    movesHolder.add(singleMove);
+                }
+            }
+
+            return movesHolder;
         }else{return null;}
     }
+
+
+//    @Override
+//    public ChessGame clone(){
+//        try{
+//            ChessGame clone = (ChessGame) super.clone();
+//
+//            ChessBoard clonedChessBoard = (ChessBoard) getBoard().clone();
+//            clone.setBoard(clonedChessBoard);
+//
+//            return clone;
+//        } catch (CloneNotSupportedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
+
+
+    public boolean placesKingInCheck(ChessMove move){
+        ChessBoard tempBoard = thisBoard.clone();
+        
+        return true;
+    }
+
 
     /**
      * Makes a move in a chess game
