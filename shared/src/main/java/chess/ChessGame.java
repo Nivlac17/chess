@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -58,8 +59,7 @@ public class ChessGame implements Cloneable{
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = thisBoard.getPiece(startPosition);
-        if (currentPiece != null) {
-
+        if ( currentPiece != null ) {
 //            for move in possibleMoves, if move not placesKingInCheck add to returned collection
             Collection<ChessMove> tempMovesHolder = currentPiece.pieceMoves(thisBoard,startPosition);
             Collection<ChessMove> movesHolder = new ArrayList<>();
@@ -68,33 +68,35 @@ public class ChessGame implements Cloneable{
                     movesHolder.add(singleMove);
                 }
             }
-
             return movesHolder;
+//        }else if(isInCheck( currentPiece.getTeamColor())) {
+
         }else{return null;}
     }
 
 
-    @Override
-    public ChessGame clone(){
-        try{
-            ChessGame clone = (ChessGame) super.clone();
+//    @Override
+//    public ChessGame clone(){
+//        try{
+//            ChessGame clone = (ChessGame) super.clone();
+//            clone.thisBoard = thisBoard.clone();
+//            return clone;
+//        } catch (CloneNotSupportedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
 
-            ChessBoard clonedChessBoard = (ChessBoard) getBoard().clone();
-            clone.setBoard(clonedChessBoard);
-
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
 
 
     public boolean placesKingInCheck(ChessMove move){
-        ChessBoard tempBoard = thisBoard.clone();
-//        thoughts: clone chess game w/ chess board makeMove. return boolean iskingincheck
 
-        return true;
+//        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean iskingincheck
+
+//        if(isInCheck(movePiece.getTeamColor())){
+//            return true;
+//        }
+        return false;
     }
 
 
@@ -106,11 +108,16 @@ public class ChessGame implements Cloneable{
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece movePiece = thisBoard.getPiece(move.getStartPosition());
-        if(movePiece.getTeamColor() != getTeamTurn() || (!validMoves(move.startPosition).contains(move))){
+        try {
+            if (movePiece.getTeamColor() != getTeamTurn() || (!validMoves(move.startPosition).contains(move))) {
+                throw new InvalidMoveException();
+            }
+            thisBoard.addPiece(move.getEndPosition(), movePiece);
+            thisBoard.addPiece(move.getStartPosition(), null);
+            turnTracker += 1;
+        } catch (NullPointerException e) {
             throw new InvalidMoveException();
         }
-        thisBoard.addPiece(move.getEndPosition(), movePiece);
-        turnTracker += 1;
     }
 
     /**
@@ -141,9 +148,10 @@ public class ChessGame implements Cloneable{
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++) {
                 ChessPiece threat = thisBoard.getPiece(new ChessPosition(i, j));
+
                 if (threat != null && threat.getTeamColor() != teamColor) {
                     ChessPosition threatPosition = new ChessPosition(i, j);
-                    Collection<ChessMove> threatPossibleMoves = validMoves(threatPosition);
+                    Collection<ChessMove> threatPossibleMoves = threat.pieceMoves(thisBoard, threatPosition);
                     for (ChessMove possibleMove : threatPossibleMoves){
                         if (kingRow == possibleMove.endPosition.getRow() && kingCol == possibleMove.endPosition.getColumn()) {
                             checkBool = true;
@@ -184,7 +192,7 @@ public class ChessGame implements Cloneable{
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        thisBoard = board;
+        this.thisBoard = board;
     }
 
     /**
