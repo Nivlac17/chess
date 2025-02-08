@@ -75,29 +75,39 @@ public class ChessGame implements Cloneable{
     }
 
 
-//    @Override
-//    public ChessGame clone(){
-//        try{
-//            ChessGame clone = (ChessGame) super.clone();
-//            clone.thisBoard = thisBoard.clone();
-//            return clone;
-//        } catch (CloneNotSupportedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
+    @Override
+    public ChessGame clone(){
+        try{
+            ChessGame clone = (ChessGame) super.clone();
+            clone.thisBoard = thisBoard.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
 
-    public boolean placesKingInCheck(ChessMove move){
+    public boolean placesKingInCheck(ChessMove move) {
 
 //        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean iskingincheck
-
-//        if(isInCheck(movePiece.getTeamColor())){
-//            return true;
-//        }
-        return false;
+        ChessGame tempGame = this.clone();
+        ChessBoard tempBoard = this.thisBoard.clone();
+        ChessPiece movePiece = tempBoard.getPiece(move.getStartPosition());
+//        ChessGame.TeamColor movePieceColor = movePiece.getTeamColor();
+        if (move.getPromotionPiece() == null) {
+            tempGame.thisBoard.addPiece(move.getEndPosition(), movePiece);
+        } else {
+            tempGame.thisBoard.addPiece(move.getEndPosition(), new ChessPiece(movePiece.getTeamColor(),move.getPromotionPiece()));
+        }
+        tempGame.thisBoard.addPiece(move.getStartPosition(), null);
+            if (tempGame.isInCheck(movePiece.getTeamColor())) {
+                return true;
+            }
+            return false;
     }
+
 
 
     /**
@@ -176,7 +186,10 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)){
+            return true;
+        }
+        return false;
     }
 
     /**
