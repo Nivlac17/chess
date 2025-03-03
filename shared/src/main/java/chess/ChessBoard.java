@@ -93,7 +93,7 @@ public class ChessBoard implements Cloneable{
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(squares);
+        return Arrays.deepHashCode(squares);
     }
 
 

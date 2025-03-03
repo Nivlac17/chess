@@ -1,5 +1,8 @@
 These are my notes!
 
+Heavenly Father is the greatest debuger.
+
+
 Oak was Created, Java Came from Oak. HotJava Browser Created. Netscap proceeded to support Java. oracle acquired Sun Microsystems, owner of Java.
 Java:
 Built in Garbage Collection -> self cleaning memory
@@ -7,6 +10,9 @@ References instead of pointers -> Safer and easyier than worrying about pointers
 Classes dynamically linked at runtime
 Java is hybrid, compiled/interpreted language
 
+
+Code Qualit:
+If it is difficult to think of a name, the method is doing too much.
 
 
 Java Code:
@@ -27,6 +33,17 @@ Cloneable to make a copy of an object. Cloneable is an interface so to use we do
 
 
 
+JUnit Testing:
+ @Test
+ @BeforeEach or @BeforeAll ---- i.e. beforeAll create chess game, beforeEach reset board
+ @AfterEach or @AfterAll
+ @Timeout(5)  is a break if takes more than 5 seconds.	
+ For testing directories, packages must exactly match
+
+
+
+
+
 
 JSON:
 [...] is an array
@@ -42,3 +59,8 @@ We need to build an interface to code the pieces -> most efficient and somewhat 
 Look into Records lecture to avoid toString() and @Override methods
 
 use Cloneable to check if king is in checkmate, take all of your moves, apply to a cloneable if move gets you out of check, return false i.e. your not in checkmate.
+
+add dependencies for sparkjava before implementation of phase 3.
+HTTP Method translates to the following examples i.e. spark.Delete or spark.post or 
+
+response.status 403 
