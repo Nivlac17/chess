@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -89,7 +88,7 @@ public class ChessGame implements Cloneable{
 
     public boolean placesKingInCheck(ChessMove move) {
 
-//        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean iskingincheck
+//        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean is king in check
         ChessGame tempGame = this.clone();
         ChessBoard tempBoard = this.thisBoard.clone();
         ChessPiece movePiece = tempBoard.getPiece(move.getStartPosition());
@@ -99,10 +98,7 @@ public class ChessGame implements Cloneable{
             tempGame.thisBoard.addPiece(move.getEndPosition(), new ChessPiece(movePiece.getTeamColor(),move.getPromotionPiece()));
         }
         tempGame.thisBoard.addPiece(move.getStartPosition(), null);
-            if (tempGame.isInCheck(movePiece.getTeamColor())) {
-                return true;
-            }
-            return false;
+        return tempGame.isInCheck(movePiece.getTeamColor());
     }
 
 
@@ -138,32 +134,18 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPosition;
-        boolean checkBool = false;
-        kingPosition = getKingPosition(teamColor);
-        int kingRow = kingPosition.getRow();
-        int kingCol = kingPosition.getColumn();
+        ChessPosition kingPosition = getKingPosition(teamColor);
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++) {
-                ChessPiece threat = thisBoard.getPiece(new ChessPosition(i, j));
-
-                if (threat != null && threat.getTeamColor() != teamColor) {
-                    ChessPosition threatPosition = new ChessPosition(i, j);
-                    Collection<ChessMove> threatPossibleMoves = threat.pieceMoves(thisBoard, threatPosition);
-                    for (ChessMove possibleMove : threatPossibleMoves){
-                        if (kingRow == possibleMove.endPosition.getRow() && kingCol == possibleMove.endPosition.getColumn()) {
-                            checkBool = true;
-                            break;
-                        }
-                    }
+                if (isThreat(i,j,teamColor,kingPosition)){
+                    return true;
                 }
             }
-            if(checkBool){break;}
         }
-        return checkBool;
+        return false;
     }
 
-    public ChessPosition getKingPosition(TeamColor teamColor){
+    ChessPosition getKingPosition(TeamColor teamColor){
         ChessPosition kingPosition = new ChessPosition(1,1);
         boolean foundKingBool = false;
         ChessPiece king;
@@ -183,6 +165,20 @@ public class ChessGame implements Cloneable{
         return kingPosition;
     }
 
+    boolean isThreat(int i, int j, TeamColor teamColor, ChessPosition kingPosition){
+        ChessPiece threat = thisBoard.getPiece(new ChessPosition(i, j));
+        if (threat != null && threat.getTeamColor() != teamColor) {
+            ChessPosition threatPosition = new ChessPosition(i, j);
+            Collection<ChessMove> threatPossibleMoves = threat.pieceMoves(thisBoard, threatPosition);
+            for (ChessMove possibleMove : threatPossibleMoves){
+                if (kingPosition.getRow() == possibleMove.endPosition.getRow()
+                        && kingPosition.getColumn() == possibleMove.endPosition.getColumn()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Determines if the given team is in checkmate
@@ -194,18 +190,25 @@ public class ChessGame implements Cloneable{
         if (isInCheck(teamColor)){
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
-                    ChessPiece pieceToCheck = thisBoard.getPiece(new ChessPosition(i, j));
-                    if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
-                        Collection<ChessMove> protectKingMoves = pieceToCheck.pieceMoves(thisBoard, new ChessPosition(i,j));
-                        for (ChessMove protectKingMove : protectKingMoves) {
-                            if (!placesKingInCheck(protectKingMove)) {
-                                return false;
-                            }
-                        }
+                    if (isValidMove(i,j,teamColor)){
+                        return false;
                     }
                 }
             }
             return true;
+        }
+        return false;
+    }
+
+    boolean isValidMove(int i, int j, TeamColor teamColor){
+        ChessPiece pieceToCheck = thisBoard.getPiece(new ChessPosition(i, j));
+        if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
+            Collection<ChessMove> protectKingMoves = pieceToCheck.pieceMoves(thisBoard, new ChessPosition(i,j));
+            for (ChessMove protectKingMove : protectKingMoves) {
+                if (!placesKingInCheck(protectKingMove)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -221,19 +224,26 @@ public class ChessGame implements Cloneable{
         if (!isInCheck(teamColor)){
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
-                    ChessPosition location = new ChessPosition(i, j);
-                    ChessPiece pieceToCheck = thisBoard.getPiece(location);
-                    if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
-                        Collection<ChessMove> protectKingMoves = validMoves(location);
-                        for (ChessMove protectKingMove : protectKingMoves) {
-                            if (!placesKingInCheck(protectKingMove)) {
-                                return false;
-                            }
-                        }
+                    if (isFreshMove(i,j,teamColor)){
+                        return false;
                     }
                 }
             }
             return true;
+        }
+        return false;
+    }
+
+    boolean isFreshMove(int i, int j, TeamColor teamColor){
+        ChessPosition location = new ChessPosition(i, j);
+        ChessPiece pieceToCheck = thisBoard.getPiece(location);
+        if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
+            Collection<ChessMove> protectKingMoves = validMoves(location);
+            for (ChessMove protectKingMove : protectKingMoves) {
+                if (!placesKingInCheck(protectKingMove)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
