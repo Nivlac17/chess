@@ -92,6 +92,6 @@ public class ChessPiece implements Cloneable{
 
             default -> {return Collections.emptyList();}
         }
-        return moves.PieceMovesCalculaterInterface(board, myPosition);
+        return moves.calculatePieceMoves(board, myPosition);
     }
 }

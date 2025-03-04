@@ -6,7 +6,7 @@ import java.util.Collection;
 import static chess.ChessGame.TeamColor.WHITE;
 
 public interface PieceMovesCalculatorInterface {
-    Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition);
+    Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition);
 }
 
 class PieceMovesCalculator{
@@ -16,7 +16,7 @@ class PieceMovesCalculator{
 
 
 class BishopMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
@@ -55,7 +55,7 @@ class BishopMovesCalculator extends PieceMovesCalculator implements PieceMovesCa
 
 
 class KingMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
@@ -89,7 +89,7 @@ class KingMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
 
 
 class KnightMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
@@ -123,7 +123,7 @@ class KnightMovesCalculator extends PieceMovesCalculator implements PieceMovesCa
 
 
 class RookMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
@@ -162,7 +162,7 @@ class RookMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
 
 
 class QueenMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
@@ -201,7 +201,7 @@ class QueenMovesCalculator extends PieceMovesCalculator implements PieceMovesCal
 
 
 class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalculatorInterface{
-    public Collection<ChessMove> PieceMovesCalculaterInterface(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> calculatePieceMoves(ChessBoard board, ChessPosition myPosition) {
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
