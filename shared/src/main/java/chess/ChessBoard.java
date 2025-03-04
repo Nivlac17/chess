@@ -10,8 +10,11 @@ import java.util.Arrays;
  */
 public class ChessBoard implements Cloneable{
     public ChessPiece[][] squares = new ChessPiece[8][8];
+
     public ChessBoard() {
-        
+        /*
+        Blank Method
+         */
     }
 
     /**
@@ -42,8 +45,8 @@ public class ChessBoard implements Cloneable{
      */
     public void resetBoard() {
 //        remove existing pieces
-        for (int i = 0; i < squares.length; i++ ){
-            Arrays.fill(squares[i], null);
+        for (ChessPiece[] square : squares) {
+            Arrays.fill(square, null);
         }
 // White
         addPiece(new ChessPosition(1,1), new ChessPiece(ChessGame.TeamColor.WHITE ,ChessPiece.PieceType.ROOK));
