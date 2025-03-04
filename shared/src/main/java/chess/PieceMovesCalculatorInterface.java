@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import static chess.ChessGame.TeamColor.WHITE;
 
@@ -205,14 +206,14 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
         this.row = myPosition.getRow();
         this.col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
-        boolean IsWhite = false;
+        boolean isWhite = false;
         if(currentPiece.getTeamColor() == WHITE){
-            IsWhite = true;
+            isWhite = true;
         }
 
         Collection<ChessMove> moves = new ArrayList<>();
         int futureRow;
-        if(IsWhite) {
+        if(isWhite) {
             futureRow = this.row + 1;
         } else {
             futureRow = this.row -1;
@@ -222,22 +223,15 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
             ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
             ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
             if (pieceInFuturePosition == null) {
-                if(futureRow == 8 || futureRow == 1){
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.QUEEN));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.ROOK));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.KNIGHT));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.BISHOP));
-                }else {
-                    moves.add(new ChessMove(myPosition, futurePosition, null));
-                }
-                if (this.row == 2 && IsWhite) {
+                addPawnMoveOrPromotionToCollection(myPosition,futurePosition,moves);
+                if (this.row == 2 && isWhite) {
                     futureRow = 4;
                     futurePosition = new ChessPosition(futureRow, futureCol);
                     pieceInFuturePosition = board.getPiece(futurePosition);
                     if (pieceInFuturePosition == null) {
                         moves.add(new ChessMove(myPosition, futurePosition, null));
                     }
-                } else if ((this.row == 7 && !IsWhite)) {
+                } else if ((this.row == 7 && !isWhite)) {
                     futureRow = 5;
                     futurePosition = new ChessPosition(futureRow, futureCol);
                     pieceInFuturePosition = board.getPiece(futurePosition);
@@ -246,57 +240,46 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
                     }
                 }
             }
-
-
         }
-//        Attack Right
-        if(IsWhite) {
+        //        Attack Right if White
+        if(isWhite) {
             futureRow = this.row + 1;
         } else {
             futureRow = this.row -1;
         }
-
-        futureCol = this.col + 1;
-        if (!(futureRow > 8 || futureCol > 8 || futureRow <=0 || futureCol <=0 )){
-            ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
-            ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
-            if (pieceInFuturePosition != null && pieceInFuturePosition.getTeamColor() != currentPiece.getTeamColor()) {
-                if(futureRow == 8 || futureRow == 1){
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.QUEEN));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.ROOK));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.KNIGHT));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.BISHOP));
-                }else {
-                    moves.add(new ChessMove(myPosition, futurePosition, null));
-                }            }
-        }
-
-
-        //        Attack Left
-        if(IsWhite) {
+        attackDiagonal(futureRow, this.col + 1, board, moves, myPosition);
+        //        Attack Left if White
+        if(isWhite) {
             futureRow = this.row + 1;
         } else {
             futureRow = this.row -1;
         }
-
-        futureCol = this.col - 1;
-        if (!(futureRow > 8 || futureCol > 8 || futureRow <=0 || futureCol <=0 )){
-            ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
-            ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
-            if (pieceInFuturePosition != null && pieceInFuturePosition.getTeamColor() != currentPiece.getTeamColor()) {
-                if(futureRow == 8 || futureRow == 1){
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.QUEEN));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.ROOK));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.KNIGHT));
-                    moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.BISHOP));
-                }else {
-                    moves.add(new ChessMove(myPosition, futurePosition, null));
-                }            }
-        }
+        attackDiagonal(futureRow, this.col - 1, board, moves, myPosition);
 
 
 
 
         return moves;
     }
+    void attackDiagonal(int futureRow, int futureCol, ChessBoard board, Collection<ChessMove> moves, ChessPosition myPosition){
+        if (!(futureRow > 8 || futureCol > 8 || futureRow <=0 || futureCol <=0 )){
+            ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
+            ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
+            if (pieceInFuturePosition != null && pieceInFuturePosition.getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
+                addPawnMoveOrPromotionToCollection(myPosition,futurePosition,moves);
+            }
+        }
+    }
+    void addPawnMoveOrPromotionToCollection(ChessPosition myPosition, ChessPosition futurePosition, Collection<ChessMove> moves){
+        if(futurePosition.getRow() == 8 || futurePosition.getRow() == 1){
+            moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.QUEEN));
+            moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.ROOK));
+            moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.KNIGHT));
+            moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.BISHOP));
+        }else {
+            moves.add(new ChessMove(myPosition, futurePosition, null));
+        }
+    }
 }
+
+
