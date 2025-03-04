@@ -129,10 +129,7 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         ChessPiece currentPiece = board.getPiece(myPosition);
-        boolean isWhite = false;
-        if(currentPiece.getTeamColor() == WHITE){
-            isWhite = true;
-        }
+        boolean isWhite = currentPiece.getTeamColor() == WHITE;
 
         Collection<ChessMove> moves = new ArrayList<>();
         int futureRow;
@@ -141,27 +138,12 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
         } else {
             futureRow = row -1;
         }
-        int futureCol = col;
-        if (!(futureRow > 8 || futureCol > 8 || futureRow <=0 || futureCol <=0 )){
-            ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
+        if (!(futureRow > 8 || col > 8 || futureRow <=0 || col <=0 )){
+            ChessPosition futurePosition = new ChessPosition(futureRow,col);
             ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
             if (pieceInFuturePosition == null) {
                 addPawnMoveOrPromotionToCollection(myPosition,futurePosition,moves);
-                if (row == 2 && isWhite) {
-                    futureRow = 4;
-                    futurePosition = new ChessPosition(futureRow, futureCol);
-                    pieceInFuturePosition = board.getPiece(futurePosition);
-                    if (pieceInFuturePosition == null) {
-                        moves.add(new ChessMove(myPosition, futurePosition, null));
-                    }
-                } else if ((row == 7 && !isWhite)) {
-                    futureRow = 5;
-                    futurePosition = new ChessPosition(futureRow, futureCol);
-                    pieceInFuturePosition = board.getPiece(futurePosition);
-                    if (pieceInFuturePosition == null) {
-                        moves.add(new ChessMove(myPosition, futurePosition, null));
-                    }
-                }
+                movePawnForward2IfStart(row, col, isWhite, board, myPosition,moves);
             }
         }
         //        Attack Right if White
@@ -184,6 +166,26 @@ class PawnMovesCalculator extends PieceMovesCalculator implements PieceMovesCalc
 
         return moves;
     }
+
+
+    void movePawnForward2IfStart(int row, int col, boolean isWhite, ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves){
+        if (row == 2 && isWhite) {
+            int futureRow = 4;
+            ChessPosition futurePosition = new ChessPosition(futureRow, col);
+            ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
+            if (pieceInFuturePosition == null) {
+                moves.add(new ChessMove(myPosition, futurePosition, null));
+            }
+        } else if ((row == 7 && !isWhite)) {
+            int futureRow = 5;
+            ChessPosition futurePosition = new ChessPosition(futureRow, col);
+            ChessPiece pieceInFuturePosition = board.getPiece(futurePosition);
+            if (pieceInFuturePosition == null) {
+                moves.add(new ChessMove(myPosition, futurePosition, null));
+            }
+        }
+    }
+
     void attackDiagonal(int futureRow, int futureCol, ChessBoard board, Collection<ChessMove> moves, ChessPosition myPosition){
         if (!(futureRow > 8 || futureCol > 8 || futureRow <=0 || futureCol <=0 )){
             ChessPosition futurePosition = new ChessPosition(futureRow,futureCol);
