@@ -9,9 +9,13 @@ public class Main {
         int port = 8080;
         server.Server server8080 = new server.Server();
         server8080.run(port);
-        
-        System.out.println("♕ Chess Server Running ");
+        System.out.println("♕ Chess Server Running on port: " + port);
+//        Spark.get("/myPage", (req, res) -> "sup");
 
-        Spark.get("/myPage", (req, res) -> "sup");
+
+
+
+
+
     }
 }
