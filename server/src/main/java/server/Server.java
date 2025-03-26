@@ -1,5 +1,7 @@
 package server;
 
+import com.google.gson.Gson;
+import service.ChessService;
 import spark.*;
 
 public class Server {
@@ -17,6 +19,9 @@ public class Server {
         Spark.delete("/session", this::logOut);
         Spark.get("/game", this::listGames);
         Spark.put("/game", this::joinGame);
+        Spark.post("/game", this::createGame);
+
+//        Spark.exception(HttpResponseException.class, this::exceptionHandler);
 
 
         
@@ -31,9 +36,14 @@ public class Server {
     }
 
 
-// Handlers
+
+    // Handlers
     private Object registerUser(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
+        Gson serializer = new Gson();
+        var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
+        System.out.println(registerRequest.username());
+        ChessService.register(registerRequest);
+        return "";
     }
 
     private Object clearApplication(Request request, Response response) {
@@ -57,6 +67,14 @@ public class Server {
         throw new RuntimeException("Not Implemented");
 
     }
+
+
+    private Object createGame(Request request, Response response) {
+        throw new RuntimeException("Not Implemented");
+
+    }
+
+
 
 
 
