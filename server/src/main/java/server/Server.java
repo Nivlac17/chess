@@ -26,8 +26,6 @@ public class Server {
         Spark.post("/game", this::createGame);
 //        Spark.exception(ResponseException.class, this::exceptionHandler);
 
-        
-
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -40,6 +38,17 @@ public class Server {
 
 
     // Handlers
+    private Object clearApplication(Request request, Response response) throws DataAccessException {
+        try {
+            return ChessService.clear();
+        } catch (DataAccessException e ){
+//            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message", e.getMessage()));
+        }
+
+    }
+
+
     private Object registerUser(Request request, Response response) {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
@@ -49,14 +58,13 @@ public class Server {
             return serializer.toJson(registerResult);
         } catch (DataAccessException e ) {
             response.status(e.getStatus());
-            return new Gson().toJson(Map.of("Error", e.getMessage()));
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
 
         }
     }
 
-    private Object clearApplication(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
-    }
+
+
 
     private Object logIn(Request request, Response response) {
         throw new RuntimeException("Not Implemented");
