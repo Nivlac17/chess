@@ -1,18 +1,23 @@
 package dataaccess;
 
-public class DataAccessMethods {
+public class DataAccessMethods implements DataAccessInterface{
 
-    public static String getUser(String username) {
+    public static String getUser(String username) throws DataAccessException {
 //        search DB for username
-//        if username in db: return Failure response	[403] { "message": "Error: already taken" }
-//        else
-        return null;
+        if(registeredUsers.get(username) == null ){
+            return null;
+
+        } else {
+            throw new DataAccessException("Error: Username " + username + " is taken.");
+        }
     }
 
 
     public static void createUser(model.UserData userData) {
 //    create user object, add to db
-        System.out.println(userData);
+        registeredUsers.put(userData.username(), userData);
+
+//        System.out.println(userData);
     }
 
 

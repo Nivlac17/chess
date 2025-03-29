@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import model.AuthData;
 import service.ChessService;
 import spark.*;
 
@@ -20,9 +22,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.put("/game", this::joinGame);
         Spark.post("/game", this::createGame);
-
 //        Spark.exception(HttpResponseException.class, this::exceptionHandler);
-
 
         
 
@@ -38,12 +38,12 @@ public class Server {
 
 
     // Handlers
-    private Object registerUser(Request request, Response response) {
+    private Object registerUser(Request request, Response response) throws DataAccessException {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
-        System.out.println(registerRequest.username());
-        ChessService.register(registerRequest);
-        return "";
+        System.out.println("creating account for: " + registerRequest.username());
+        AuthData registerResult = ChessService.register(registerRequest);
+        return serializer.toJson(registerResult);
     }
 
     private Object clearApplication(Request request, Response response) {
