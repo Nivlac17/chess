@@ -6,6 +6,8 @@ import model.AuthData;
 import service.ChessService;
 import spark.*;
 
+import java.util.Map;
+
 public class Server {
 
     public int run(int desiredPort) {
@@ -22,7 +24,7 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.put("/game", this::joinGame);
         Spark.post("/game", this::createGame);
-//        Spark.exception(HttpResponseException.class, this::exceptionHandler);
+//        Spark.exception(ResponseException.class, this::exceptionHandler);
 
         
 
@@ -38,12 +40,18 @@ public class Server {
 
 
     // Handlers
-    private Object registerUser(Request request, Response response) throws DataAccessException {
+    private Object registerUser(Request request, Response response) {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
         System.out.println("creating account for: " + registerRequest.username());
-        AuthData registerResult = ChessService.register(registerRequest);
-        return serializer.toJson(registerResult);
+        try {
+            var registerResult = ChessService.register(registerRequest);
+            return serializer.toJson(registerResult);
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("Error", e.getMessage()));
+
+        }
     }
 
     private Object clearApplication(Request request, Response response) {
