@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.UserData;
 
 public class DataAccessMethods implements DataAccessInterface{
 
@@ -16,14 +17,9 @@ public class DataAccessMethods implements DataAccessInterface{
     }
 
 
-    public static String getUser(String username) throws DataAccessException {
+    public static UserData getUser(String username) {
 //        search DB for username
-        if(registeredUsers.get(username) == null ){
-            return null;
-
-        } else {
-            throw new DataAccessException("Error: Username " + username + " is taken.", 403);
-        }
+        return registeredUsers.get(username);
     }
 
 

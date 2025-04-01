@@ -42,24 +42,21 @@ public class Server {
         try {
             return ChessService.clear();
         } catch (DataAccessException e ){
-//            response.status(e.getStatus());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
-
     }
 
 
     private Object registerUser(Request request, Response response) {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
-        System.out.println("creating account for: " + registerRequest.username());
+//        System.out.println("creating account for: " + registerRequest.username());
         try {
             var registerResult = ChessService.register(registerRequest);
             return serializer.toJson(registerResult);
         } catch (DataAccessException e ) {
             response.status(e.getStatus());
             return new Gson().toJson(Map.of("message" , e.getMessage()));
-
         }
     }
 
@@ -67,7 +64,16 @@ public class Server {
 
 
     private Object logIn(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
+        Gson serializer = new Gson();
+        var logInRequest = serializer.fromJson(request.body(), model.UserData.class);
+//        System.out.println("Log In Request for: " + logInRequest);
+        try {
+            var logInResult = ChessService.logIn(logInRequest);
+            return serializer.toJson(logInResult);
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
+        }
     }
 
     private Object logOut(Request request, Response response) {
