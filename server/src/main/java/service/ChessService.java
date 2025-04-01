@@ -7,6 +7,7 @@ import model.AuthData;
 import java.util.UUID;
 
 public class ChessService {
+
     public static String clear() throws DataAccessException {
         try {
             return DataAccessMethods.clear();
@@ -16,7 +17,7 @@ public class ChessService {
     }
 
     public static AuthData register(model.UserData registerRequest) throws DataAccessException {
-        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null){
+        if ( registerRequest.username().isEmpty()  || registerRequest.password().isEmpty()  || registerRequest.email().isEmpty()){
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
         try {
@@ -34,7 +35,8 @@ public class ChessService {
         return null;
     }
 
-    public static String generateAuthToken() {
+
+    private static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
 }
