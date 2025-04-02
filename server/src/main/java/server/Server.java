@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import model.GameData;
 import service.ChessService;
 import spark.*;
 
@@ -85,13 +86,21 @@ public class Server {
         } catch (DataAccessException e ) {
             response.status(e.getStatus());
             return new Gson().toJson(Map.of("message" , e.getMessage()));
-        }    }
+        }
+    }
 
 
 
     private Object listGames(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
-
+        Gson serializer = new Gson();
+        String token = request.headers("Authorization");
+        try {
+            model.GameData listGamesResult = (GameData) ChessService.listGames(token);
+            return serializer.toJson(listGamesResult);
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
+        }
     }
 
     private Object joinGame(Request request, Response response) {
@@ -101,8 +110,16 @@ public class Server {
 
 
     private Object createGame(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
-
+        Gson serializer = new Gson();
+        String token = request.headers("Authorization");
+        var createGameRequest = serializer.fromJson(request.body(), model.GameData.class);
+        try {
+            int createGameResult = ChessService.createGame(token, createGameRequest);
+            return serializer.toJson(Map.of("gameID", createGameResult));
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
+        }
     }
 
 

@@ -1,7 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+
+import java.util.Map;
 
 public class DataAccessMethods implements DataAccessInterface{
 
@@ -39,8 +43,17 @@ public class DataAccessMethods implements DataAccessInterface{
     }
 
 
-    public static void deleteAuth(String token) {
+    public static AuthData deleteAuth(String token) {
         allAuthData.remove(token);
-        System.out.println(allAuthData);
+        return allAuthData.get(token);
+    }
+
+    public static Map<String, GameData> listGames() {
+        return createdGames;
+    }
+
+
+    public static void createGame(int gameID, String gameName, ChessGame game) {
+        createdGames.put(gameName, new GameData(gameID,null, null, gameName, game));
     }
 }

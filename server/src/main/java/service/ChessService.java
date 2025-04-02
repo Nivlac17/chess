@@ -1,10 +1,13 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessMethods;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class ChessService {
@@ -66,6 +69,38 @@ public class ChessService {
         }
         DataAccessMethods.deleteAuth(token);
         return "";
+    }
+
+
+    public static Object listGames(String token) throws DataAccessException {
+        AuthData authData = DataAccessMethods.getAuth(token);
+        System.out.println(authData);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        return DataAccessMethods.listGames();
+    }
+
+    public static int createGame(String token, GameData createGameRequest) throws DataAccessException{
+        AuthData authData = DataAccessMethods.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        String gameName = createGameRequest.gameName();
+        ChessGame game = new ChessGame();
+        int gameID = generateGameID();
+        DataAccessMethods.createGame(gameID, gameName, game);
+
+        return gameID;
+    }
+
+    private static int generateGameID() {
+        Map<String, GameData> gameDataList = DataAccessMethods.listGames();
+        int idnum = 1;
+        for ( GameData game:  gameDataList.values()){
+            idnum++;
+        }
+        return idnum + 1;
     }
 }
 
