@@ -2,11 +2,12 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import model.AuthData;
 import model.GameData;
+import model.JoinGame;
 import service.ChessService;
 import spark.*;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class Server {
@@ -95,7 +96,7 @@ public class Server {
         Gson serializer = new Gson();
         String token = request.headers("Authorization");
         try {
-            model.GameData listGamesResult = (GameData) ChessService.listGames(token);
+            var listGamesResult = ChessService.listGames(token);
             return serializer.toJson(listGamesResult);
         } catch (DataAccessException e ) {
             response.status(e.getStatus());
@@ -104,8 +105,17 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
+        Gson serializer = new Gson();
+        String token = request.headers("Authorization");
+        JoinGame joinGameRequest = serializer.fromJson(request.body(), model.JoinGame.class);
 
+        try {
+            ChessService.joinGame(token, joinGameRequest);
+            return "";
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
+        }
     }
 
 

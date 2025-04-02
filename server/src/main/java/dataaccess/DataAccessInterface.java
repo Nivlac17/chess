@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface DataAccessInterface {
     Map<String, UserData> registeredUsers = new HashMap<>();
-    Map<String, GameData> createdGames = new HashMap<>();
+    Map<Integer, GameData> createdGames = new HashMap<>();
     Map<String, AuthData> allAuthData = new HashMap<>();
 }

@@ -3,10 +3,11 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessMethods;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
+import javax.xml.crypto.Data;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -78,7 +79,8 @@ public class ChessService {
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
-        return DataAccessMethods.listGames();
+        Collection<model.GameList> listGamesResult = DataAccessMethods.listGames();
+        return listGamesResult;
     }
 
     public static int createGame(String token, GameData createGameRequest) throws DataAccessException{
@@ -95,12 +97,29 @@ public class ChessService {
     }
 
     private static int generateGameID() {
-        Map<String, GameData> gameDataList = DataAccessMethods.listGames();
+        Collection<GameList> gameDataList = DataAccessMethods.listGames();
+        System.out.println(gameDataList + "right here");
         int idnum = 1;
-        for ( GameData game:  gameDataList.values()){
+        for ( GameList game:  gameDataList){
             idnum++;
         }
         return idnum + 1;
+    }
+
+
+    public static void joinGame(String token, JoinGame joinGameRequest) throws DataAccessException {
+        AuthData authData = DataAccessMethods.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        GameData game = DataAccessMethods.getGame(joinGameRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        }
+        if (joinGameRequest.playerColor().equals("White") && game.whiteUsername() == null){
+            DataAccessMethods.updateGame(game.gameID(),joinGameRequest.playerColor(),null, null, null);
+
+        }
     }
 }
 
