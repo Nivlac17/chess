@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,11 @@ public class ChessServiceTests {
 ////       chessService.register(new UserData("t","o","m"));
 //    }
 
+//    @AfterAll
+//    static void stopServer() throws DataAccessException {
+//        ChessService.clear();
+//    }
+
 
     @Test
     @DisplayName("Clear Data Test")
@@ -24,6 +30,8 @@ public class ChessServiceTests {
         ChessService.register(new UserData("t","o","m"));
         ChessService.clear();
         assertNotNull(ChessService.register(new UserData("t","o","m")));
+        ChessService.clear();
+
     }
 
 
@@ -35,7 +43,7 @@ public class ChessServiceTests {
         AuthData testAuthData = ChessService.register(testUser);
         assertNotNull(testAuthData);
         assertEquals("Calvin", testAuthData.username());
-
+        ChessService.clear();
     }
 
     @Test
@@ -54,7 +62,7 @@ public class ChessServiceTests {
         Exception exception2 = assertThrows(DataAccessException.class, () -> ChessService.register(testUser2));
         assertEquals("Error: Username Username is taken.", exception2.getMessage());
 
-
+        ChessService.clear();
     }
 
 
@@ -67,14 +75,14 @@ public class ChessServiceTests {
         AuthData authDataActual = ChessService.logIn(testUserLogIn);
         assertEquals( "username",authDataActual.username());
         assertNotNull(authDataActual.authToken());
-
+        ChessService.clear();
     }
 
 
     @Test
     @DisplayName("LogIn User Negative Test")
     void logInNegativeTest() throws DataAccessException {
-        UserData testUser = new UserData("username", "Password", "email@email.com");
+        UserData testUser = new UserData("username1", "Password1", "email@email.com1");
         ChessService.register(testUser);
 
         UserData testUserFake = new UserData("stan", "Password", "email@email.com");
@@ -85,10 +93,33 @@ public class ChessServiceTests {
         Exception exception1 = assertThrows(DataAccessException.class, () -> ChessService.logIn(testUserFake1));
         assertEquals("Error: Incomplete Information!!!", exception1.getMessage());
 
-        UserData testUserFake2 = new UserData("username", "fake_password", "email@email.com");
+        UserData testUserFake2 = new UserData("username1", "fake_password", "email@email.com");
         Exception exception2 = assertThrows(DataAccessException.class, () -> ChessService.logIn(testUserFake2));
         assertEquals("Error: invalid credentials", exception2.getMessage());
 
+        ChessService.clear();
+
+    }
+
+
+
+    @Test
+    @DisplayName("Logout Positive Test")
+    void logOutPositiveTest() throws DataAccessException {
+        ChessService chessService = new ChessService();
+        UserData testUser = new UserData("username", "password", "email@email.com");
+        AuthData authData = chessService.register(testUser);
+        assertEquals("", chessService.logOut(authData.authToken()));
+        ChessService.clear();
+    }
+
+
+    @Test
+    @DisplayName("LogOut User Negative Test")
+    void logOutNegativeTest() throws DataAccessException {
+        Exception exception = assertThrows(DataAccessException.class, () -> ChessService.logOut("d234rft"));
+        assertEquals("Error: unauthorized", exception.getMessage());
+        ChessService.clear();
 
     }
 

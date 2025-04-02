@@ -30,10 +30,17 @@ public class DataAccessMethods implements DataAccessInterface{
     }
 
 
-    public static void createAuth(String username, AuthData authData) {
-        allAuthData.put(username, authData);
+    public static void createAuth(AuthData authData) {
+        allAuthData.put(authData.authToken(), authData);
+    }
+
+    public static AuthData getAuth(String token) {
+        return allAuthData.get(token);
     }
 
 
-
+    public static void deleteAuth(String token) {
+        allAuthData.remove(token);
+        System.out.println(allAuthData);
+    }
 }

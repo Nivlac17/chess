@@ -18,13 +18,15 @@ public class ChessService {
     }
 
     public static AuthData register(model.UserData registerRequest) throws DataAccessException {
-        if ( registerRequest.username().isEmpty()  || registerRequest.password().isEmpty()  || registerRequest.email().isEmpty()){
+        if (registerRequest.password() == null || registerRequest.username() == null) {
+            throw new DataAccessException("Error: Invalid User", 400);
+        } else if ( registerRequest.username().isEmpty()  || registerRequest.password().isEmpty()  || registerRequest.email().isEmpty()){
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
             if (dataaccess.DataAccessMethods.getUser(registerRequest.username()) == null) {
                 DataAccessMethods.createUser(registerRequest);
                 AuthData registerResult = new AuthData(generateAuthToken(), registerRequest.username());
-                DataAccessMethods.createAuth(registerRequest.username(), registerResult);
+                DataAccessMethods.createAuth(registerResult);
                 System.out.println(DataAccessMethods.registeredUsers);
                 return registerResult;
             } else {
@@ -51,9 +53,19 @@ public class ChessService {
             throw new DataAccessException("Error: invalid credentials", 401);
         }else {
             AuthData logInResult = new AuthData(generateAuthToken(), logInRequest.username());
-            DataAccessMethods.createAuth(logInRequest.username(), logInResult);
+            DataAccessMethods.createAuth(logInResult);
             return logInResult;
         }
+    }
+
+    public static Object logOut(String token) throws DataAccessException {
+        AuthData authData = DataAccessMethods.getAuth(token);
+        System.out.println(authData);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        DataAccessMethods.deleteAuth(token);
+        return "";
     }
 }
 

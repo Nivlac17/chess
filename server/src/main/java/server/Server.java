@@ -47,6 +47,7 @@ public class Server {
     }
 
 
+
     private Object registerUser(Request request, Response response) {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
@@ -62,11 +63,9 @@ public class Server {
 
 
 
-
     private Object logIn(Request request, Response response) {
         Gson serializer = new Gson();
         var logInRequest = serializer.fromJson(request.body(), model.UserData.class);
-//        System.out.println("Log In Request for: " + logInRequest);
         try {
             var logInResult = ChessService.logIn(logInRequest);
             return serializer.toJson(logInResult);
@@ -76,9 +75,19 @@ public class Server {
         }
     }
 
+
+
     private Object logOut(Request request, Response response) {
-        throw new RuntimeException("Not Implemented");
-    }
+        String token = request.headers("Authorization");
+        try {
+            ChessService.logOut(token);
+            return "";
+        } catch (DataAccessException e ) {
+            response.status(e.getStatus());
+            return new Gson().toJson(Map.of("message" , e.getMessage()));
+        }    }
+
+
 
     private Object listGames(Request request, Response response) {
         throw new RuntimeException("Not Implemented");
