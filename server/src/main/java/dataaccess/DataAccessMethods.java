@@ -13,9 +13,9 @@ public class DataAccessMethods implements DataAccessInterface{
 
     public static String clear() throws DataAccessException {
         try {
-            RegisteredUsers.clear();
-            CreatedGames.clear();
-            AllAuthData.clear();
+            Registered_Users.clear();
+            Created_Games.clear();
+            All_Auth_Data.clear();
         } catch (Exception e){
             throw new DataAccessException(e.getMessage(), 500);
         }
@@ -25,32 +25,32 @@ public class DataAccessMethods implements DataAccessInterface{
 
     public static UserData getUser(String username) {
 //        search DB for username
-        return RegisteredUsers.get(username);
+        return Registered_Users.get(username);
     }
 
 
     public static void createUser(UserData userData) {
 //    create user object, add to db
-        RegisteredUsers.put(userData.username(), userData);
+        Registered_Users.put(userData.username(), userData);
     }
 
 
     public static void createAuth(AuthData authData) {
-        AllAuthData.put(authData.authToken(), authData);
+        All_Auth_Data.put(authData.authToken(), authData);
     }
 
     public static AuthData getAuth(String token) {
-        return AllAuthData.get(token);
+        return All_Auth_Data.get(token);
     }
 
 
     public static void deleteAuth(String token) {
-        AllAuthData.remove(token);
+        All_Auth_Data.remove(token);
     }
 
     public static Collection<GameList> listGames() {
         Collection<model.GameList> gameList = new ArrayList<>();
-        for (GameData gameData : CreatedGames.values()){
+        for (GameData gameData : Created_Games.values()){
             gameList.add(new model.GameList(gameData.gameID(), gameData.whiteUsername(),
                     gameData.blackUsername(), gameData.gameName()));
         }
@@ -59,16 +59,16 @@ public class DataAccessMethods implements DataAccessInterface{
 
 
     public static void createGame(int gameID, String gameName, ChessGame game) {
-        CreatedGames.put(gameID, new GameData(gameID,null, null, gameName, game));
+        Created_Games.put(gameID, new GameData(gameID,null, null, gameName, game));
     }
 
     public static GameData getGame(int gameID) {
-        return CreatedGames.get(gameID);
+        return Created_Games.get(gameID);
     }
 
     public static void updateGame(int gameID, String whiteUsername, String blackUsername,
                                   String gameName, ChessGame game) {
-        GameData origonalGameData = CreatedGames.get(gameID);
+        GameData origonalGameData = Created_Games.get(gameID);
         if(whiteUsername != null){
             origonalGameData.setWhiteUsername(whiteUsername);
         }
