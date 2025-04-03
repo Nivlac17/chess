@@ -27,10 +27,6 @@ public class Server {
         Spark.post(stringVarToSatisfyQualityCode, this::createGame);
 
 
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
-
         Spark.awaitInitialization();
         return Spark.port();
     }

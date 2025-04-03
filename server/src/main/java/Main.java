@@ -1,5 +1,4 @@
 import chess.*;
-import spark.Spark;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,12 +9,6 @@ public class Main {
         server.Server server8080 = new server.Server();
         server8080.run(port);
         System.out.println("♕ Chess Server Running on port: " + port);
-//        Spark.get("/myPage", (req, res) -> "sup");
-
-
-
-
-
 
     }
 }

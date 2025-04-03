@@ -21,7 +21,8 @@ public class ChessService {
     public static AuthData register(model.UserData registerRequest) throws DataAccessException {
         if (registerRequest.password() == null || registerRequest.username() == null) {
             throw new DataAccessException("Error: Invalid User", 400);
-        } else if ( registerRequest.username().isEmpty()  || registerRequest.password().isEmpty()  || registerRequest.email().isEmpty()){
+        } else if ( registerRequest.username().isEmpty()  ||
+                registerRequest.password().isEmpty() || registerRequest.email().isEmpty()){
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
             if (dataaccess.DataAccessMethods.getUser(registerRequest.username()) == null) {
@@ -99,7 +100,7 @@ public class ChessService {
     private static int generateGameID() {
         Collection<GameList> gameDataList = DataAccessMethods.listGames();
         int idnum = 0;
-        for ( GameList game:  gameDataList){
+        for ( GameList ignored :  gameDataList){
             idnum++;
         }
         return idnum + 1;

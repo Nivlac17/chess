@@ -4,7 +4,7 @@ package dataaccess;
  * Indicates there was an error connecting to the database
  */
 public class DataAccessException extends Exception{
-    int status;
+    final int status;
     public DataAccessException(String message, int status) {
         super(message);
         this.status = status;
