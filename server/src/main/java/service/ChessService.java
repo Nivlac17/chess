@@ -112,18 +112,32 @@ public class ChessService {
             throw new DataAccessException("Error: unauthorized", 401);
         }
         GameData game = DataAccessMethods.getGame(joinGameRequest.gameID());
-        if (game == null) {
+        if (game == null ) {
             throw new DataAccessException("Error: bad request", 400);
         }
-        if (joinGameRequest.playerColor().equals("WHITE") && game.whiteUsername() == null){
-            DataAccessMethods.updateGame(game.gameID(),authData.username(),null, null, null);
-
-        } else if (joinGameRequest.playerColor().equals("BLACK") && game.blackUsername() == null){
-            DataAccessMethods.updateGame(game.gameID(),null,authData.username(), null, null);
-        } else {
-            throw new DataAccessException("Error: Forbidden", 403);
+        if (joinGameRequest.playerColor() == null){
+            throw new DataAccessException("Error: bad request", 400);
         }
-
+        switch (joinGameRequest.playerColor()) {
+            case "WHITE":
+            if (game.whiteUsername() == null) {
+                DataAccessMethods.updateGame(game.gameID(), authData.username(), null, null, null);
+            } else{
+                throw new DataAccessException("Error: already taken", 403);
+            }
+            break;
+            case "BLACK":
+                if (game.blackUsername() == null) {
+                DataAccessMethods.updateGame(game.gameID(), null, authData.username(), null, null);
+            } else {
+                throw new DataAccessException("Error: already taken", 403);
+            }
+                break;
+            default:
+            {
+                throw new DataAccessException("Error: Forbidden", 400);
+            }
+        }
     }
 }
 

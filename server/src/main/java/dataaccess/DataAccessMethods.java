@@ -74,7 +74,7 @@ public class DataAccessMethods implements DataAccessInterface{
             origonalGameData.setWhiteUsername(whiteUsername);
         }
         if(blackUsername != null){
-            origonalGameData.setBlackUsername(whiteUsername);
+            origonalGameData.setBlackUsername(blackUsername);
         }
 
 
