@@ -8,8 +8,6 @@ import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public class DataAccessMethods implements DataAccessInterface{
 
@@ -46,15 +44,15 @@ public class DataAccessMethods implements DataAccessInterface{
     }
 
 
-    public static AuthData deleteAuth(String token) {
+    public static void deleteAuth(String token) {
         allAuthData.remove(token);
-        return allAuthData.get(token);
     }
 
     public static Collection<GameList> listGames() {
         Collection<model.GameList> gameList = new ArrayList<>();
         for (GameData gameData : createdGames.values()){
-            gameList.add(new model.GameList(gameData.gameID(),gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName()));
+            gameList.add(new model.GameList(gameData.gameID(), gameData.whiteUsername(),
+                    gameData.blackUsername(), gameData.gameName()));
         }
         return gameList;
     }
@@ -68,13 +66,20 @@ public class DataAccessMethods implements DataAccessInterface{
         return createdGames.get(gameID);
     }
 
-    public static void updateGame(int gameID,String whiteUsername,String blackUsername, String gameName, ChessGame game) {
+    public static void updateGame(int gameID, String whiteUsername, String blackUsername,
+                                  String gameName, ChessGame game) {
         GameData origonalGameData = createdGames.get(gameID);
         if(whiteUsername != null){
             origonalGameData.setWhiteUsername(whiteUsername);
         }
         if(blackUsername != null){
             origonalGameData.setBlackUsername(blackUsername);
+        }
+        if(gameName != null){
+            origonalGameData.setGameName(gameName);
+        }
+        if(game != null){
+            origonalGameData.setGame(game);
         }
 
 

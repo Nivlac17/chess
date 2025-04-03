@@ -5,10 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.DataAccessMethods;
 import model.*;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class ChessService {
@@ -31,7 +28,6 @@ public class ChessService {
                 DataAccessMethods.createUser(registerRequest);
                 AuthData registerResult = new AuthData(generateAuthToken(), registerRequest.username());
                 DataAccessMethods.createAuth(registerResult);
-                System.out.println(DataAccessMethods.registeredUsers);
                 return registerResult;
             } else {
                 throw new DataAccessException("Error: Username " + registerRequest.username() + " is taken.", 403);
@@ -64,9 +60,8 @@ public class ChessService {
 
     public static Object logOut(String token) throws DataAccessException {
         AuthData authData = DataAccessMethods.getAuth(token);
-        System.out.println(authData);
         if (authData == null) {
-            throw new DataAccessException("Error: unauthorized", 401);
+            throw new DataAccessException("Error: unauthorized log out", 401);
         }
         DataAccessMethods.deleteAuth(token);
         return "";
@@ -75,20 +70,24 @@ public class ChessService {
 
     public static Object listGames(String token) throws DataAccessException {
         AuthData authData = DataAccessMethods.getAuth(token);
-        System.out.println(authData);
         if (authData == null) {
-            throw new DataAccessException("Error: unauthorized", 401);
+            throw new DataAccessException("Error: unauthorized request to list games", 401);
         }
-        Collection<model.GameList> listGamesResult = DataAccessMethods.listGames();
-        return listGamesResult;
+        return DataAccessMethods.listGames();
     }
+
 
     public static int createGame(String token, GameData createGameRequest) throws DataAccessException{
         AuthData authData = DataAccessMethods.getAuth(token);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
+
         String gameName = createGameRequest.gameName();
+        if (gameName.isEmpty()) {
+            throw new DataAccessException("Error: bad request, no game name", 400);
+        }
+
         ChessGame game = new ChessGame();
         int gameID = generateGameID();
         DataAccessMethods.createGame(gameID, gameName, game);
@@ -96,9 +95,10 @@ public class ChessService {
         return gameID;
     }
 
+
     private static int generateGameID() {
         Collection<GameList> gameDataList = DataAccessMethods.listGames();
-        int idnum = 1;
+        int idnum = 0;
         for ( GameList game:  gameDataList){
             idnum++;
         }
@@ -118,6 +118,7 @@ public class ChessService {
         if (joinGameRequest.playerColor() == null){
             throw new DataAccessException("Error: bad request", 400);
         }
+
         switch (joinGameRequest.playerColor()) {
             case "WHITE":
             if (game.whiteUsername() == null) {
