@@ -11,6 +11,12 @@ import java.util.Map;
 
 public class Server {
 
+    private final ChessService service;
+
+    public Server(ChessService service) {
+        this.service = service;
+    }
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -39,7 +45,7 @@ private Object returnErrorHelper (Response response, DataAccessException e ){
     // Handlers
     private Object clearApplication(Request request, Response response) throws DataAccessException {
         try {
-            return ChessService.clear();
+            return service.clear();
         } catch (DataAccessException e ){
             return returnErrorHelper(response,e);
         }
@@ -51,7 +57,7 @@ private Object returnErrorHelper (Response response, DataAccessException e ){
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
         try {
-            var registerResult = ChessService.register(registerRequest);
+            var registerResult = service.register(registerRequest);
             return serializer.toJson(registerResult);
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);
@@ -64,7 +70,7 @@ private Object returnErrorHelper (Response response, DataAccessException e ){
         Gson serializer = new Gson();
         var logInRequest = serializer.fromJson(request.body(), model.UserData.class);
         try {
-            var logInResult = ChessService.logIn(logInRequest);
+            var logInResult = service.logIn(logInRequest);
             return serializer.toJson(logInResult);
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);
@@ -76,7 +82,7 @@ String authStringVarToSatisfyQualityCode = "Authorization";
     private Object logOut(Request request, Response response) {
         String token = request.headers(authStringVarToSatisfyQualityCode);
         try {
-            ChessService.logOut(token);
+            service.logOut(token);
             return "";
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);
@@ -90,7 +96,7 @@ String authStringVarToSatisfyQualityCode = "Authorization";
         JsonObject jsonSerializer = new JsonObject();
         String token = request.headers(authStringVarToSatisfyQualityCode);
         try {
-            var listGamesResult = ChessService.listGames(token);
+            var listGamesResult = service.listGames(token);
             JsonArray arrayOfGames = serializer.toJsonTree(listGamesResult).getAsJsonArray();
             jsonSerializer.add("games", arrayOfGames);
             return serializer.toJson(jsonSerializer);
@@ -107,7 +113,7 @@ String authStringVarToSatisfyQualityCode = "Authorization";
         JoinGame joinGameRequest = serializer.fromJson(request.body(), model.JoinGame.class);
 
         try {
-            ChessService.joinGame(token, joinGameRequest);
+            service.joinGame(token, joinGameRequest);
             return "";
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);
@@ -120,7 +126,7 @@ String authStringVarToSatisfyQualityCode = "Authorization";
         String token = request.headers(authStringVarToSatisfyQualityCode);
         var createGameRequest = serializer.fromJson(request.body(), model.GameData.class);
         try {
-            int createGameResult = ChessService.createGame(token, createGameRequest);
+            int createGameResult = service.createGame(token, createGameRequest);
             return serializer.toJson(Map.of("gameID", createGameResult));
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);

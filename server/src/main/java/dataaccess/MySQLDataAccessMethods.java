@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataAccessMethods implements DataAccessInterface{
+public class MySQLDataAccessMethods implements DataAccessInterface{
     private static Map<String, UserData> REGISTERED_USERS = new HashMap<>();
     private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
     private static Map<String, AuthData> AUTH_DATA = new HashMap<>();
@@ -72,7 +72,7 @@ public class DataAccessMethods implements DataAccessInterface{
     }
 
     public void updateGame(int gameID, String whiteUsername, String blackUsername,
-                                  String gameName, ChessGame game) {
+                           String gameName, ChessGame game) {
         GameData origonalGameData = CREATED_GAMES.get(gameID);
         if(whiteUsername != null){
             origonalGameData = origonalGameData.setWhiteUsername(whiteUsername);
