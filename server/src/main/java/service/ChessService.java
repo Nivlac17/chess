@@ -98,7 +98,6 @@ public class ChessService {
 
     private static int generateGameID() {
         Collection<GameList> gameDataList = DataAccessMethods.listGames();
-        System.out.println(gameDataList + "right here");
         int idnum = 1;
         for ( GameList game:  gameDataList){
             idnum++;
@@ -116,10 +115,15 @@ public class ChessService {
         if (game == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
-        if (joinGameRequest.playerColor().equals("White") && game.whiteUsername() == null){
-            DataAccessMethods.updateGame(game.gameID(),joinGameRequest.playerColor(),null, null, null);
+        if (joinGameRequest.playerColor().equals("WHITE") && game.whiteUsername() == null){
+            DataAccessMethods.updateGame(game.gameID(),authData.username(),null, null, null);
 
+        } else if (joinGameRequest.playerColor().equals("BLACK") && game.blackUsername() == null){
+            DataAccessMethods.updateGame(game.gameID(),null,authData.username(), null, null);
+        } else {
+            throw new DataAccessException("Error: Forbidden", 403);
         }
+
     }
 }
 

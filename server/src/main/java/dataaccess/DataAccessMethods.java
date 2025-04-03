@@ -70,15 +70,13 @@ public class DataAccessMethods implements DataAccessInterface{
 
     public static void updateGame(int gameID,String whiteUsername,String blackUsername, String gameName, ChessGame game) {
         GameData origonalGameData = createdGames.get(gameID);
-        GameData newGameData = new GameData(
-                gameID,
-                (whiteUsername != null) ? whiteUsername : origonalGameData.whiteUsername(),
-                (blackUsername != null) ? blackUsername : origonalGameData.blackUsername(),
-                (gameName != null) ? gameName : origonalGameData.gameName(),
-                (game != null) ? game : origonalGameData.game()
-        );
-        createdGames.remove(gameID);
-        createdGames.put(gameID, newGameData);
+        if(whiteUsername != null){
+            origonalGameData.setWhiteUsername(whiteUsername);
+        }
+        if(blackUsername != null){
+            origonalGameData.setBlackUsername(whiteUsername);
+        }
+
 
     }
 }

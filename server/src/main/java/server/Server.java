@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import model.GameData;
 import model.JoinGame;
@@ -53,7 +55,6 @@ public class Server {
     private Object registerUser(Request request, Response response) {
         Gson serializer = new Gson();
         var registerRequest = serializer.fromJson(request.body(), model.UserData.class);
-//        System.out.println("creating account for: " + registerRequest.username());
         try {
             var registerResult = ChessService.register(registerRequest);
             return serializer.toJson(registerResult);
@@ -94,10 +95,15 @@ public class Server {
 
     private Object listGames(Request request, Response response) {
         Gson serializer = new Gson();
+        JsonObject jsonSerializer = new JsonObject();
         String token = request.headers("Authorization");
         try {
             var listGamesResult = ChessService.listGames(token);
-            return serializer.toJson(listGamesResult);
+            JsonArray arrayOfGames = serializer.toJsonTree(listGamesResult).getAsJsonArray();
+            jsonSerializer.add("games", arrayOfGames);
+            return serializer.toJson(jsonSerializer);
+
+
         } catch (DataAccessException e ) {
             response.status(e.getStatus());
             return new Gson().toJson(Map.of("message" , e.getMessage()));
