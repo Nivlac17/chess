@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
-import dataaccess.DataAccessMethods;
 import dataaccess.MySQLDataAccessMethods;
 import model.JoinGame;
 import service.ChessService;
@@ -15,6 +14,9 @@ import java.util.Map;
 public class Server {
     DataAccessInterface dataAccess = new MySQLDataAccessMethods();
     ChessService service = new ChessService(dataAccess);
+
+    public Server() {
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

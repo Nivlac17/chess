@@ -3,7 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
-import dataaccess.DataAccessMethods;
+import dataaccess.MemoryDataAccessMethods;
 import model.*;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ public class ChessService {
 
     public static String clear() throws DataAccessException {
         try {
-            return DataAccessMethods.clear();
+            return MemoryDataAccessMethods.clear();
         } catch (DataAccessException e ){
             throw new DataAccessException(e.getMessage(), e.getStatus());
         }

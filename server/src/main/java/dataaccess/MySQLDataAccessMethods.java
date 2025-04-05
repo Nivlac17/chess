@@ -1,51 +1,109 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.GameList;
 import model.UserData;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class MySQLDataAccessMethods implements DataAccessInterface{
-    private static Map<String, UserData> REGISTERED_USERS = new HashMap<>();
+    public MySQLDataAccessMethods(){
+        try {
+            configureDatabase();
+        } catch (DataAccessException e) {
+            // Handle it however you want (log, rethrow as RuntimeException, etc.)
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
     private static Map<String, AuthData> AUTH_DATA = new HashMap<>();
 
     public static String clear() throws DataAccessException {
-        try {
-            REGISTERED_USERS.clear();
-            CREATED_GAMES.clear();
-            AUTH_DATA.clear();
-        } catch (Exception e){
-            throw new DataAccessException(e.getMessage(), 500);
-        }
-        return "";
+            var statement = "TRUNCATE UserData, AuthData, GameData";
+            executeUpdate(statement);
+        return"";
     }
 
 
-    public UserData getUser(String username) {
+
+    public UserData getUser(String username) throws DataAccessException {
 //        search DB for username
-        return REGISTERED_USERS.get(username);
+        System.out.println("howdy");
+        try (var connection = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, FROM UserData WHERE username=?";
+            try (var ps = connection.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    } else {
+                        return null; // or throw an exception if preferred
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), 400);
+        }
+
     }
 
 
-    public void createUser(UserData userData) {
+    private static int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    ps.setObject(i + 1, params[i]);
+                }
+                ps.executeUpdate();
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(),500);
+        }
+    }
+
+
+
+
+    public void createUser(UserData userData) throws DataAccessException {
 //    create user object, add to db
-        REGISTERED_USERS.put(userData.username(), userData);
+        var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
-
-    public void createAuth(AuthData authData) {
-        AUTH_DATA.put(authData.authToken(), authData);
+    public void createAuth(AuthData authData) throws DataAccessException {
+        var statement = "INSERT INTO AuthData (authToken, authData) VALUES (?, ?)";
+        executeUpdate(statement, authData.authToken(), authData);
     }
 
-    public AuthData getAuth(String token) {
-        return AUTH_DATA.get(token);
+    public AuthData getAuth(String token) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, FROM UserData WHERE authToken=?";
+            try (var ps = connection.prepareStatement(statement)) {
+                ps.setString(1, token);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                    } else {
+                        return null; // or throw an exception if preferred
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), 400);
+        }
     }
 
 
@@ -90,4 +148,47 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
         CREATED_GAMES.put(gameID,origonalGameData);
 
     }
+
+
+
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS UserData (
+            username varchar(75) PRIMARY KEY,
+            password varchar(100),
+            email varchar(100));
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS GameData (
+            gameID INT PRIMARY KEY,
+            whiteUsername varchar(100),
+            blackUsername varchar(100),
+            gameName varchar(150),
+            gameJson TEXT DEFAULT NULL);
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS AuthData (
+            authToken varchar(100) PRIMARY KEY,
+            username varchar(100));
+            """
+    };
+
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), 500);
+        }
+    }
+
+
 }
+
+

@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface DataAccessInterface {
-    UserData getUser(String username);
-    void createUser(UserData userData);
-    void createAuth(AuthData authData);
-    AuthData getAuth(String token);
+    UserData getUser(String username) throws DataAccessException;
+    void createUser(UserData userData) throws DataAccessException;
+    void createAuth(AuthData authData) throws DataAccessException;
+    AuthData getAuth(String token) throws DataAccessException;
     void deleteAuth(String token);
     Collection<GameList> listGames();
     void createGame(int gameID, String gameName, ChessGame game);

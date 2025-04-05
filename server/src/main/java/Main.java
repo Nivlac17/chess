@@ -1,7 +1,4 @@
 import chess.*;
-import dataaccess.DataAccessInterface;
-import dataaccess.DataAccessMethods;
-import service.ChessService;
 
 public class Main {
     public static void main(String[] args) {

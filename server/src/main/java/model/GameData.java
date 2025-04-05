@@ -1,8 +1,6 @@
 package model;
 
 import chess.ChessGame;
-import dataaccess.DataAccessInterface;
-import dataaccess.DataAccessMethods;
 
 public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
     public GameData setWhiteUsername(String username){
