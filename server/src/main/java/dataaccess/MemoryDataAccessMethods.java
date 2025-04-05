@@ -16,7 +16,7 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
     private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
     private static Map<String, AuthData> AUTH_DATA = new HashMap<>();
 
-    public static String clear() throws DataAccessException {
+    public String clear() throws DataAccessException {
         try {
             REGISTERED_USERS.clear();
             CREATED_GAMES.clear();

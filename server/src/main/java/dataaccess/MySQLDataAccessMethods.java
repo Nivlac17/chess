@@ -27,11 +27,15 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
     }
 
     private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
-    private static Map<String, AuthData> AUTH_DATA = new HashMap<>();
 
-    public static String clear() throws DataAccessException {
-            var statement = "TRUNCATE UserData, AuthData, GameData";
-            executeUpdate(statement);
+    public String clear() throws DataAccessException {
+            try {
+                executeUpdate("TRUNCATE TABLE AuthData");
+                executeUpdate("TRUNCATE TABLE GameData");
+                executeUpdate("TRUNCATE TABLE UserData");
+            } catch (DataAccessException e){
+                throw new DataAccessException(e.getMessage(), 500);
+            }
         return"";
     }
 
@@ -39,9 +43,8 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
 
     public UserData getUser(String username) throws DataAccessException {
 //        search DB for username
-        System.out.println("howdy");
         try (var connection = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, FROM UserData WHERE username=?";
+            var statement = "SELECT username, password, email FROM UserData WHERE username=?";
             try (var ps = connection.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
@@ -84,13 +87,13 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
     }
 
     public void createAuth(AuthData authData) throws DataAccessException {
-        var statement = "INSERT INTO AuthData (authToken, authData) VALUES (?, ?)";
-        executeUpdate(statement, authData.authToken(), authData);
+        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, authData.authToken(), authData.username());
     }
 
     public AuthData getAuth(String token) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
-            var statement = "SELECT authToken, FROM UserData WHERE authToken=?";
+            var statement = "SELECT authToken, username FROM AuthData WHERE authToken=?";
             try (var ps = connection.prepareStatement(statement)) {
                 ps.setString(1, token);
                 try (var rs = ps.executeQuery()) {
@@ -107,8 +110,10 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
     }
 
 
-    public void deleteAuth(String token) {
-        AUTH_DATA.remove(token);
+
+    public void deleteAuth(String token) throws DataAccessException {
+        var statement = "DELETE FROM AuthData WHERE authToken=?";
+        executeUpdate(statement, token);
     }
 
     public Collection<GameList> listGames() {

@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
-import dataaccess.MemoryDataAccessMethods;
 import model.*;
 
 import java.util.Collection;
@@ -18,11 +17,7 @@ public class ChessService {
 
 
     public static String clear() throws DataAccessException {
-        try {
-            return MemoryDataAccessMethods.clear();
-        } catch (DataAccessException e ){
-            throw new DataAccessException(e.getMessage(), e.getStatus());
-        }
+        return dataAccess.clear();
     }
 
     public static AuthData register(UserData registerRequest) throws DataAccessException {
