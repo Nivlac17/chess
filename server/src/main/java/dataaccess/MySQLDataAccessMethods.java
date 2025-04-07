@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import model.GameList;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,11 +72,15 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
         }
     }
 
+    String hashPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    }
+
 
     public void createUser(UserData userData) throws DataAccessException {
 //    create user object, add to db
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, userData.username(), userData.password(), userData.email());
+        executeUpdate(statement, userData.username(), hashPassword(userData.password()), userData.email());
     }
 
     public void createAuth(AuthData authData) throws DataAccessException {

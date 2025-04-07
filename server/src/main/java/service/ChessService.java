@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -49,10 +50,9 @@ public class ChessService {
         }
 
         UserData userData = dataAccess.getUser(logInRequest.username());
-
         if (userData == null) {
             throw new DataAccessException("Error: Invalid User", 401);
-        }else if (!(userData.password().equals(logInRequest.password())) || userData.username().isEmpty() ){
+        }else if (!(BCrypt.checkpw(logInRequest.password(), userData.password())) || userData.username().isEmpty() ){
             throw new DataAccessException("Error: invalid credentials", 401);
         }else {
             AuthData logInResult = new AuthData(generateAuthToken(), logInRequest.username());
