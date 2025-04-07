@@ -16,29 +16,25 @@ import java.util.Map;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
-public class MySQLDataAccessMethods implements DataAccessInterface{
-    public MySQLDataAccessMethods(){
+public class MySQLDataAccessMethods implements DataAccessInterface {
+    public MySQLDataAccessMethods() {
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            // Handle it however you want (log, rethrow as RuntimeException, etc.)
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
-
     public String clear() throws DataAccessException {
-            try {
-                executeUpdate("TRUNCATE TABLE AuthData");
-                executeUpdate("TRUNCATE TABLE GameData");
-                executeUpdate("TRUNCATE TABLE UserData");
-            } catch (DataAccessException e){
-                throw new DataAccessException(e.getMessage(), 500);
-            }
-        return"";
+        try {
+            executeUpdate("TRUNCATE TABLE AuthData");
+            executeUpdate("TRUNCATE TABLE GameData");
+            executeUpdate("TRUNCATE TABLE UserData");
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage(), 500);
+        }
+        return "";
     }
-
 
 
     public UserData getUser(String username) throws DataAccessException {
@@ -62,22 +58,18 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
     }
 
 
-    private static int executeUpdate(String statement, Object... params) throws DataAccessException {
+    private static void executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     ps.setObject(i + 1, params[i]);
                 }
                 ps.executeUpdate();
-
-                return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage(),500);
+            throw new DataAccessException(e.getMessage(), 500);
         }
     }
-
-
 
 
     public void createUser(UserData userData) throws DataAccessException {
@@ -110,7 +102,6 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
     }
 
 
-
     public void deleteAuth(String token) throws DataAccessException {
         var statement = "DELETE FROM AuthData WHERE authToken=?";
         executeUpdate(statement, token);
@@ -118,25 +109,63 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
 
     public Collection<GameList> listGames() {
         Collection<model.GameList> gameList = new ArrayList<>();
-        for (GameData gameData : CREATED_GAMES.values()){
-            gameList.add(new model.GameList(gameData.gameID(), gameData.whiteUsername(),
-                    gameData.blackUsername(), gameData.gameName()));
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName FROM GameData";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int gameID = rs.getInt("gameID");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String gameName = rs.getString("gameName");
+
+                        gameList.add(new GameList(gameID, whiteUsername, blackUsername, gameName));
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
         return gameList;
     }
 
 
-    public void createGame(int gameID, String gameName, ChessGame game) {
-        CREATED_GAMES.put(gameID, new GameData(gameID,null, null, gameName, game));
+    public void createGame(int gameID, String gameName, ChessGame game) throws DataAccessException {
+        var gameJson = new Gson().toJson(game);
+        var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, gameJson) VALUES (?, ?, ?, ?, ?)";
+        executeUpdate(statement, gameID, null, null,gameName, gameJson);
     }
 
-    public GameData getGame(int gameID) {
-        return CREATED_GAMES.get(gameID);
+    public GameData getGame(int gameID) throws DataAccessException {
+        try (var connection = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM GameData WHERE gameID=?";
+            try (var ps = connection.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int thisGameID = (rs.getInt("gameID"));
+                        String thisWhiteUsername = rs.getString("whiteUsername");
+                        String thisBlackUsername = rs.getString("blackUsername");
+                        String thisGameName = rs.getString("gameName");
+                        String thisGameJson = rs.getString("gameJson");
+
+                        ChessGame game = new Gson().fromJson(thisGameJson, ChessGame.class);
+                        return new GameData(thisGameID, thisWhiteUsername, thisBlackUsername, thisGameName, game);
+                    } else {
+                        return null; // or throw an exception if preferred
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), 400);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void updateGame(int gameID, String whiteUsername, String blackUsername,
-                           String gameName, ChessGame game) {
-        GameData origonalGameData = CREATED_GAMES.get(gameID);
+                           String gameName, ChessGame game) throws DataAccessException {
+        GameData origonalGameData = getGame(gameID);
         if(whiteUsername != null){
             origonalGameData = origonalGameData.setWhiteUsername(whiteUsername);
         }
@@ -150,8 +179,9 @@ public class MySQLDataAccessMethods implements DataAccessInterface{
             origonalGameData = origonalGameData.setGame(game);
         }
 
-        CREATED_GAMES.put(gameID,origonalGameData);
-
+        var gameJson = new Gson().toJson(origonalGameData.game());
+        var statement = "UPDATE GameData SET whiteUsername=?, blackUsername=?, gameName=?, gameJson=? WHERE gameID=?";
+        executeUpdate(statement, origonalGameData.whiteUsername(), origonalGameData.blackUsername(),origonalGameData.gameName(), gameJson, origonalGameData.gameID());
     }
 
 
