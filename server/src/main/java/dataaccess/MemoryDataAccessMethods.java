@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.GameList;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,11 +33,13 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
 //        search DB for username
         return REGISTERED_USERS.get(username);
     }
-
+    String hashPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    }
 
     public void createUser(UserData userData) {
 //    create user object, add to db
-        REGISTERED_USERS.put(userData.username(), userData);
+        REGISTERED_USERS.put(userData.username(), new UserData(userData.username(),hashPassword(userData.password()), userData.email()));
     }
 
 

@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
+import dataaccess.MemoryDataAccessMethods;
 import dataaccess.MySQLDataAccessMethods;
 import model.JoinGame;
 import service.ChessService;
@@ -12,7 +13,7 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    DataAccessInterface dataAccess = new MySQLDataAccessMethods();
+    DataAccessInterface dataAccess = new MemoryDataAccessMethods();
     ChessService service = new ChessService(dataAccess);
 
     public Server() {
