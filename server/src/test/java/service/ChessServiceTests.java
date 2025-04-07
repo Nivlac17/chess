@@ -60,11 +60,11 @@ public class ChessServiceTests {
     @Test
     @DisplayName("Login Positive Test")
     void logInPositiveTest() throws DataAccessException {
-        UserData testUser = new UserData("username", "password", "email@email.com");
+        UserData testUser = new UserData("usernamekey", "password", "email@email.com");
         ChessService.register(testUser);
-        UserData testUserLogIn = new UserData("username", "password",null);
+        UserData testUserLogIn = new UserData("usernamekey", "password",null);
         AuthData authDataActual = ChessService.logIn(testUserLogIn);
-        assertEquals( "username",authDataActual.username());
+        assertEquals( "usernamekey",authDataActual.username());
         assertNotNull(authDataActual.authToken());
     }
 
