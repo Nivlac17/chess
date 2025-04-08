@@ -13,7 +13,7 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    DataAccessInterface dataAccess = new MemoryDataAccessMethods();
+    DataAccessInterface dataAccess = new MySQLDataAccessMethods();
     ChessService service = new ChessService(dataAccess);
 
     public Server() {

@@ -32,7 +32,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             executeUpdate("TRUNCATE TABLE GameData");
             executeUpdate("TRUNCATE TABLE UserData");
         } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage(), 500);
+            throw new DataAccessException(e.getMessage(), 401);
         }
         return "";
     }
@@ -79,11 +79,17 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
     public void createUser(UserData userData) throws DataAccessException {
 //    create user object, add to db
+        if (userData.username() == null || userData.password() == null || userData.email() == null) {
+            throw new DataAccessException("Error: Bad data internal server error", 500);
+        }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), hashPassword(userData.password()), userData.email());
     }
 
     public void createAuth(AuthData authData) throws DataAccessException {
+        if (authData.username() == null || authData.authToken() == null) {
+            throw new DataAccessException("Error: Bad data internal server error", 500);
+        }
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authData.authToken(), authData.username());
     }
@@ -97,7 +103,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                     if (rs.next()) {
                         return new AuthData(rs.getString("authToken"), rs.getString("username"));
                     } else {
-                        return null; // or throw an exception if preferred
+                        throw new DataAccessException("Error: Bad data internal server error", 401);
                     }
                 }
             }
@@ -108,6 +114,9 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
 
     public void deleteAuth(String token) throws DataAccessException {
+        if (token == null || token.isEmpty()) {
+            throw new DataAccessException("Error: Bad data internal server error", 500);
+        }
         var statement = "DELETE FROM AuthData WHERE authToken=?";
         executeUpdate(statement, token);
     }

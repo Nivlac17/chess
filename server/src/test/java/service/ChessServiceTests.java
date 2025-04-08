@@ -6,14 +6,15 @@ import model.GameData;
 import model.JoinGame;
 import model.UserData;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ChessServiceTests {
-    @AfterAll
-    static void stopServer() throws DataAccessException {
+    @AfterEach
+    void stopServer() throws DataAccessException {
         ChessService.clear();
     }
 
@@ -107,7 +108,7 @@ public class ChessServiceTests {
     @DisplayName("LogOut User Negative Test")
     void logOutNegativeTest()  {
         Exception exception = assertThrows(DataAccessException.class, () -> ChessService.logOut("d234rft"));
-        assertEquals("Error: unauthorized log out", exception.getMessage());
+        assertEquals("Error: Bad data internal server error", exception.getMessage());
 
     }
 
