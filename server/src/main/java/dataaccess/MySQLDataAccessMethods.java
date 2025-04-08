@@ -8,21 +8,18 @@ import model.GameList;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class MySQLDataAccessMethods implements DataAccessInterface {
-    public MySQLDataAccessMethods() {
+    public MySQLDataAccessMethods() throws DataAccessException {
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new DataAccessException(e.getMessage(),400);
         }
     }
 
@@ -46,7 +43,10 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                        return new UserData(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email"));
                     } else {
                         return null; // or throw an exception if preferred
                     }
@@ -80,7 +80,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
     public void createUser(UserData userData) throws DataAccessException {
 //    create user object, add to db
         if (userData.username() == null || userData.password() == null || userData.email() == null) {
-            throw new DataAccessException("Error: Bad data internal server error", 500);
+            throw new DataAccessException("Error: Bad data internal server error creating user", 500);
         }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), hashPassword(userData.password()), userData.email());
@@ -88,7 +88,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
     public void createAuth(AuthData authData) throws DataAccessException {
         if (authData.username() == null || authData.authToken() == null) {
-            throw new DataAccessException("Error: Bad data internal server error", 500);
+            throw new DataAccessException("Error: Bad data internal server error creating auth", 500);
         }
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authData.authToken(), authData.username());
@@ -149,13 +149,16 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             throw new DataAccessException("Error: Bad data internal server error", 500);
         }
         var gameJson = new Gson().toJson(game);
-        var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, gameJson) VALUES (?, ?, ?, ?, ?)";
+        var statement =
+                "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, gameJson) " +
+                        "VALUES (?, ?, ?, ?, ?)";
         executeUpdate(statement, gameID, null, null,gameName, gameJson);
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM GameData WHERE gameID=?";
+            var statement =
+                    "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM GameData WHERE gameID=?";
             try (var ps = connection.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -198,7 +201,12 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
         var gameJson = new Gson().toJson(origonalGameData.game());
         var statement = "UPDATE GameData SET whiteUsername=?, blackUsername=?, gameName=?, gameJson=? WHERE gameID=?";
-        executeUpdate(statement, origonalGameData.whiteUsername(), origonalGameData.blackUsername(),origonalGameData.gameName(), gameJson, origonalGameData.gameID());
+        executeUpdate(statement,
+                origonalGameData.whiteUsername(),
+                origonalGameData.blackUsername(),
+                origonalGameData.gameName(),
+                gameJson,
+                origonalGameData.gameID());
     }
 
 

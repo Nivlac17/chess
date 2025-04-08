@@ -13,11 +13,18 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    DataAccessInterface dataAccess = new MySQLDataAccessMethods();
+    DataAccessInterface dataAccess;
+
+    {
+        try {
+            dataAccess = new MySQLDataAccessMethods();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     ChessService service = new ChessService(dataAccess);
 
-    public Server() {
-    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

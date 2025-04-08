@@ -9,7 +9,6 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
-import service.ChessService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +18,11 @@ public class MySQLDataAccessMethodsTest {
 
     @BeforeAll
     static void setup() {
-         dataAccessMethods = new MySQLDataAccessMethods();
+        try {
+            dataAccessMethods = new MySQLDataAccessMethods();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -37,7 +40,7 @@ public class MySQLDataAccessMethodsTest {
         dataAccessMethods.createAuth(new AuthData("1234","Calvin"));
         dataAccessMethods.clear();
         assertNull(dataAccessMethods.getUser("username"));
-        assertNull(dataAccessMethods.getGame(1));
+        assertThrows(DataAccessException.class, () ->dataAccessMethods.getGame(1));
         assertThrows(DataAccessException.class, () -> dataAccessMethods.getAuth("1234"));
     }
 
@@ -195,8 +198,13 @@ public class MySQLDataAccessMethodsTest {
     @DisplayName("List Games Positive Test")
     @Order(12)
     void listGamesPositiveTest () throws DataAccessException {
-        GameData game1 = new GameData(1,"Joe", "Fred", "game1", new ChessGame());
-        GameData uprising = new GameData(2,"Frodo", "Sam", "1 game to rule them all", new ChessGame());
+        GameData game1 =
+                new GameData(1,"Joe", "Fred", "game1", new ChessGame());
+        GameData uprising = new GameData(2,
+                "Frodo",
+                "Sam",
+                "1 game to rule them all",
+                new ChessGame());
 
 
         dataAccessMethods.createGame(game1.gameID(), game1.gameName(), game1.game());
@@ -238,8 +246,10 @@ public class MySQLDataAccessMethodsTest {
     @DisplayName("Create Game Negative Test")
     @Order(15)
     void createGameNegativeTest () throws DataAccessException {
-        assertThrows(DataAccessException.class, () -> dataAccessMethods.createGame(1,"name", null));
-        assertThrows(DataAccessException.class, () -> dataAccessMethods.createGame(1,"", new ChessGame()));
+        assertThrows(DataAccessException.class, () ->
+                dataAccessMethods.createGame(1,"name", null));
+        assertThrows(DataAccessException.class, () ->
+                dataAccessMethods.createGame(1,"", new ChessGame()));
     }
 
     @Test
@@ -273,7 +283,8 @@ public class MySQLDataAccessMethodsTest {
         ChessGame game = new ChessGame();
         dataAccessMethods.createGame(7,"name7", game);
         dataAccessMethods.updateGame(7,"cal", "val", null, null);
-        GameData gameDataExpected = new GameData(7,"cal", "val", "name7", game);
+        GameData gameDataExpected =
+                new GameData(7,"cal", "val", "name7", game);
         GameData gameDataActual = dataAccessMethods.getGame(7);
         assertEquals(gameDataExpected.gameName(), gameDataActual.gameName());
         assertEquals(gameDataExpected.whiteUsername(), gameDataActual.whiteUsername());
@@ -300,7 +311,8 @@ public class MySQLDataAccessMethodsTest {
     @Order(19)
     void updateGameNegativeTest () throws DataAccessException {
         dataAccessMethods.createGame(1,"name", new ChessGame());
-        assertThrows(DataAccessException.class, () -> dataAccessMethods.updateGame(4,null,null,null,null));
+        assertThrows(DataAccessException.class, () ->
+                dataAccessMethods.updateGame(4,null,null,null,null));
     }
 
 }
