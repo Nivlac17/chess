@@ -1,6 +1,9 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -92,11 +95,10 @@ public class MySQLDataAccessMethodsTest {
     @DisplayName("Create User Negative Test")
     @Order(5)
     void createUserNegativeTest () throws DataAccessException {
-        UserData a = new UserData("a", null, "email@email.com");
-        UserData b = new UserData("b", "c", "d");
-
-        assertThrows(DataAccessException.class, () -> dataAccessMethods.createUser(a));
-        dataAccessMethods.createUser(b);
+        UserData a = new UserData("a", "a", "email@email.com");
+        UserData b = new UserData("a", "c", "d");
+        dataAccessMethods.createUser(a);
+        assertThrows(DataAccessException.class, () -> dataAccessMethods.createUser(b));
 
     }
 
@@ -211,14 +213,14 @@ public class MySQLDataAccessMethodsTest {
     @Test
     @DisplayName("List Games Negative Test")
     @Order(13)
-    void listGamesNegativeTest () throws DataAccessException {
+    void listGamesNegativeTest ()  {
         assertEquals("[]", dataAccessMethods.listGames().toString());
     }
 
     @Test
     @DisplayName("Create Game Positive Test")
     @Order(14)
-    void createGameNegativeTest () throws DataAccessException {
+    void createGamePositiveTest () throws DataAccessException {
         ChessGame game = new ChessGame();
         dataAccessMethods.createGame(1,"name", game);
         GameData chessGameNamedName = dataAccessMethods.getGame(1);
@@ -229,8 +231,76 @@ public class MySQLDataAccessMethodsTest {
         assertEquals(expected.gameName(),chessGameNamedName.gameName());
         assertEquals(game.getBoard().toString(), chessGameNamedName.game().getBoard().toString());
         assertEquals(game.getTeamTurn(), chessGameNamedName.game().getTeamTurn());
-        System.out.println(chessGameNamedName.game().getBoard().toString());
     }
 
+
+    @Test
+    @DisplayName("Create Game Negative Test")
+    @Order(15)
+    void createGameNegativeTest () throws DataAccessException {
+        assertThrows(DataAccessException.class, () -> dataAccessMethods.createGame(1,"name", null));
+        assertThrows(DataAccessException.class, () -> dataAccessMethods.createGame(1,"", new ChessGame()));
+    }
+
+    @Test
+    @DisplayName("Get Game Positive Test")
+    @Order(16)
+    void getGamePositiveTest () throws DataAccessException {
+        ChessGame game = new ChessGame();
+        dataAccessMethods.createGame(2,"name", game);
+        GameData chessGameNamedName = dataAccessMethods.getGame(2);
+        GameData expected = new GameData(2,"null", "null", "name", game);
+        assertEquals(expected.gameID(),chessGameNamedName.gameID());
+        assertEquals(expected.gameName(),chessGameNamedName.gameName());
+        assertEquals(game.getBoard().toString(), chessGameNamedName.game().getBoard().toString());
+        assertEquals(game.getTeamTurn(), chessGameNamedName.game().getTeamTurn());
+    }
+
+    @Test
+    @DisplayName("Create Game Negative Test")
+    @Order(17)
+    void getGameNegativeTest () throws DataAccessException {
+        dataAccessMethods.createGame(1,"name", new ChessGame());
+        assertThrows(DataAccessException.class, () -> dataAccessMethods.getGame(4));
+    }
+
+
+
+    @Test
+    @DisplayName("Update Game Positive Test")
+    @Order(18)
+    void updateGamePositiveTest () throws DataAccessException, InvalidMoveException {
+        ChessGame game = new ChessGame();
+        dataAccessMethods.createGame(7,"name7", game);
+        dataAccessMethods.updateGame(7,"cal", "val", null, null);
+        GameData gameDataExpected = new GameData(7,"cal", "val", "name7", game);
+        GameData gameDataActual = dataAccessMethods.getGame(7);
+        assertEquals(gameDataExpected.gameName(), gameDataActual.gameName());
+        assertEquals(gameDataExpected.whiteUsername(), gameDataActual.whiteUsername());
+        assertEquals(gameDataExpected.blackUsername(), gameDataActual.blackUsername());
+        assertEquals(gameDataExpected.gameName(), gameDataActual.gameName());
+
+        game.makeMove(new ChessMove(
+                new ChessPosition(2, 2),  // start position
+                new ChessPosition(3, 2),  // end position
+                null));
+
+        dataAccessMethods.updateGame(7,null, null, null, game);
+        gameDataExpected = new GameData(7,"cal", "val", "name7", game);
+        dataAccessMethods.updateGame(7,null, null, null, game);
+        gameDataActual = dataAccessMethods.getGame(7);
+        assertEquals(
+                gameDataExpected.game().getBoard().getPiece(new ChessPosition(3,2)),
+                gameDataActual.game().getBoard().getPiece(new ChessPosition(3,2)));
+
+    }
+
+    @Test
+    @DisplayName("Update Game Negative Test")
+    @Order(19)
+    void updateGameNegativeTest () throws DataAccessException {
+        dataAccessMethods.createGame(1,"name", new ChessGame());
+        assertThrows(DataAccessException.class, () -> dataAccessMethods.updateGame(4,null,null,null,null));
+    }
 
 }

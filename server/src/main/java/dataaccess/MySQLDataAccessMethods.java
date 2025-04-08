@@ -145,6 +145,9 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
 
     public void createGame(int gameID, String gameName, ChessGame game) throws DataAccessException {
+        if (gameName.isEmpty() || game == null) {
+            throw new DataAccessException("Error: Bad data internal server error", 500);
+        }
         var gameJson = new Gson().toJson(game);
         var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, gameJson) VALUES (?, ?, ?, ?, ?)";
         executeUpdate(statement, gameID, null, null,gameName, gameJson);
@@ -166,16 +169,16 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                         ChessGame game = new Gson().fromJson(thisGameJson, ChessGame.class);
                         return new GameData(thisGameID, thisWhiteUsername, thisBlackUsername, thisGameName, game);
                     } else {
-                        return null; // or throw an exception if preferred
+                        throw new DataAccessException("Error: You dumb from get game", 400);
+                        // or throw an exception if preferred
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage(), 400);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
         }
     }
+
 
     public void updateGame(int gameID, String whiteUsername, String blackUsername,
                            String gameName, ChessGame game) throws DataAccessException {
