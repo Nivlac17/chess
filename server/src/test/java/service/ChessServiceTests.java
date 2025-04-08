@@ -108,7 +108,7 @@ public class ChessServiceTests {
     @DisplayName("LogOut User Negative Test")
     void logOutNegativeTest()  {
         Exception exception = assertThrows(DataAccessException.class, () -> ChessService.logOut("d234rft"));
-        assertEquals("Error: Bad data internal server error", exception.getMessage());
+        assertEquals("Error: unauthorized log out", exception.getMessage());
 
     }
 

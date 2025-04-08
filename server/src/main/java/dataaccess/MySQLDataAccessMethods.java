@@ -103,7 +103,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                     if (rs.next()) {
                         return new AuthData(rs.getString("authToken"), rs.getString("username"));
                     } else {
-                        throw new DataAccessException("Error: Bad data internal server error", 401);
+                        throw new DataAccessException("Error: unauthorized log out", 401);
                     }
                 }
             }

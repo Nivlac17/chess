@@ -13,15 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryDataAccessMethods implements DataAccessInterface{
-    private static Map<String, UserData> REGISTERED_USERS = new HashMap<>();
-    private static Map<Integer, GameData> CREATED_GAMES = new HashMap<>();
-    private static Map<String, AuthData> AUTH_DATA = new HashMap<>();
+    private static Map<String, UserData> registeredUsers = new HashMap<>();
+    private static Map<Integer, GameData> createdGames = new HashMap<>();
+    private static Map<String, AuthData> authData = new HashMap<>();
 
     public String clear() throws DataAccessException {
         try {
-            REGISTERED_USERS.clear();
-            CREATED_GAMES.clear();
-            AUTH_DATA.clear();
+            registeredUsers.clear();
+            createdGames.clear();
+            authData.clear();
         } catch (Exception e){
             throw new DataAccessException(e.getMessage(), 500);
         }
@@ -31,7 +31,7 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
 
     public UserData getUser(String username) {
 //        search DB for username
-        return REGISTERED_USERS.get(username);
+        return registeredUsers.get(username);
     }
     String hashPassword(String clearTextPassword) {
         return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
@@ -39,26 +39,26 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
 
     public void createUser(UserData userData) {
 //    create user object, add to db
-        REGISTERED_USERS.put(userData.username(), new UserData(userData.username(),hashPassword(userData.password()), userData.email()));
+        registeredUsers.put(userData.username(), new UserData(userData.username(),hashPassword(userData.password()), userData.email()));
     }
 
 
     public void createAuth(AuthData authData) {
-        AUTH_DATA.put(authData.authToken(), authData);
+        MemoryDataAccessMethods.authData.put(authData.authToken(), authData);
     }
 
     public AuthData getAuth(String token) {
-        return AUTH_DATA.get(token);
+        return authData.get(token);
     }
 
 
     public void deleteAuth(String token) {
-        AUTH_DATA.remove(token);
+        authData.remove(token);
     }
 
     public Collection<GameList> listGames() {
         Collection<model.GameList> gameList = new ArrayList<>();
-        for (GameData gameData : CREATED_GAMES.values()){
+        for (GameData gameData : createdGames.values()){
             gameList.add(new model.GameList(gameData.gameID(), gameData.whiteUsername(),
                     gameData.blackUsername(), gameData.gameName()));
         }
@@ -67,16 +67,16 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
 
 
     public void createGame(int gameID, String gameName, ChessGame game) {
-        CREATED_GAMES.put(gameID, new GameData(gameID,null, null, gameName, game));
+        createdGames.put(gameID, new GameData(gameID,null, null, gameName, game));
     }
 
     public GameData getGame(int gameID) {
-        return CREATED_GAMES.get(gameID);
+        return createdGames.get(gameID);
     }
 
     public void updateGame(int gameID, String whiteUsername, String blackUsername,
                                   String gameName, ChessGame game) {
-        GameData origonalGameData = CREATED_GAMES.get(gameID);
+        GameData origonalGameData = createdGames.get(gameID);
         if(whiteUsername != null){
             origonalGameData = origonalGameData.setWhiteUsername(whiteUsername);
         }
@@ -90,7 +90,7 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
             origonalGameData = origonalGameData.setGame(game);
         }
 
-        CREATED_GAMES.put(gameID,origonalGameData);
+        createdGames.put(gameID,origonalGameData);
 
     }
 }
