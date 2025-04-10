@@ -44,7 +44,7 @@ public class PreLogInClient {
     public String register(String... params){
         try {
             AuthData authData = server.register(params);
-            String authToken = authData.authToken();
+            authToken = authData.authToken();
             return "Successful registration!!";
 
         } catch (ResponseException e){
@@ -56,7 +56,7 @@ public class PreLogInClient {
     private String logIn(String... params) {
         try {
             AuthData authData = server.logIn(params);
-            String authToken = authData.authToken();
+            authToken = authData.authToken();
             return "Successful login!!";
 
         } catch (ResponseException e){

@@ -6,12 +6,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
 
 
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameList;
+import model.ListOfGameList;
 import model.UserData;
 
 public class ServerFacade {
@@ -20,6 +21,7 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+        System.out.println(url);
 
     }
 
@@ -29,7 +31,7 @@ public class ServerFacade {
         String email    = params[2];
         UserData userData = new UserData(username,password,email);
         var path = "/user";
-        return this.makeRequest("POST", path, userData, AuthData.class);
+        return this.makeRequest("POST", path, null, userData, AuthData.class);
     }
 
     public AuthData logIn(String... params) throws ResponseException {
@@ -37,29 +39,32 @@ public class ServerFacade {
         String password = params[1];
         UserData userData = new UserData(username,password,null);
         var path = "/session";
-        return this.makeRequest("POST", path, userData, AuthData.class);
+        return this.makeRequest("POST", path, null, userData, AuthData.class);
     }
 
 
-    public HashMap listGames(String authToken) throws ResponseException {
+    public GameList listGames(String authToken) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("GET", path, authToken, HashMap.class);
+        System.out.println(authToken);
+        return  this.makeRequest("GET", path, authToken, null, GameList.class);
     }
 
     public int createGame(String authToken, String... params) throws ResponseException {
         String gameName = params[0]; // authToken and game name request
         var path = "/game";
-        return this.makeRequest("POST", path, gameName, Integer.class);
+        return this.makeRequest("POST", path, authToken, gameName, Integer.class);
     }
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, String authToken, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);

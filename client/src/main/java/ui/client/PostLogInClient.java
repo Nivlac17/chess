@@ -2,10 +2,13 @@ package ui.client;
 
 import exception.ResponseException;
 import model.AuthData;
+import model.GameList;
+import model.ListOfGameList;
 import ui.ServerFacade;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class PostLogInClient {
 
@@ -25,6 +28,7 @@ public class PostLogInClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "l", "list" -> listGames(authToken);
+                case "c", "create" -> createGame(authToken, params);
 
 
                 case "quit" -> "quit";
@@ -38,7 +42,7 @@ public class PostLogInClient {
     private String listGames(String authToken) {
         try {
 
-            HashMap gameList = server.listGames(authToken);
+            GameList gameList = server.listGames(authToken);
             if (gameList == null) {
                 return "No Games Currently Created";
             }else{
@@ -51,17 +55,18 @@ public class PostLogInClient {
     }
 
 
-//    private String createGame(String authToken, String... params) {
-//        try {
-//            int gameID = server.createGame(authToken, params);
-//            if (gameID) {
-//                return "Game Created";
-//            }
-//
-//        } catch (ResponseException e){
-//            return e.getMessage();
-//        }
-//    }
+    private String createGame(String authToken, String... params) {
+        try {
+            int gameID = server.createGame(authToken, params);
+            if (gameID <= 0 ) {
+                return "Game Created";
+            }
+
+        } catch (ResponseException e){
+            return e.getMessage();
+        }
+        return "Failure to create Game";
+    }
 
 
 
