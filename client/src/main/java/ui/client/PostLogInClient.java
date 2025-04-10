@@ -51,7 +51,7 @@ public class PostLogInClient {
                 int i = 0;
                 for(GameList game: gameList){
                     i++;
-//                    listNumberInterpreter.put(i,game.gameID());
+                    listNumberInterpreter.put(i, game.gameID());
                     String white = "Empty";
                     String black = "Empty";
                     if(game.whiteUsername() != null){
@@ -98,17 +98,18 @@ public class PostLogInClient {
             return help();
         }
 
-        System.out.println(params[1]);
         try {
-            List<GameList> gameList = server.listGames(authToken);
-            if (gameList.isEmpty()) {
-                return "No Games Currently Created";
-            }else {
-                String uiList = "Games: ";
-                int i = 0;
-                for (GameList game : gameList) {
-                    i++;
-                    listNumberInterpreter.put(i, game.gameID());
+            if(listNumberInterpreter == null){
+                List<GameList> gameList = server.listGames(authToken);
+                if (gameList.isEmpty()) {
+                    return "No Games Currently Created";
+                }else {
+                    String uiList = "Games: ";
+                    int i = 0;
+                    for (GameList game : gameList) {
+                        i++;
+                        listNumberInterpreter.put(i, game.gameID());
+                    }
                 }
             }
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
