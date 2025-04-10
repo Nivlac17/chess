@@ -6,6 +6,7 @@ import model.GameList;
 import ui.ServerFacade;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class PostLogInClient {
 
@@ -39,11 +40,27 @@ public class PostLogInClient {
     private String listGames(String authToken) {
         try {
 
-            GameList gameList = server.listGames(authToken);
-            if (gameList == null) {
+            List<GameList> gameList = server.listGames(authToken);
+            if (gameList.isEmpty()) {
                 return "No Games Currently Created";
             }else{
-                return gameList.toString();
+                String uiList = "Games: ";
+                for(GameList game: gameList){
+                    String white = "Empty";
+                    String black = "Empty";
+                    if(game.whiteUsername() != null){
+                        white = game.whiteUsername();
+                    }
+                    if (game.blackUsername() != null){
+                        black = game.blackUsername();
+                    }
+                    uiList = (uiList +
+                            "\n GameID: " + game.gameID() +
+                            "\t\t White: " + white +
+                            "\tBlack: " + black +
+                            "\tGame Name: " +game.gameName());
+                }
+                return uiList;
             }
         } catch (ResponseException e){
             return e.getMessage();

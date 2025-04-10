@@ -6,10 +6,14 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.*;
 
@@ -41,9 +45,14 @@ public class ServerFacade {
     }
 
 
-    public GameList listGames(String authToken) throws ResponseException {
+    public List<GameList> listGames(String authToken) throws ResponseException {
         var path = "/game";
-        return  this.makeRequest("GET", path, authToken, null, GameList.class);
+
+          JsonObject response = this.makeRequest("GET", path, authToken, null,  JsonObject.class);
+          JsonArray gamesArray = response.getAsJsonArray("games");
+        List<GameList> games = new Gson().fromJson(gamesArray, new TypeToken<List<GameList>>(){}.getType());
+
+        return games;
     }
 
     public GameID createGame(String authToken, String... params) throws ResponseException {
