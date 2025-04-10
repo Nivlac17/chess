@@ -7,9 +7,11 @@ import static ui.EscapeSequences.*;
 
 public class PreLogInRepl {
     private final PreLogInClient client;
+    private final String serverUrl;
 
     public PreLogInRepl(String serverUrl) {
         client = new PreLogInClient(serverUrl /*, this ----- notification handler*/);
+        this.serverUrl = serverUrl;
     }
 
     public void run() {
@@ -25,6 +27,11 @@ public class PreLogInRepl {
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (result.equals("login success")) {
+                    PostLogInRepl postLoginRepl = new PostLogInRepl(this.serverUrl);
+                    postLoginRepl.run();
+                    break;
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);

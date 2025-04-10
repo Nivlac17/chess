@@ -23,12 +23,20 @@ public class ServerFacade {
 
     }
 
-    public AuthData register(String[] params) throws ResponseException {
+    public AuthData register(String... params) throws ResponseException {
         String username = params[0];
         String password = params[1];
         String email    = params[2];
         UserData userData = new UserData(username,password,email);
         var path = "/user";
+        return this.makeRequest("POST", path, userData, AuthData.class);
+    }
+
+    public AuthData logIn(String... params) throws ResponseException {
+        String username = params[0];
+        String password = params[1];
+        UserData userData = new UserData(username,password,null);
+        var path = "/session";
         return this.makeRequest("POST", path, userData, AuthData.class);
     }
 

@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 public class PreLogInClient {
 
+    private String authToken = null;
+
     private ServerFacade server;
     private String serverUrl;
 
@@ -23,6 +25,7 @@ public class PreLogInClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register","r" -> register(params);
+                case "login", "l" -> logIn(params);
 
 
                 case "quit" -> "quit";
@@ -36,6 +39,7 @@ public class PreLogInClient {
     public String register(String... params){
         try {
             AuthData authData = server.register(params);
+            authToken = authData.authToken();
             return ("Successful registration for: " + authData.username());
 
         } catch (ResponseException e){
@@ -44,14 +48,26 @@ public class PreLogInClient {
 
     }
 
+    private String logIn(String... params) {
+        try {
+            AuthData authData = server.logIn(params);
+            authToken = authData.authToken();
+            return ("Successful LogIn for: " + authData.username());
+
+        } catch (ResponseException e){
+            return e.getMessage();
+        }
+    }
+
 
 
     public String help(){
      return   """
                         Available commands:
-                         - login 
-                         - register, r <Username> <Password> <Email>
-                         - quit
+                         Log In as Existing User - "login" , "l" <Username> <Password>
+                         Register as a New User  - "register", "r" <Username> <Password> <Email>
+                         Print Help Message      - "help", "h"
+                         Exit Program            - "quit", "q"
                                 
                 """;
 
