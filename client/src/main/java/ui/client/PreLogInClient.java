@@ -1,21 +1,26 @@
-package ui;
+package ui.client;
 
 import exception.ResponseException;
 import model.AuthData;
+import ui.ServerFacade;
 
 import java.util.Arrays;
 
 public class PreLogInClient {
 
-    private String authToken = null;
-
     private ServerFacade server;
     private String serverUrl;
+
+    public static String authToken;
 
     public  PreLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
 //        this.notificationHandler = notificationHandler;
+    }
+
+    public static String getAuthToken() {
+        return authToken;
     }
 
     public String eval(String input) {
@@ -39,8 +44,8 @@ public class PreLogInClient {
     public String register(String... params){
         try {
             AuthData authData = server.register(params);
-            authToken = authData.authToken();
-            return ("Successful registration for: " + authData.username());
+            String authToken = authData.authToken();
+            return "Successful registration!!";
 
         } catch (ResponseException e){
             return e.getMessage();
@@ -51,8 +56,8 @@ public class PreLogInClient {
     private String logIn(String... params) {
         try {
             AuthData authData = server.logIn(params);
-            authToken = authData.authToken();
-            return ("Successful LogIn for: " + authData.username());
+            String authToken = authData.authToken();
+            return "Successful login!!";
 
         } catch (ResponseException e){
             return e.getMessage();

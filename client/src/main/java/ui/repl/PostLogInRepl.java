@@ -1,21 +1,26 @@
-package ui;
+package ui.repl;
+
+import ui.client.PostLogInClient;
+import ui.client.PreLogInClient;
 
 import java.util.Scanner;
 
-import static java.awt.Color.BLUE;
 import static ui.EscapeSequences.*;
 
-public class PreLogInRepl {
-    private final PreLogInClient client;
+public class PostLogInRepl {
+    public final String authToken;
+
+    private final PostLogInClient client;
     private final String serverUrl;
 
-    public PreLogInRepl(String serverUrl) {
-        client = new PreLogInClient(serverUrl /*, this ----- notification handler*/);
+    public PostLogInRepl(String serverUrl, String authToken) {
+        client = new PostLogInClient(serverUrl /*, this ----- notification handler*/);
         this.serverUrl = serverUrl;
+        this.authToken = authToken;
     }
 
     public void run() {
-        System.out.println("Welcome to Calvin's Chess Client. Sign in or Register to start.");
+        System.out.println("Welcome to Calvin's Chess Client. \n\nDo you want to play a game?");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -27,9 +32,9 @@ public class PreLogInRepl {
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
-                if (result.equals("login success")) {
-                    PostLogInRepl postLoginRepl = new PostLogInRepl(this.serverUrl);
-                    postLoginRepl.run();
+                if (result.equals("game has started 1")) {
+                    GamePlayRepl gamePlayRepl = new GamePlayRepl();
+//                    gamePlayRepl.run();
                     break;
                 }
             } catch (Throwable e) {
