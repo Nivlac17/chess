@@ -8,13 +8,14 @@ import ui.ServerFacade;
 import java.util.*;
 
 public class PostLogInClient {
-    private Map<Integer, Integer> listNumberInterpreter = new HashMap<>();
+    public static Map<Integer, Integer> listNumberInterpreter;
     private ServerFacade server;
     private String serverUrl;
 
     public  PostLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.listNumberInterpreter = new HashMap<>();
 //        this.notificationHandler = notificationHandler;
     }
 
@@ -50,7 +51,7 @@ public class PostLogInClient {
                 int i = 0;
                 for(GameList game: gameList){
                     i++;
-                    listNumberInterpreter.put(i,game.gameID());
+//                    listNumberInterpreter.put(i,game.gameID());
                     String white = "Empty";
                     String black = "Empty";
                     if(game.whiteUsername() != null){
@@ -97,7 +98,23 @@ public class PostLogInClient {
             return help();
         }
 
-        params[1] = String.valueOf(listNumberInterpreter.get(params[1]));
+        System.out.println(params[1]);
+        try {
+            List<GameList> gameList = server.listGames(authToken);
+            if (gameList.isEmpty()) {
+                return "No Games Currently Created";
+            }else {
+                String uiList = "Games: ";
+                int i = 0;
+                for (GameList game : gameList) {
+                    i++;
+                    listNumberInterpreter.put(i, game.gameID());
+                }
+            }
+            params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
+        } catch (Exception e){}
+
+
 
         try {
             String result = server.joinGame(authToken, params);
