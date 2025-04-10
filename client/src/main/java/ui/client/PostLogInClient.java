@@ -29,9 +29,8 @@ public class PostLogInClient {
                 case "l", "list" -> listGames(authToken);
                 case "c", "create" -> createGame(authToken, params);
                 case "j", "join" -> joinGame(authToken, params);
-
-
-
+//                case "w", "watch" -> watchGame(authToken, params);
+                case "logout" -> logOut(authToken);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -95,6 +94,19 @@ public class PostLogInClient {
             }
         } catch (ResponseException e) {
         return "Failure to Join Game " + e.getMessage();
+        }
+        return "Failure to Join Game ";
+    }
+
+
+    private String logOut(String authToken) {
+
+        try {
+            if (Objects.equals(server.logOut(authToken), " Successful Logout ")){
+                return " GOODBYE!!! ";
+            }
+        } catch (ResponseException e) {
+            return "Failure to Join Game " + e.getMessage();
         }
         return "Failure to Join Game ";
     }

@@ -20,7 +20,7 @@ public class PostLogInRepl {
     }
 
     public void run() {
-        System.out.println("Welcome to Calvin's Chess Client. \n\nDo you want to play a game?");
+        System.out.println(SET_TEXT_COLOR_BLUE + "Welcome to Calvin's Chess Client. \n\nDo you want to play a game?");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -35,6 +35,8 @@ public class PostLogInRepl {
                 if (result.equals("game has started 1")) {
                     GamePlayRepl gamePlayRepl = new GamePlayRepl();
 //                    gamePlayRepl.run();
+                }
+                if (result.equals(" GOODBYE!!! ")) {
                     break;
                 }
             } catch (Throwable e) {

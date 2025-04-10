@@ -78,6 +78,14 @@ public class ServerFacade {
         return " Game Joined Successfully ";
     }
 
+    public String logOut(String authToken) throws ResponseException {
+        var path = "/session";
+                this.makeRequest("DELETE", path, authToken, null, Void.class);
+        return " Successful Logout ";
+    }
+
+
+
 
 
 
