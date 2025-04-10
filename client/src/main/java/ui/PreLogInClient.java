@@ -1,5 +1,8 @@
 package ui;
 
+import exception.ResponseException;
+import model.AuthData;
+
 import java.util.Arrays;
 
 public class PreLogInClient {
@@ -19,7 +22,7 @@ public class PreLogInClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register","r" -> server.register(params);
+                case "register","r" -> register(params);
 
 
                 case "quit" -> "quit";
@@ -28,6 +31,17 @@ public class PreLogInClient {
         } catch (Exception ex) {
             return ex.getMessage();
         }
+    }
+
+    public String register(String... params){
+        try {
+            AuthData authData = server.register(params);
+            return ("Successful registration for: " + authData.username());
+
+        } catch (ResponseException e){
+            return e.getMessage();
+        }
+
     }
 
 

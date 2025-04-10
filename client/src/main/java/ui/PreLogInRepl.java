@@ -13,7 +13,7 @@ public class PreLogInRepl {
     }
 
     public void run() {
-        System.out.println("Welcome to Calvin's Chess App. Sign in or Register to start.");
+        System.out.println("Welcome to Calvin's Chess Client. Sign in or Register to start.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
