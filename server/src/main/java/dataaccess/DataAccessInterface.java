@@ -7,8 +7,6 @@ import model.GameList;
 import model.UserData;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public interface DataAccessInterface {
     UserData getUser(String username) throws DataAccessException;

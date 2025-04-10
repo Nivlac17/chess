@@ -5,7 +5,6 @@ import model.AuthData;
 import model.GameData;
 import model.JoinGame;
 import model.UserData;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

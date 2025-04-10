@@ -3,8 +3,7 @@ package ui;
 import java.util.Scanner;
 
 import static java.awt.Color.BLUE;
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+import static ui.EscapeSequences.*;
 
 public class PreLogInRepl {
     private final PreLogInClient client;
@@ -25,7 +24,7 @@ public class PreLogInRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);

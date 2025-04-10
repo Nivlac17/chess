@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
-import dataaccess.MemoryDataAccessMethods;
 import dataaccess.MySQLDataAccessMethods;
 import model.JoinGame;
 import service.ChessService;
