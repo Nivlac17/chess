@@ -1,6 +1,8 @@
 package ui;
 
 
+import model.UserData;
+
 public class ServerFacade {
     private final String serverUrl;
 
@@ -10,19 +12,16 @@ public class ServerFacade {
 
     }
 
-    public static String register(String[] params) {
+    public String register(String[] params) {
         String username = params[0];
         String password = params[1];
         String email    = params[2];
+        UserData userData = new UserData(username,password,email);
 
-        System.out.println("This is it boys: " + ", " + username + ", " + password + ", " + email);
+//        System.out.println("This is it boys: " + ", " + username + ", " + password + ", " + email);
 
-//        public UserData register(UserData userdata) throws ResponseException {
-//            var path = "/user";
-//            return this.makeRequest("POST", path, , .class);
-//        }
-
-        return null;
+            var path = "/user";
+            return this.makeRequest("POST", path, userData, UserData.class);
     }
 
 

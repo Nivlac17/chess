@@ -19,7 +19,7 @@ public class PreLogInClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register","r" -> ServerFacade.register(params);
+                case "register","r" -> server.register(params);
 
 
                 case "quit" -> "quit";
