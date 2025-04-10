@@ -30,7 +30,7 @@ public class PostLogInRepl {
             String line = scanner.nextLine();
 
             try {
-                result = client.eval(line);
+                result = client.eval(line, authToken);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
                 if (result.equals("game has started 1")) {
                     GamePlayRepl gamePlayRepl = new GamePlayRepl();

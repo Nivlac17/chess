@@ -5,6 +5,7 @@ import model.AuthData;
 import ui.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class PostLogInClient {
 
@@ -17,14 +18,13 @@ public class PostLogInClient {
 //        this.notificationHandler = notificationHandler;
     }
 
-    public String eval(String input) {
+    public String eval(String input, String authToken) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-//                case "register","r" -> register(params);
-//                case "login", "l" -> logIn(params);
+                case "l", "list" -> listGames(authToken);
 
 
                 case "quit" -> "quit";
@@ -35,7 +35,33 @@ public class PostLogInClient {
         }
     }
 
+    private String listGames(String authToken) {
+        try {
 
+            HashMap gameList = server.listGames(authToken);
+            if (gameList == null) {
+                return "No Games Currently Created";
+            }else{
+                return gameList.toString();
+            }
+        } catch (ResponseException e){
+            return e.getMessage();
+        }
+
+    }
+
+
+//    private String createGame(String authToken, String... params) {
+//        try {
+//            int gameID = server.createGame(authToken, params);
+//            if (gameID) {
+//                return "Game Created";
+//            }
+//
+//        } catch (ResponseException e){
+//            return e.getMessage();
+//        }
+//    }
 
 
 

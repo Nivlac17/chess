@@ -6,7 +6,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-
+import java.util.HashMap;
 
 
 import com.google.gson.Gson;
@@ -40,6 +40,17 @@ public class ServerFacade {
         return this.makeRequest("POST", path, userData, AuthData.class);
     }
 
+
+    public HashMap listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("GET", path, authToken, HashMap.class);
+    }
+
+    public int createGame(String authToken, String... params) throws ResponseException {
+        String gameName = params[0]; // authToken and game name request
+        var path = "/game";
+        return this.makeRequest("POST", path, gameName, Integer.class);
+    }
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
