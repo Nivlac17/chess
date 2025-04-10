@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.GameID;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
@@ -30,8 +31,9 @@ public class ServerFacadeTests {
     public void sampleTest() throws ResponseException {
         Assertions.assertTrue(true);
         String authToken = sf.logIn("c", "a").authToken();
+        GameID newGameID = sf.createGame(authToken,"calvin12");
         String gameList = sf.listGames(authToken).toString();
-        System.out.println(gameList);
+//        System.out.println(gameList);
     }
 
 }

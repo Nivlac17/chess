@@ -6,14 +6,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.AuthData;
-import model.GameList;
-import model.ListOfGameList;
-import model.UserData;
+import model.*;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -45,14 +43,14 @@ public class ServerFacade {
 
     public GameList listGames(String authToken) throws ResponseException {
         var path = "/game";
-        System.out.println(authToken);
         return  this.makeRequest("GET", path, authToken, null, GameList.class);
     }
 
-    public int createGame(String authToken, String... params) throws ResponseException {
-        String gameName = params[0]; // authToken and game name request
+    public GameID createGame(String authToken, String... params) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, authToken, gameName, Integer.class);
+        var gameName = new GameCreationRequest(params[0]);
+
+        return this.makeRequest("POST", path, authToken, gameName, GameID.class);
     }
 
 

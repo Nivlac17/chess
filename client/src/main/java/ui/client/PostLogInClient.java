@@ -1,14 +1,11 @@
 package ui.client;
 
 import exception.ResponseException;
-import model.AuthData;
+import model.GameID;
 import model.GameList;
-import model.ListOfGameList;
 import ui.ServerFacade;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 public class PostLogInClient {
 
@@ -57,8 +54,8 @@ public class PostLogInClient {
 
     private String createGame(String authToken, String... params) {
         try {
-            int gameID = server.createGame(authToken, params);
-            if (gameID <= 0 ) {
+            GameID gameID = server.createGame(authToken, params);
+            if (gameID.gameID() > 0 ) {
                 return "Game Created";
             }
 
