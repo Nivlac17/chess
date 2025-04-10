@@ -5,12 +5,10 @@ import model.GameID;
 import model.GameList;
 import ui.ServerFacade;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PostLogInClient {
-
+    private Map<Integer, Integer> listNumberInterpreter = new HashMap<>();
     private ServerFacade server;
     private String serverUrl;
 
@@ -49,7 +47,10 @@ public class PostLogInClient {
                 return "No Games Currently Created";
             }else{
                 String uiList = "Games: ";
+                int i = 0;
                 for(GameList game: gameList){
+                    i++;
+                    listNumberInterpreter.put(i,game.gameID());
                     String white = "Empty";
                     String black = "Empty";
                     if(game.whiteUsername() != null){
@@ -59,10 +60,10 @@ public class PostLogInClient {
                         black = game.blackUsername();
                     }
                     uiList = (uiList +
-                            "\n GameID: " + game.gameID() +
+                            "\n" + i + ". " +
+                            "\tGame Name: " + game.gameName()) +
                             "\t\t White: " + white +
-                            "\tBlack: " + black +
-                            "\tGame Name: " +game.gameName());
+                            "\tBlack: " + black ;
                 }
                 return uiList;
             }
@@ -90,16 +91,19 @@ public class PostLogInClient {
         return "Failure to create Game";
     }
 
-    private String joinGame(String authToken, String[] params) {
+    private String joinGame(String authToken, String... params) {
         if (params.length != 2){
             System.out.println("Invalid Game Input, Please Try Again");
             return help();
         }
 
+        params[1] = String.valueOf(listNumberInterpreter.get(params[1]));
+
         try {
-            if (Objects.equals(server.joinGame(authToken, params), " Game Joined Successfully ")){
+            String result = server.joinGame(authToken, params);
+            if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
-            } else if(Objects.equals(server.joinGame(authToken, params), "Invalid Color Given, please try again")){
+            } else if(Objects.equals(result, "Invalid Color Given, please try again")){
                 return "Invalid Color Given, please try again";
             }
         } catch (ResponseException e) {
