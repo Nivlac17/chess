@@ -7,6 +7,7 @@ import ui.ServerFacade;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class PostLogInClient {
 
@@ -27,6 +28,8 @@ public class PostLogInClient {
             return switch (cmd) {
                 case "l", "list" -> listGames(authToken);
                 case "c", "create" -> createGame(authToken, params);
+                case "j", "join" -> joinGame(authToken, params);
+
 
 
                 case "quit" -> "quit";
@@ -36,6 +39,8 @@ public class PostLogInClient {
             return ex.getMessage();
         }
     }
+
+
 
     private String listGames(String authToken) {
         try {
@@ -82,6 +87,18 @@ public class PostLogInClient {
         return "Failure to create Game";
     }
 
+    private String joinGame(String authToken, String[] params) {
+
+        try {
+            if (Objects.equals(server.joinGame(authToken, params), " Game Joined Successfully ")){
+                return " Game Joined Successfully! ";
+            }
+        } catch (ResponseException e) {
+        return "Failure to Join Game " + e.getMessage();
+        }
+        return "Failure to Join Game ";
+    }
+
 
 
     public String help(){
@@ -89,7 +106,7 @@ public class PostLogInClient {
                         Options:
                         List current games:  "l", "list"
                         Create a new game:   "c", "create" ‹GAME NAME>
-                        Join a game:         "j", "join" ‹GAME ID> ‹COLOR›
+                        Join a game:         "j", "join" ‹WHITE/BLACK›‹GAME ID> 
                         Watch a game:        "w", "watch" <GAME ID>
                         Logout:              "logout"
                                 

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -47,9 +48,8 @@ public class ServerFacade {
 
     public List<GameList> listGames(String authToken) throws ResponseException {
         var path = "/game";
-
-          JsonObject response = this.makeRequest("GET", path, authToken, null,  JsonObject.class);
-          JsonArray gamesArray = response.getAsJsonArray("games");
+        JsonObject response = this.makeRequest("GET", path, authToken, null,  JsonObject.class);
+        JsonArray gamesArray = response.getAsJsonArray("games");
         List<GameList> games = new Gson().fromJson(gamesArray, new TypeToken<List<GameList>>(){}.getType());
 
         return games;
@@ -61,6 +61,28 @@ public class ServerFacade {
 
         return this.makeRequest("POST", path, authToken, gameName, GameID.class);
     }
+
+
+    public String joinGame(String authToken, String[] params) throws ResponseException {
+        var path = "/game";
+        String color = null;
+        if(params[0].equals("white")){
+            color = "WHITE";
+        }
+        if(params[0].equals("black")){
+            color = "BLACK";
+        }
+        var joinRequest = new JoinGame(color ,Integer.parseInt(params[1]));
+        this.makeRequest("PUT", path, authToken, joinRequest, Void.class);
+
+        return " Game Joined Successfully ";
+    }
+
+
+
+
+
+
 
 
     private <T> T makeRequest(String method, String path, String authToken, Object request, Class<T> responseClass) throws ResponseException {
@@ -117,11 +139,12 @@ public class ServerFacade {
             }
 
             throw new RuntimeException("not implemented but yes, it is an error in server facade");
-//        }
         }
     }
+
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
 
 }
