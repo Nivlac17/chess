@@ -74,6 +74,10 @@ public class PostLogInClient {
 
 
     private String createGame(String authToken, String... params) {
+        if (params.length != 1){
+            System.out.println("Invalid Game Name, Please Try Again");
+            return help();
+        }
         try {
             GameID gameID = server.createGame(authToken, params);
             if (gameID.gameID() > 0 ) {
@@ -87,10 +91,16 @@ public class PostLogInClient {
     }
 
     private String joinGame(String authToken, String[] params) {
+        if (params.length != 2){
+            System.out.println("Invalid Game Input, Please Try Again");
+            return help();
+        }
 
         try {
             if (Objects.equals(server.joinGame(authToken, params), " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
+            } else if(Objects.equals(server.joinGame(authToken, params), "Invalid Color Given, please try again")){
+                return "Invalid Color Given, please try again";
             }
         } catch (ResponseException e) {
         return "Failure to Join Game " + e.getMessage();

@@ -64,8 +64,11 @@ public class ServerFacade {
     public GameID createGame(String authToken, String... params) throws ResponseException {
         var path = "/game";
         var gameName = new GameCreationRequest(params[0]);
-
+        try{
         return this.makeRequest("POST", path, authToken, gameName, GameID.class);
+        }catch (ResponseException | NullPointerException e){
+            throw new ResponseException(404, "Invalid Game Creation, Please try again.");
+        }
     }
 
 
@@ -74,12 +77,17 @@ public class ServerFacade {
         String color = null;
         if(params[0].equals("white")){
             color = "WHITE";
-        }
-        if(params[0].equals("black")){
+        }else if(params[0].equals("black")){
             color = "BLACK";
+        } else {
+            return "Invalid Color Given, please try again";
         }
         var joinRequest = new JoinGame(color ,Integer.parseInt(params[1]));
+        try {
         this.makeRequest("PUT", path, authToken, joinRequest, Void.class);
+        }catch (ResponseException | NullPointerException e){
+            throw new ResponseException(404, "Game Play Position Taken or Game does not exist, Please try again.");
+        }
 
         return " Game Joined Successfully ";
     }
