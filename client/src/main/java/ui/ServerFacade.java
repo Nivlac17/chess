@@ -24,17 +24,19 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
-        System.out.println(url);
-
     }
 
-    public AuthData register(String... params) throws ResponseException {
+    public AuthData register(String... params) throws ResponseException  {
         String username = params[0];
         String password = params[1];
         String email    = params[2];
         UserData userData = new UserData(username,password,email);
         var path = "/user";
-        return this.makeRequest("POST", path, null, userData, AuthData.class);
+        try {
+            return this.makeRequest("POST", path, null, userData, AuthData.class);
+        }catch (ResponseException | NullPointerException e){
+            throw new ResponseException(404, "User Already Exists, Please Use a Different Username");
+        }
     }
 
     public AuthData logIn(String... params) throws ResponseException {
@@ -42,7 +44,11 @@ public class ServerFacade {
         String password = params[1];
         UserData userData = new UserData(username,password,null);
         var path = "/session";
+        try{
         return this.makeRequest("POST", path, null, userData, AuthData.class);
+        }catch (ResponseException | NullPointerException e){
+            throw new ResponseException(404, "Invalid Credential, Please try again.");
+        }
     }
 
 

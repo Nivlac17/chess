@@ -29,10 +29,8 @@ public class PreLogInClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register","r" -> register(params);
+                case "register", "r" -> register(params);
                 case "login", "l" -> logIn(params);
-
-
                 case "quit", "q" -> "quit";
                 default -> help();
             };
@@ -42,6 +40,10 @@ public class PreLogInClient {
     }
 
     public String register(String... params){
+        if (params.length != 3){
+            System.out.println("Invalid Registration, Please Try Again");
+            return help();
+        }
         try {
             AuthData authData = server.register(params);
             authToken = authData.authToken();
@@ -54,6 +56,10 @@ public class PreLogInClient {
     }
 
     private String logIn(String... params) {
+        if (params.length != 2){
+            System.out.println("Invalid Login, Please Try Again");
+            return help();
+        }
         try {
             AuthData authData = server.logIn(params);
             authToken = authData.authToken();
