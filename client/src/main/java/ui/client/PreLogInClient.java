@@ -33,7 +33,7 @@ public class PreLogInClient {
                 case "login", "l" -> logIn(params);
 
 
-                case "quit" -> "quit";
+                case "quit", "q" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {
