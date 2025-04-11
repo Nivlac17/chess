@@ -40,6 +40,15 @@ public class PostLogInClient {
         }
     }
 
+    private void setListNumberInterpreter (String authToken) throws ResponseException {
+        List<GameList> gameList = server.listGames(authToken);
+            int i = 0;
+            for (GameList game : gameList) {
+                i++;
+                listNumberInterpreter.put(i, game.gameID());
+            }
+    }
+
     private String watchGame(String authToken, String... params) {
         if (params.length != 1){
             System.out.println("Invalid Game Input, Please Try Again");
@@ -48,16 +57,7 @@ public class PostLogInClient {
 
         try {
             if(listNumberInterpreter == null){
-                List<GameList> gameList = server.listGames(authToken);
-                if (gameList.isEmpty()) {
-                    return "No Games Currently Created";
-                }else {
-                    int i = 0;
-                    for (GameList game : gameList) {
-                        i++;
-                        listNumberInterpreter.put(i, game.gameID());
-                    }
-                }
+                setListNumberInterpreter(authToken);
             }
         } catch (Exception e){}
             params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
@@ -65,14 +65,11 @@ public class PostLogInClient {
 
         try {
             GameData result = server.getGame(authToken, "1");
-            DrawBoard.main(result.game().getBoard(), "white");//perspective, gameboard
-            if (Objects.equals(result, " Game Joined Successfully ")){
-                return " Game Joined Successfully! ";
-            }
+            DrawBoard.main(result.game().getBoard(), "white");
+            return " Game Joined Successfully! ";
         } catch (ResponseException e) {
-            return "Failure to Join Game " + e.getMessage();
+            return "Failure to Join Game " ;
         }
-        return "Failure to Join Game ";
     }
 
 
@@ -136,16 +133,7 @@ public class PostLogInClient {
 
         try {
             if(listNumberInterpreter == null){
-                List<GameList> gameList = server.listGames(authToken);
-                if (gameList.isEmpty()) {
-                    return "No Games Currently Created";
-                }else {
-                    int i = 0;
-                    for (GameList game : gameList) {
-                        i++;
-                        listNumberInterpreter.put(i, game.gameID());
-                    }
-                }
+                setListNumberInterpreter(authToken);
             }
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
         } catch (Exception e){}
@@ -154,6 +142,9 @@ public class PostLogInClient {
 
         try {
             String result = server.joinGame(authToken, params);
+
+            GameData gameInfo = server.getGame(authToken, params[1]);
+            DrawBoard.main(gameInfo.game().getBoard(), params[0]);
             if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
             } else if(Objects.equals(result, "Invalid Color Given, please try again")){
