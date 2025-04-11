@@ -54,8 +54,8 @@ public class Server {
 
 
     private Object returnErrorHelper (Response response, DataAccessException e ){
-    response.status(e.getStatus());
-    return new Gson().toJson(Map.of( e.getMessage(), e.getStatus()));
+        response.status(e.getStatus());
+        return new Gson().toJson(Map.of("message", e.getMessage(), "status", e.getStatus()));
 }
 
     // Handlers

@@ -1,12 +1,15 @@
 package client;
 
 import chess.ChessGame;
+import com.sun.net.httpserver.Request;
+import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.GameID;
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.ChessService;
 import ui.ServerFacade;
 
 import java.util.Random;
@@ -31,11 +34,24 @@ public class ServerFacadeTests {
     @AfterAll
     static void stopServer() {
         server.stop();
+        try {
+            ChessService.clear();
+        } catch (DataAccessException e) {}
+    }
+
+    @BeforeEach
+    public void clearServer() throws DataAccessException {
+        try {
+            ChessService.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     @Test
-    public void registerPositiveTest() throws ResponseException {
+    @Order(1)
+    void registerPositiveTest() throws ResponseException {
         Random rand = new Random();
         int randomInt = rand.nextInt(1000000);
         AuthData authData = sf.register("milly" + randomInt, "password", "email");
@@ -45,53 +61,65 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void registerNegativeTest() throws ResponseException {
-        assertThrows( ResponseException.class, () -> sf.register("Jdk", "password", "email"));
+    @Order(2)
+     void registerNegativeTest() throws ResponseException {
+        sf.register("4315fgh2345", "password", "email");
+        assertThrows( ResponseException.class, () -> sf.register("4315fgh2345", "password", "email"));
     }
 
     @Test
-    public void logInPositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password", "email");
+    @Order(3)
+    void logInPositiveTest() throws ResponseException {
+        sf.register("123124342563", "password", "email");
+        AuthData authData = sf.logIn("123124342563", "password");
         assertNotNull(authData.authToken());
-        assertEquals("Jdk", authData.username());
+        assertEquals("123124342563", authData.username());
     }
 
     @Test
-    public void logInNegativeTest() throws ResponseException {
+    @Order(4)
+    void logInNegativeTest() throws ResponseException {
+        sf.register("Jdk", "password", "email");
         assertThrows( ResponseException.class, () -> sf.logIn("Jdk", "PASSWORD"));
     }
 
     @Test
-    public void listGamesPositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(5)
+    void listGamesPositiveTest() throws ResponseException {
+        AuthData authData = sf.register("098afd", "password", "email");
         assertNotNull(sf.listGames(authData.authToken()));
     }
 
     @Test
-    public void listGamesNegativeTest() throws ResponseException {
-        sf.logIn("Jdk", "password");
-        assertThrows(NullPointerException.class, () -> sf.listGames("123456yui"));
+    @Order(6)
+    void listGamesNegativeTest() throws ResponseException {
+        sf.register("08793451ihfg", "password", "email");
+        assertThrows(ResponseException.class, () -> sf.listGames("123456yui"));
     }
 
     @Test
-    public void createGamePositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(7)
+    void createGamePositiveTest() throws ResponseException {
+        AuthData authData = sf.register("la0th", "password", "email");
         GameID gameID = sf.createGame(authData.authToken(), "coolvids");
         assertNotNull(gameID.gameID());
     }
 
 
     @Test
-    public void createGameNegativeTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(8)
+    void createGameNegativeTest() throws ResponseException {
+        sf.register("asdf1234346", "password", "email");
+        AuthData authData = sf.logIn("asdf1234346", "password");
         assertThrows(ResponseException.class, () -> sf.createGame("123456yui", "nameristhiser"));
         assertThrows(ResponseException.class, () -> sf.createGame(authData.authToken(), ""));
 
     }
 
     @Test
-    public void joinGamePositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(9)
+    void joinGamePositiveTest() throws ResponseException {
+        AuthData authData = sf.register("asdf0789", "password", "email");
         GameID gameID = sf.createGame(authData.authToken(), "coolvids");
         String gameForTesting = sf.joinGame(authData.authToken(), "white", String.valueOf(gameID.gameID()));
         assertEquals(" Game Joined Successfully ", gameForTesting);
@@ -99,8 +127,9 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void joinGameNegativeTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(10)
+    void joinGameNegativeTest() throws ResponseException {
+        AuthData authData = sf.register("asdfasdfasdfasdf", "password", "email");
         GameID gameID = sf.createGame(authData.authToken(), "coolvids");
         String gameForTesting = sf.joinGame(authData.authToken(), "white", String.valueOf(gameID.gameID()));
         assertEquals(" Game Joined Successfully ", gameForTesting);
@@ -109,22 +138,28 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logOutPositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(11)
+    void logOutPositiveTest() throws ResponseException {
+        sf.register("1234543425", "password", "email");
+        AuthData authData = sf.logIn("1234543425", "password");
         assertEquals( sf.logOut(authData.authToken()), " Successful Logout ");
     }
 
     @Test
-    public void logOutNegativeTest() throws ResponseException {
-        sf.logIn("Jdk", "password");
-        assertThrows( NullPointerException.class, () -> sf.logOut("asdlfkj;"));
+    @Order(12)
+    void logOutNegativeTest() throws ResponseException {
+        sf.register("67654646574", "password", "email");
+        sf.logIn("67654646574", "password");
+        assertThrows( ResponseException.class, () -> sf.logOut("asdlfkj;"));
     }
 
 
 
     @Test
-    public void getGamePositiveTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+    @Order(13)
+    void getGamePositiveTest() throws ResponseException {
+        sf.register("43578945892345", "password", "email");
+        AuthData authData = sf.logIn("43578945892345", "password");
         GameID gameID = sf.createGame(authData.authToken(), "coolvids");
         GameData gameData = sf.getGame(authData.authToken(), String.valueOf(gameID.gameID()));
         assertNotNull(gameData);
@@ -133,10 +168,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void getGameNegativeTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
-        GameID gameID = sf.createGame(authData.authToken(), "coolvids");
-        assertThrows( NullPointerException.class, () -> sf.getGame("asdfafd;lksdjf;", String.valueOf(gameID.gameID())));
+    @Order(14)
+    void getGameNegativeTest() throws ResponseException {
+        sf.register("18768d57658758", "password", "email");
+        AuthData authData = sf.logIn("18768d57658758", "password");
+        GameID gameID = sf.createGame(authData.authToken(), "coolvids32");
+        assertThrows( ResponseException.class, () -> sf.getGame("asdfafd;lksdjf;", String.valueOf(gameID.gameID())));
 
 
     }
