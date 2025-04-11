@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
 import dataaccess.MySQLDataAccessMethods;
+import model.GameData;
 import model.JoinGame;
 import service.ChessService;
 import spark.*;
@@ -40,12 +41,19 @@ public class Server {
         Spark.put(stringVarToSatisfyQualityCode, this::joinGame);
         Spark.post(stringVarToSatisfyQualityCode, this::createGame);
 
+        Spark.post("/gameplay", this::updateGame);
+        Spark.post("/gameRet", this::getGame);
+
+
+
 
         Spark.awaitInitialization();
         return Spark.port();
     }
 
-private Object returnErrorHelper (Response response, DataAccessException e ){
+
+
+    private Object returnErrorHelper (Response response, DataAccessException e ){
     response.status(e.getStatus());
     return new Gson().toJson(Map.of( e.getMessage(), e.getStatus()));
 }
@@ -141,8 +149,30 @@ String authStringVarToSatisfyQualityCode = "Authorization";
         }
     }
 
+    private Object getGame(Request request, Response response) {
+        Gson serializer = new Gson();
+        String token = request.headers(authStringVarToSatisfyQualityCode);
+        var getGameRequest = serializer.fromJson(request.body(), model.GameID.class);
+        try {
+            GameData getGameResult = service.getGame(token, getGameRequest);
+            return serializer.toJson(getGameResult);
+        } catch (DataAccessException e ) {
+            return returnErrorHelper(response,e);
+        }
+    }
 
 
+    private Object updateGame(Request request, Response response) {
+        Gson serializer = new Gson();
+        String token = request.headers(authStringVarToSatisfyQualityCode);
+        var updateGameRequest = serializer.fromJson(request.body(), model.GameData.class);
+        try {
+            String updateGameResult = service.updateGame(token, updateGameRequest);
+            return serializer.toJson(updateGameResult);
+        } catch (DataAccessException e ) {
+            return returnErrorHelper(response,e);
+        }
+    }
 
 
 

@@ -28,7 +28,7 @@ public class PostLogInClient {
                 case "l", "list" -> listGames(authToken);
                 case "c", "create" -> createGame(authToken, params);
                 case "j", "join" -> joinGame(authToken, params);
-//                case "w", "watch" -> watchGame(authToken, params);
+                case "w", "watch" -> watchGame(authToken, params);
                 case "logout" -> logOut(authToken);
                 case "quit" -> "quit";
                 default -> help();
@@ -38,6 +38,39 @@ public class PostLogInClient {
         }
     }
 
+    private String watchGame(String authToken, String... params) {
+        if (params.length != 2){
+            System.out.println("Invalid Game Input, Please Try Again");
+            return help();
+        }
+
+        try {
+            if(listNumberInterpreter == null){
+                List<GameList> gameList = server.listGames(authToken);
+                if (gameList.isEmpty()) {
+                    return "No Games Currently Created";
+                }else {
+                    String uiList = "Games: ";
+                    int i = 0;
+                    for (GameList game : gameList) {
+                        i++;
+                        listNumberInterpreter.put(i, game.gameID());
+                    }
+                }
+            }
+            params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
+        } catch (Exception e){}
+
+        try {
+            String result = server.getGame(authToken, params);
+            if (Objects.equals(result, " Game Joined Successfully ")){
+                return " Game Joined Successfully! ";
+            }
+        } catch (ResponseException e) {
+            return "Failure to Join Game " + e.getMessage();
+        }
+        return "Failure to Join Game ";
+    }
 
 
     private String listGames(String authToken) {

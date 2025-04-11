@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.List;
 
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -90,6 +91,21 @@ public class ServerFacade {
 
 
 
+    public String getGame(String authToken, String... params) throws ResponseException {
+        GameID gameID = new GameID(Integer.parseInt(params[0]));
+       GameData gameData = this.makeRequest("POST", "/gameRet", authToken, gameID, GameData.class);
+        return gameData.gameName();
+    }
+
+    public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {
+
+        GameData gameData = new GameData(id,null,null,null, chessGame);
+        String result = this.makeRequest("POST", "/gameplay", authToken, gameData, String.class);
+        return result;
+    }
+
+
+
 
 
 
@@ -157,6 +173,7 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
+
 
 
 }

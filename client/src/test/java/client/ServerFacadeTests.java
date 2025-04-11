@@ -30,10 +30,11 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() throws ResponseException {
         Assertions.assertTrue(true);
-        String authToken = sf.logIn("c", "a").authToken();
+        String authToken = sf.logIn("c", "c").authToken();
         GameID newGameID = sf.createGame(authToken,"calvin12");
         String gameList = sf.listGames(authToken).toString();
-        System.out.println(gameList);
+        String gameName = sf.getGame(authToken,"1");
+        System.out.println(gameName);
     }
 
 }

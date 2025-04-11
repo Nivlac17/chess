@@ -12,6 +12,7 @@ import java.util.UUID;
 public class ChessService {
 
     private static DataAccessInterface dataAccess;
+
     public ChessService(DataAccessInterface dataAccess) {
         this.dataAccess = dataAccess;
     }
@@ -24,18 +25,18 @@ public class ChessService {
     public static AuthData register(UserData registerRequest) throws DataAccessException {
         if (registerRequest.password() == null || registerRequest.username() == null) {
             throw new DataAccessException("Error: Invalid User", 400);
-        } else if ( registerRequest.username().isEmpty()  ||
-                registerRequest.password().isEmpty() || registerRequest.email().isEmpty()){
+        } else if (registerRequest.username().isEmpty() ||
+                registerRequest.password().isEmpty() || registerRequest.email().isEmpty()) {
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
-            if (dataAccess.getUser(registerRequest.username()) == null) {
-                dataAccess.createUser(registerRequest);
-                AuthData registerResult = new AuthData(generateAuthToken(), registerRequest.username());
-                dataAccess.createAuth(registerResult);
-                return registerResult;
-            } else {
-                throw new DataAccessException("Error: Username " + registerRequest.username() + " is taken.", 403);
-            }
+        if (dataAccess.getUser(registerRequest.username()) == null) {
+            dataAccess.createUser(registerRequest);
+            AuthData registerResult = new AuthData(generateAuthToken(), registerRequest.username());
+            dataAccess.createAuth(registerResult);
+            return registerResult;
+        } else {
+            throw new DataAccessException("Error: Username " + registerRequest.username() + " is taken.", 403);
+        }
     }
 
 
@@ -45,16 +46,16 @@ public class ChessService {
 
 
     public static AuthData logIn(UserData logInRequest) throws DataAccessException {
-        if ( logInRequest.username().isEmpty()  || logInRequest.password().isEmpty()){
+        if (logInRequest.username().isEmpty() || logInRequest.password().isEmpty()) {
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
 
         UserData userData = dataAccess.getUser(logInRequest.username());
         if (userData == null) {
             throw new DataAccessException("Error: Invalid User", 401);
-        }else if (!(BCrypt.checkpw(logInRequest.password(), userData.password())) || userData.username().isEmpty() ){
+        } else if (!(BCrypt.checkpw(logInRequest.password(), userData.password())) || userData.username().isEmpty()) {
             throw new DataAccessException("Error: invalid credentials", 401);
-        }else {
+        } else {
             AuthData logInResult = new AuthData(generateAuthToken(), logInRequest.username());
             dataAccess.createAuth(logInResult);
             return logInResult;
@@ -80,7 +81,7 @@ public class ChessService {
     }
 
 
-    public static int createGame(String token, GameData createGameRequest) throws DataAccessException{
+    public static int createGame(String token, GameData createGameRequest) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(token);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);
@@ -102,7 +103,7 @@ public class ChessService {
     private static int generateGameID() {
         Collection<GameList> gameDataList = dataAccess.listGames();
         int idnum = 0;
-        for ( GameList ignored :  gameDataList){
+        for (GameList ignored : gameDataList) {
             idnum++;
         }
         return idnum + 1;
@@ -115,33 +116,69 @@ public class ChessService {
             throw new DataAccessException("Error: unauthorized", 401);
         }
         GameData game = dataAccess.getGame(joinGameRequest.gameID());
-        if (game == null ) {
+        if (game == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
-        if (joinGameRequest.playerColor() == null){
+        if (joinGameRequest.playerColor() == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
 
         switch (joinGameRequest.playerColor()) {
             case "WHITE":
-            if (game.whiteUsername() == null) {
-                dataAccess.updateGame(game.gameID(), authData.username(), null, null, null);
-            } else{
-                throw new DataAccessException("Error: already taken", 403);
-            }
-            break;
+                if (game.whiteUsername() == null) {
+                    dataAccess.updateGame(game.gameID(), authData.username(), null, null, null);
+                } else {
+                    throw new DataAccessException("Error: already taken", 403);
+                }
+                break;
             case "BLACK":
                 if (game.blackUsername() == null) {
-                dataAccess.updateGame(game.gameID(), null, authData.username(), null, null);
-            } else {
-                throw new DataAccessException("Error: already taken", 403);
-            }
+                    dataAccess.updateGame(game.gameID(), null, authData.username(), null, null);
+                } else {
+                    throw new DataAccessException("Error: already taken", 403);
+                }
                 break;
-            default:
-            {
+            default: {
                 throw new DataAccessException("Error: Forbidden", 400);
             }
         }
+    }
+
+
+    public static GameData getGame(String token, GameID getGameRequest) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+
+        GameData game = dataAccess.getGame(getGameRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        }
+
+        return game;
+
+    }
+
+    public String updateGame(String token, GameData updateGameRequest) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+
+        GameData game = dataAccess.getGame(updateGameRequest.gameID());
+        if (game == null) {
+            throw new DataAccessException("Error: bad request", 400);
+        }
+
+        if(!game.gameName().equals(updateGameRequest.gameName())){
+            throw new DataAccessException("Error: bad request", 400);
+        }
+
+
+
+        dataAccess.updateGame(updateGameRequest.gameID(), null, null, null, updateGameRequest.game());
+        return "success updating game";
     }
 }
 

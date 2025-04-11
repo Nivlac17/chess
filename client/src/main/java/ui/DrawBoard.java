@@ -17,7 +17,7 @@ public class DrawBoard {
     public static void main(String[] args) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        out.print(ERASE_SCREEN);
+//        out.print(ERASE_SCREEN);
 
         drawHeaders(out);
         drawChessBoard(out);
@@ -59,6 +59,7 @@ public class DrawBoard {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
 
             drawRowOfSquares(out, boardRow);
+
 
 
         }
