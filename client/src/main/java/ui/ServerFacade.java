@@ -7,10 +7,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -31,9 +29,8 @@ public class ServerFacade {
         String password = params[1];
         String email    = params[2];
         UserData userData = new UserData(username,password,email);
-        var path = "/user";
         try {
-            return this.makeRequest("POST", path, null, userData, AuthData.class);
+            return this.makeRequest("POST", "/user", null, userData, AuthData.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "User Already Exists, Please Use a Different Username");
         }
@@ -43,9 +40,8 @@ public class ServerFacade {
         String username = params[0];
         String password = params[1];
         UserData userData = new UserData(username,password,null);
-        var path = "/session";
         try{
-        return this.makeRequest("POST", path, null, userData, AuthData.class);
+        return this.makeRequest("POST", "/session", null, userData, AuthData.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "Invalid Credential, Please try again.");
         }
@@ -53,19 +49,15 @@ public class ServerFacade {
 
 
     public List<GameList> listGames(String authToken) throws ResponseException {
-        var path = "/game";
-        JsonObject response = this.makeRequest("GET", path, authToken, null,  JsonObject.class);
+        JsonObject response = this.makeRequest("GET", "/game", authToken, null,  JsonObject.class);
         JsonArray gamesArray = response.getAsJsonArray("games");
-        List<GameList> games = new Gson().fromJson(gamesArray, new TypeToken<List<GameList>>(){}.getType());
-
-        return games;
+        return new Gson().fromJson(gamesArray, new TypeToken<List<GameList>>(){}.getType());
     }
 
     public GameID createGame(String authToken, String... params) throws ResponseException {
-        var path = "/game";
         var gameName = new GameCreationRequest(params[0]);
         try{
-        return this.makeRequest("POST", path, authToken, gameName, GameID.class);
+        return this.makeRequest("POST", "/game", authToken, gameName, GameID.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "Invalid Game Creation, Please try again.");
         }
@@ -73,7 +65,6 @@ public class ServerFacade {
 
 
     public String joinGame(String authToken, String[] params) throws ResponseException {
-        var path = "/game";
         String color = null;
         if(params[0].equals("white")){
             color = "WHITE";
@@ -84,7 +75,7 @@ public class ServerFacade {
         }
         var joinRequest = new JoinGame(color ,Integer.parseInt(params[1]));
         try {
-        this.makeRequest("PUT", path, authToken, joinRequest, Void.class);
+        this.makeRequest("PUT", "/game", authToken, joinRequest, Void.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "Game Play Position Taken or Game does not exist, Please try again.");
         }
@@ -93,8 +84,7 @@ public class ServerFacade {
     }
 
     public String logOut(String authToken) throws ResponseException {
-        var path = "/session";
-                this.makeRequest("DELETE", path, authToken, null, Void.class);
+                this.makeRequest("DELETE", "/session", authToken, null, Void.class);
         return " Successful Logout ";
     }
 
