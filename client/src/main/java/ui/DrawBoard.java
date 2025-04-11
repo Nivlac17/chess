@@ -8,7 +8,6 @@ import chess.ChessPosition;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class DrawBoard {
@@ -19,22 +18,18 @@ public class DrawBoard {
     public static ChessBoard board;
 
 
-    public static void main(ChessBoard board) {
+    public static void main(ChessBoard board, String perspective) {
         DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         drawHeaders(out);
-        drawChessBoard(out);
+        drawChessBoard(out, perspective);
         drawHeaders(out);
-
     }
 
 
-
-
     private static void drawHeaders(PrintStream out) {
-
         setBlack(out);
-        out.print("  ");
+        out.print("     ");
         String[] headers = {  "A", "B", "C", "D", "E", "F", "G", "H" };
         for (String header : headers) {
             drawHeader(out, header);
@@ -43,7 +38,6 @@ public class DrawBoard {
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-
         out.print("  ");
         printHeaderText(out, headerText);
 
@@ -58,9 +52,13 @@ public class DrawBoard {
         setBlack(out);
     }
 
-    private static void drawChessBoard(PrintStream out) {
+    private static void drawChessBoard(PrintStream out, String perspective) {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-            drawRowOfSquares(out, boardRow);
+            if (perspective.equals("white")){
+                drawRowOfSquaresPerspectiveWhite(out, boardRow);
+            }else {
+                drawRowOfSquaresPerspectiveBLack(out, boardRow);
+            }
         }
     }
 
@@ -76,10 +74,7 @@ public class DrawBoard {
 
     private static String setPieceType(int row, int col, ChessBoard board){
         ChessPiece piece = null;
-        try {
-            piece = board.getPiece(new ChessPosition(row, col));
-        }catch(Exception e){}
-
+        piece = board.getPiece(new ChessPosition(row, col));
         if (piece == null){
             return null;
         }
@@ -96,34 +91,57 @@ public class DrawBoard {
         return picture;
     }
 
-    private static void drawRowOfSquares(PrintStream out, int row) {
-            out.print(SET_TEXT_COLOR_GREEN);
-                out.printf("%2d ",(8 - row));
-                String piece;
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                if((row + boardCol) % 2 == 1) {
-                    setWhite(out);
-                }else{
-                    setRed(out);
-                }
-                piece = setPieceType(row + 1, boardCol + 1, board);
-                if (piece == null){
-                    out.print(SET_TEXT_COLOR_GREEN);
-                    out.print(("   "));
-                }else{
-                    out.print(setPieceColor(row + 1, boardCol + 1, board));
-                    out.print((" " +  piece + " "));
-                }
-//                out.print(setPieceColor(row + 1, boardCol + 1, board));
-//                    out.print((" " +  piece + " "));
-                }
-                setBlack(out);
-            out.print(SET_TEXT_COLOR_GREEN);
-                out.printf(" %2d",(8 - row));
+    private static void drawRowOfSquaresPerspectiveBLack(PrintStream out, int row) {
+        out.print(SET_TEXT_COLOR_GREEN);
+            out.printf("   %2d ",(row + 1));
+            String piece;
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            if((row + boardCol) % 2 == 1) {
+                setWhite(out);
+            }else{
+                setGrey(out);
+            }
+            piece = setPieceType(row + 1, boardCol + 1, board);
+            if (piece == null){
+                out.print(SET_TEXT_COLOR_GREEN);
+                out.print(("   "));
+            }else{
+                out.print(setPieceColor(row + 1, boardCol + 1, board));
+                out.print((" " +  piece + " "));
+            }
+        }
+        setBlack(out);
+        out.print(SET_TEXT_COLOR_GREEN);
+        out.printf(" %2d  ",(row + 1));
 
-            out.println();
+        out.println();
     }
 
+    private static void drawRowOfSquaresPerspectiveWhite(PrintStream out, int row) {
+        out.print(SET_TEXT_COLOR_GREEN);
+        out.printf("   %2d ",(8 - row));
+        String piece;
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            if((row + boardCol) % 2 == 1) {
+                setWhite(out);
+            }else{
+                setGrey(out);
+            }
+            piece = setPieceType(8 - row, 8 - boardCol, board);
+            if (piece == null){
+                out.print(SET_TEXT_COLOR_GREEN);
+                out.print(("   "));
+            }else{
+                out.print(setPieceColor(8 - row, 8 - boardCol, board));
+                out.print((" " +  piece + " "));
+            }
+        }
+        setBlack(out);
+        out.print(SET_TEXT_COLOR_GREEN);
+        out.printf(" %2d   ",(8 - row));
+
+        out.println();
+    }
 
 
     private static void setWhite(PrintStream out) {
@@ -134,6 +152,11 @@ public class DrawBoard {
     private static void setRed(PrintStream out) {
         out.print(SET_BG_COLOR_RED);
         out.print(SET_TEXT_COLOR_RED);
+    }
+
+    private static void setGrey(PrintStream out) {
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     private static void setBlack(PrintStream out) {

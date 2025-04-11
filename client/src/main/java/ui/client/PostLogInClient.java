@@ -52,7 +52,6 @@ public class PostLogInClient {
                 if (gameList.isEmpty()) {
                     return "No Games Currently Created";
                 }else {
-                    String uiList = "Games: ";
                     int i = 0;
                     for (GameList game : gameList) {
                         i++;
@@ -66,7 +65,7 @@ public class PostLogInClient {
 
         try {
             GameData result = server.getGame(authToken, "1");
-            DrawBoard.main(result.game().getBoard());//perspective, gameboard
+            DrawBoard.main(result.game().getBoard(), "white");//perspective, gameboard
             if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
             }
