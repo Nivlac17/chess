@@ -97,11 +97,11 @@ public class ServerFacade {
         return gameData;
     }
 
-    public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {
-        GameData gameData = new GameData(id,null,null,null, chessGame);
-        String result = this.makeRequest("POST", "/gameplay", authToken, gameData, String.class);
-        return result;
-    }
+//    public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {
+//        GameData gameData = new GameData(id,null,null,null, chessGame);
+//        String result = this.makeRequest("POST", "/gameplay", authToken, gameData, String.class);
+//        return result;
+//    }
 
 
 

@@ -1,6 +1,6 @@
 package client;
 
-import dataaccess.DataAccessException;
+import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -132,34 +132,19 @@ public class ServerFacadeTests {
 
     }
 
+    @Test
+    public void getGameNegativeTest() throws ResponseException {
+        AuthData authData = sf.logIn("Jdk", "password");
+        GameID gameID = sf.createGame(authData.authToken(), "coolvids");
+        assertThrows( NullPointerException.class, () -> sf.getGame("asdfafd;lksdjf;", String.valueOf(gameID.gameID())));
+
+
+    }
+
+
 
 
 }
 
 
 
-
-
-//
-//        Assertions.assertTrue(true);
-//        String authToken = sf.logIn("c", "c").authToken();
-//        GameID newGameID = sf.createGame(authToken,"calvin12");
-//        String gameList = sf.listGames(authToken).toString();
-////        String gameName = sf.getGame(authToken,"1");
-////        System.out.println(gameName);
-//    }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//    getGame
-//            updateGame
-//
-//}
