@@ -1,9 +1,14 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
+import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class DrawBoard {
@@ -11,20 +16,20 @@ public class DrawBoard {
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 2;
     int middleLine = SQUARE_SIZE_IN_PADDED_CHARS / 2;
 
-    private static final String EMPTY = "   ";
+    public static ChessBoard board;
 
 
-    public static void main(String[] args) {
+    public static void main(ChessBoard board) {
+        DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
-//        out.print(ERASE_SCREEN);
-
         drawHeaders(out);
         drawChessBoard(out);
         drawHeaders(out);
 
-
     }
+
+
+
 
     private static void drawHeaders(PrintStream out) {
 
@@ -38,12 +43,10 @@ public class DrawBoard {
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-        int prefixLength = 1;
-//        int suffixLength = 1;
 
-        out.print(EMPTY.repeat(prefixLength));
-        printHeaderText(out, headerText);
         out.print("  ");
+        printHeaderText(out, headerText);
+
     }
 
     private static void printHeaderText(PrintStream out, String player) {
@@ -57,45 +60,68 @@ public class DrawBoard {
 
     private static void drawChessBoard(PrintStream out) {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-
             drawRowOfSquares(out, boardRow);
-
-
-
         }
     }
 
+    private static String setPieceColor(int row, int col, ChessBoard board){
+        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            return(SET_TEXT_COLOR_BLUE);
+        } else {
+            return(SET_TEXT_COLOR_BLACK);
+        }
+    }
+
+
+    private static String setPieceType(int row, int col, ChessBoard board){
+        ChessPiece piece = null;
+        try {
+            piece = board.getPiece(new ChessPosition(row, col));
+        }catch(Exception e){}
+
+        if (piece == null){
+            return null;
+        }
+        String picture = null;
+        switch (piece.getPieceType()) {
+            case BISHOP -> picture ="B";
+            case KNIGHT -> picture ="N";
+            case PAWN -> picture ="p";
+            case KING -> picture ="K";
+            case QUEEN -> picture ="Q";
+            case ROOK -> picture ="R";
+            default -> picture = null;
+        }
+        return picture;
+    }
+
     private static void drawRowOfSquares(PrintStream out, int row) {
-        int middleLine = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-
-        for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             out.print(SET_TEXT_COLOR_GREEN);
-            if (squareRow == middleLine){
                 out.printf("%2d ",(8 - row));
-            }else {
-                out.print("   ");
-            }
-
-
+                String piece;
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 if((row + boardCol) % 2 == 1) {
                     setWhite(out);
                 }else{
                     setRed(out);
                 }
-
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+                piece = setPieceType(row + 1, boardCol + 1, board);
+                if (piece == null){
+                    out.print(SET_TEXT_COLOR_GREEN);
+                    out.print(("   "));
+                }else{
+                    out.print(setPieceColor(row + 1, boardCol + 1, board));
+                    out.print((" " +  piece + " "));
+                }
+//                out.print(setPieceColor(row + 1, boardCol + 1, board));
+//                    out.print((" " +  piece + " "));
                 }
                 setBlack(out);
             out.print(SET_TEXT_COLOR_GREEN);
-            if (squareRow == middleLine){
                 out.printf(" %2d",(8 - row));
-            }else {
-                out.print("  ");
-            }
-            out.println();
-        }
 
+            out.println();
     }
 
 

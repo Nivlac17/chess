@@ -91,10 +91,10 @@ public class ServerFacade {
 
 
 
-    public String getGame(String authToken, String... params) throws ResponseException {
+    public GameData getGame(String authToken, String... params) throws ResponseException {
         GameID gameID = new GameID(Integer.parseInt(params[0]));
        GameData gameData = this.makeRequest("POST", "/gameRet", authToken, gameID, GameData.class);
-        return gameData.gameName();
+        return gameData;
     }
 
     public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {

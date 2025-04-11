@@ -1,8 +1,10 @@
 package ui.client;
 
 import exception.ResponseException;
+import model.GameData;
 import model.GameID;
 import model.GameList;
+import ui.DrawBoard;
 import ui.ServerFacade;
 
 import java.util.*;
@@ -39,7 +41,7 @@ public class PostLogInClient {
     }
 
     private String watchGame(String authToken, String... params) {
-        if (params.length != 2){
+        if (params.length != 1){
             System.out.println("Invalid Game Input, Please Try Again");
             return help();
         }
@@ -58,11 +60,13 @@ public class PostLogInClient {
                     }
                 }
             }
-            params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
         } catch (Exception e){}
+            params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
+
 
         try {
-            String result = server.getGame(authToken, params);
+            GameData result = server.getGame(authToken, "1");
+            DrawBoard.main(result.game().getBoard());//perspective, gameboard
             if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
             }
@@ -137,7 +141,6 @@ public class PostLogInClient {
                 if (gameList.isEmpty()) {
                     return "No Games Currently Created";
                 }else {
-                    String uiList = "Games: ";
                     int i = 0;
                     for (GameList game : gameList) {
                         i++;

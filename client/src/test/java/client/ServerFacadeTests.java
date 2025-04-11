@@ -33,8 +33,8 @@ public class ServerFacadeTests {
         String authToken = sf.logIn("c", "c").authToken();
         GameID newGameID = sf.createGame(authToken,"calvin12");
         String gameList = sf.listGames(authToken).toString();
-        String gameName = sf.getGame(authToken,"1");
-        System.out.println(gameName);
+//        String gameName = sf.getGame(authToken,"1");
+//        System.out.println(gameName);
     }
 
 }
