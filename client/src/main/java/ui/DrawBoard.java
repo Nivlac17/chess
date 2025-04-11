@@ -9,16 +9,9 @@ import static ui.EscapeSequences.*;
 public class DrawBoard {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 2;
+    int middleLine = SQUARE_SIZE_IN_PADDED_CHARS / 2;
 
-    // Board dimensions.
-
-
-    // Padded characters.
     private static final String EMPTY = "   ";
-    private static final String X = " X ";
-    private static final String O = " O ";
-
-    private static Random rand = new Random();
 
 
     public static void main(String[] args) {
@@ -27,34 +20,30 @@ public class DrawBoard {
         out.print(ERASE_SCREEN);
 
         drawHeaders(out);
-
         drawChessBoard(out);
+        drawHeaders(out);
 
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+
     }
 
     private static void drawHeaders(PrintStream out) {
 
         setBlack(out);
-
-        String[] headers = { "1", "2", "3", "4", "5", "6" , "7", "8" };
-        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-            drawHeader(out, headers[boardCol]);
-
-
+        out.print("  ");
+        String[] headers = {  "A", "B", "C", "D", "E", "F", "G", "H" };
+        for (String header : headers) {
+            drawHeader(out, header);
         }
-
         out.println();
     }
 
     private static void drawHeader(PrintStream out, String headerText) {
-        int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-        int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength;
+        int prefixLength = 1;
+//        int suffixLength = 1;
 
         out.print(EMPTY.repeat(prefixLength));
         printHeaderText(out, headerText);
-        out.print(EMPTY.repeat(suffixLength));
+        out.print("  ");
     }
 
     private static void printHeaderText(PrintStream out, String player) {
@@ -67,44 +56,45 @@ public class DrawBoard {
     }
 
     private static void drawChessBoard(PrintStream out) {
-
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
 
-            drawRowOfSquares(out);
+            drawRowOfSquares(out, boardRow);
 
 
         }
     }
 
-    private static void drawRowOfSquares(PrintStream out) {
+    private static void drawRowOfSquares(PrintStream out, int row) {
+        int middleLine = SQUARE_SIZE_IN_PADDED_CHARS / 2;
 
         for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
+            out.print(SET_TEXT_COLOR_GREEN);
+            if (squareRow == middleLine){
+                out.printf("%2d ",(8 - row));
+            }else {
+                out.print("   ");
+            }
+
+
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                if((squareRow + boardCol) % 2 == 1) {
+                if((row + boardCol) % 2 == 1) {
                     setWhite(out);
                 }else{
                     setRed(out);
                 }
 
-                if (squareRow == SQUARE_SIZE_IN_PADDED_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
-
-//                    out.print(EMPTY.repeat(prefixLength));
-//                    printPlayer(out, rand.nextBoolean() ? X : O);
-//                    out.print(EMPTY.repeat(suffixLength));
-                }
-                else {
                     out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
                 }
-
-
-
                 setBlack(out);
+            out.print(SET_TEXT_COLOR_GREEN);
+            if (squareRow == middleLine){
+                out.printf(" %2d",(8 - row));
+            }else {
+                out.print("  ");
             }
-
             out.println();
         }
+
     }
 
 
