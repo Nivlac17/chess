@@ -16,7 +16,6 @@ public class PreLogInClient {
     public  PreLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-//        this.notificationHandler = notificationHandler;
     }
 
     public static String getAuthToken() {

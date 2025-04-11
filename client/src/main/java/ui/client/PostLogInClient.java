@@ -65,7 +65,7 @@ public class PostLogInClient {
 
         try {
             GameData result = server.getGame(authToken, "1");
-            DrawBoard.main(result.game().getBoard(), "white");
+            DrawBoard.Draw(result.game().getBoard(), "white");
             return " Game Joined Successfully! ";
         } catch (ResponseException e) {
             return "Failure to Join Game " ;
@@ -142,7 +142,7 @@ public class PostLogInClient {
             String result = server.joinGame(authToken, params);
 
             GameData gameInfo = server.getGame(authToken, params[1]);
-            DrawBoard.main(gameInfo.game().getBoard(), params[0]);
+            DrawBoard.Draw(gameInfo.game().getBoard(), params[0]);
             if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
             } else if(Objects.equals(result, "Invalid Color Given, please try again")){

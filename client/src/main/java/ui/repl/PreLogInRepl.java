@@ -32,7 +32,6 @@ public class PreLogInRepl {
                 if (result.equals("Successful registration!!") || result.equals("Successful login!!")) {
                     PostLogInRepl postLoginRepl = new PostLogInRepl(this.serverUrl, PreLogInClient.getAuthToken());
                     postLoginRepl.run();
-//                    break;
                 }
 
 
@@ -44,10 +43,7 @@ public class PreLogInRepl {
         System.out.println();
     }
 
-//    public void notify(Notification notification) {
-//        System.out.println(RED + notification.message());
-//        printPrompt();
-//    }
+
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);

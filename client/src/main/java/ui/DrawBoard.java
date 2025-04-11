@@ -15,10 +15,10 @@ public class DrawBoard {
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 2;
     int middleLine = SQUARE_SIZE_IN_PADDED_CHARS / 2;
 
-    public static ChessBoard board;
+    private static ChessBoard board;
 
 
-    public static void main(ChessBoard board, String perspective) {
+    public static void Draw(ChessBoard board, String perspective) {
         DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         drawHeaders(out);
@@ -149,10 +149,6 @@ public class DrawBoard {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    private static void setRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_RED);
-    }
 
     private static void setGrey(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);

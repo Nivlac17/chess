@@ -33,8 +33,7 @@ public class PostLogInRepl {
                 result = client.eval(line, authToken);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
                 if (result.equals("game has started 1")) {
-                    GamePlayRepl gamePlayRepl = new GamePlayRepl();
-//                    gamePlayRepl.run();
+                    System.out.println("Gameplay has started");
                 }
                 if (result.equals(" GOODBYE!!! ")) {
                     break;
@@ -47,10 +46,7 @@ public class PostLogInRepl {
         System.out.println();
     }
 
-//    public void notify(Notification notification) {
-//        System.out.println(RED + notification.message());
-//        printPrompt();
-//    }
+
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
