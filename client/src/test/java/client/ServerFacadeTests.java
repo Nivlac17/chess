@@ -45,7 +45,6 @@ public class ServerFacadeTests {
 
     @Test
     public void registerNegativeTest() throws ResponseException {
-        sf.register("Jdk", "password", "email");
         assertThrows( ResponseException.class, () -> sf.register("Jdk", "password", "email"));
     }
 
