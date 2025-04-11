@@ -3,6 +3,7 @@ package client;
 import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.GameID;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -115,9 +116,22 @@ public class ServerFacadeTests {
 
     @Test
     public void logOutNegativeTest() throws ResponseException {
-        AuthData authData = sf.logIn("Jdk", "password");
+        sf.logIn("Jdk", "password");
         assertThrows( NullPointerException.class, () -> sf.logOut("asdlfkj;"));
     }
+
+
+
+    @Test
+    public void getGamePositiveTest() throws ResponseException {
+        AuthData authData = sf.logIn("Jdk", "password");
+        GameID gameID = sf.createGame(authData.authToken(), "coolvids");
+        GameData gameData = sf.getGame(authData.authToken(), String.valueOf(gameID.gameID()));
+        assertNotNull(gameData);
+        assertEquals("coolvids", gameData.gameName());
+
+    }
+
 
 
 }
@@ -144,7 +158,7 @@ public class ServerFacadeTests {
 //
 //
 //
-//            logOut
+//
 //    getGame
 //            updateGame
 //
