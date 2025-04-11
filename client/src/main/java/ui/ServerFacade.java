@@ -65,7 +65,7 @@ public class ServerFacade {
     }
 
 
-    public String joinGame(String authToken, String[] params) throws ResponseException {
+    public String joinGame(String authToken, String... params) throws ResponseException {
         String color = null;
         if(params[0].equals("white")){
             color = "WHITE";
@@ -98,7 +98,6 @@ public class ServerFacade {
     }
 
     public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {
-
         GameData gameData = new GameData(id,null,null,null, chessGame);
         String result = this.makeRequest("POST", "/gameplay", authToken, gameData, String.class);
         return result;

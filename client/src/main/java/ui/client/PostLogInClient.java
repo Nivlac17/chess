@@ -132,9 +132,7 @@ public class PostLogInClient {
         }
 
         try {
-            if(listNumberInterpreter == null){
-                setListNumberInterpreter(authToken);
-            }
+            setListNumberInterpreter(authToken);
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
         } catch (Exception e){}
 
