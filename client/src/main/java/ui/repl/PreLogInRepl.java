@@ -1,7 +1,6 @@
 package ui.repl;
 
 import ui.client.PreLogInClient;
-import ui.repl.PostLogInRepl;
 
 import java.util.Scanner;
 

@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.List;
 
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -19,6 +18,7 @@ import model.*;
 
 public class ServerFacade {
     private final String serverUrl;
+    private static final String GAME = "/game";
 
 
     public ServerFacade(String url) {
@@ -49,16 +49,17 @@ public class ServerFacade {
     }
 
 
-    public List<GameList> listGames(String authToken) throws ResponseException {
-        JsonObject response = this.makeRequest("GET", "/game", authToken, null,  JsonObject.class);
-        JsonArray gamesArray = response.getAsJsonArray("games");
+    public List<GameList> listGames(String authToken) throws ResponseException, NullPointerException{
+        JsonObject response = this.makeRequest("GET", GAME, authToken, null,  JsonObject.class);
+        JsonArray gamesArray;
+        gamesArray = response.getAsJsonArray("games");
         return new Gson().fromJson(gamesArray, new TypeToken<List<GameList>>(){}.getType());
     }
 
     public GameID createGame(String authToken, String... params) throws ResponseException {
         var gameName = new GameCreationRequest(params[0]);
         try{
-        return this.makeRequest("POST", "/game", authToken, gameName, GameID.class);
+        return this.makeRequest("POST", GAME, authToken, gameName, GameID.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "Invalid Game Creation, Please try again.");
         }
@@ -66,7 +67,7 @@ public class ServerFacade {
 
 
     public String joinGame(String authToken, String... params) throws ResponseException {
-        String color = null;
+        String color;
         if(params[0].equals("white")){
             color = "WHITE";
         }else if(params[0].equals("black")){
@@ -76,7 +77,7 @@ public class ServerFacade {
         }
         var joinRequest = new JoinGame(color ,Integer.parseInt(params[1]));
         try {
-        this.makeRequest("PUT", "/game", authToken, joinRequest, Void.class);
+        this.makeRequest("PUT", GAME, authToken, joinRequest, Void.class);
         }catch (ResponseException | NullPointerException e){
             throw new ResponseException(404, "Game Play Position Taken or Game does not exist, Please try again.");
         }
@@ -93,15 +94,9 @@ public class ServerFacade {
 
     public GameData getGame(String authToken, String... params) throws ResponseException {
         GameID gameID = new GameID(Integer.parseInt(params[0]));
-       GameData gameData = this.makeRequest("POST", "/gameRet", authToken, gameID, GameData.class);
-        return gameData;
+        return this.makeRequest("POST", "/gameRet", authToken, gameID, GameData.class);
     }
 
-//    public String updateGame(String authToken,ChessGame chessGame, int id) throws ResponseException {
-//        GameData gameData = new GameData(id,null,null,null, chessGame);
-//        String result = this.makeRequest("POST", "/gameplay", authToken, gameData, String.class);
-//        return result;
-//    }
 
 
 
@@ -133,7 +128,7 @@ public class ServerFacade {
     }
 
 
-    private static void writeBody(Object request, HttpURLConnection http) throws RuntimeException, IOException {
+    private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
@@ -165,7 +160,7 @@ public class ServerFacade {
                 }
             }
 
-            throw new RuntimeException("not implemented but yes, it is an error in server facade");
+            throw new ResponseException(500,"not implemented but yes, it is an error in server facade");
         }
     }
 

@@ -1,7 +1,6 @@
 package client;
 
-import chess.ChessGame;
-import com.sun.net.httpserver.Request;
+
 import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.AuthData;
@@ -36,7 +35,7 @@ public class ServerFacadeTests {
         server.stop();
         try {
             ChessService.clear();
-        } catch (DataAccessException e) {}
+        } catch (DataAccessException ignored) {}
     }
 
     @BeforeEach
@@ -102,7 +101,7 @@ public class ServerFacadeTests {
     void createGamePositiveTest() throws ResponseException {
         AuthData authData = sf.register("la0th", "password", "email");
         GameID gameID = sf.createGame(authData.authToken(), "coolvids");
-        assertNotNull(gameID.gameID());
+        assertEquals(1,gameID.gameID());
     }
 
 
@@ -142,7 +141,7 @@ public class ServerFacadeTests {
     void logOutPositiveTest() throws ResponseException {
         sf.register("1234543425", "password", "email");
         AuthData authData = sf.logIn("1234543425", "password");
-        assertEquals( sf.logOut(authData.authToken()), " Successful Logout ");
+        assertEquals(" Successful Logout ", sf.logOut(authData.authToken()));
     }
 
     @Test

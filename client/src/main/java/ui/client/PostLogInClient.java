@@ -17,8 +17,7 @@ public class PostLogInClient {
     public  PostLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.listNumberInterpreter = new HashMap<>();
-//        this.notificationHandler = notificationHandler;
+        listNumberInterpreter = new HashMap<>();
     }
 
     public String eval(String input, String authToken) {
@@ -59,16 +58,16 @@ public class PostLogInClient {
             if(listNumberInterpreter == null){
                 setListNumberInterpreter(authToken);
             }
-        } catch (Exception e){}
+        } catch (Exception ignored){}
             params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
 
 
         try {
             GameData result = server.getGame(authToken, "1");
-            DrawBoard.Draw(result.game().getBoard(), "white");
+            DrawBoard.draw(result.game().getBoard(), "white");
             return " Game Joined Successfully! ";
         } catch (ResponseException e) {
-            return "Failure to Join Game " ;
+            return " Failure to Join Game " ;
         }
     }
 
@@ -80,7 +79,7 @@ public class PostLogInClient {
             if (gameList.isEmpty()) {
                 return "No Games Currently Created";
             }else{
-                String uiList = "Games: ";
+                StringBuilder uiList = new StringBuilder("Games: ");
                 int i = 0;
                 for(GameList game: gameList){
                     i++;
@@ -93,13 +92,13 @@ public class PostLogInClient {
                     if (game.blackUsername() != null){
                         black = game.blackUsername();
                     }
-                    uiList = (uiList +
+                    uiList = new StringBuilder((uiList +
                             "\n" + i + ". " +
                             "\tGame Name: " + game.gameName()) +
                             "\t\t White: " + white +
-                            "\tBlack: " + black ;
+                            "\tBlack: " + black);
                 }
-                return uiList;
+                return uiList.toString();
             }
         } catch (ResponseException e){
             return e.getMessage();
@@ -134,7 +133,8 @@ public class PostLogInClient {
         try {
             setListNumberInterpreter(authToken);
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
-        } catch (Exception e){}
+        } catch (Exception ignored){}
+
 
 
 
@@ -142,7 +142,7 @@ public class PostLogInClient {
             String result = server.joinGame(authToken, params);
 
             GameData gameInfo = server.getGame(authToken, params[1]);
-            DrawBoard.Draw(gameInfo.game().getBoard(), params[0]);
+            DrawBoard.draw(gameInfo.game().getBoard(), params[0]);
             if (Objects.equals(result, " Game Joined Successfully ")){
                 return " Game Joined Successfully! ";
             } else if(Objects.equals(result, "Invalid Color Given, please try again")){
@@ -174,7 +174,7 @@ public class PostLogInClient {
                         Options:
                         List current games:  "l", "list"
                         Create a new game:   "c", "create" ‹GAME NAME>
-                        Join a game:         "j", "join" ‹WHITE/BLACK›‹GAME ID> 
+                        Join a game:         "j", "join" ‹WHITE/BLACK›‹GAME ID>
                         Watch a game:        "w", "watch" <GAME ID>
                         Logout:              "logout"
                                 

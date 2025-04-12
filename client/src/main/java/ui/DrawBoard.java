@@ -18,7 +18,7 @@ public class DrawBoard {
     private static ChessBoard board;
 
 
-    public static void Draw(ChessBoard board, String perspective) {
+    public static void draw(ChessBoard board, String perspective) {
         DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         drawHeaders(out);
@@ -86,7 +86,6 @@ public class DrawBoard {
             case KING -> picture ="K";
             case QUEEN -> picture ="Q";
             case ROOK -> picture ="R";
-            default -> picture = null;
         }
         return picture;
     }
