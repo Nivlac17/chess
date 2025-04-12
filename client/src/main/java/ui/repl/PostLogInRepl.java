@@ -32,8 +32,10 @@ public class PostLogInRepl {
             try {
                 result = client.eval(line, authToken);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
-                if (result.equals("game has started 1")) {
-                    System.out.println("Gameplay has started");
+                if (result.equals(" Game Joined Successfully! ")) {
+                    System.out.println(SET_TEXT_COLOR_BLUE + "Gameplay has started");
+                    GamePlayRepl gamePlayRepl = new GamePlayRepl(this.serverUrl);
+                    gamePlayRepl.run();
                 }
                 if (result.equals(" GOODBYE!!! ")) {
                     break;
