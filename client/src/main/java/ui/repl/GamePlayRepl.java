@@ -19,7 +19,7 @@ public class GamePlayRepl {
     }
 
     public void run() {
-        System.out.println("Welcome to Game Play");
+        System.out.println(SET_TEXT_COLOR_MAGENTA + "Welcome to Game Play");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
