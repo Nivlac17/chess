@@ -60,6 +60,11 @@ public class PostLogInClient {
             }
         } catch (Exception ignored){}
             params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
+        System.out.println(params[0] + " look here");
+        if(params[0].equals("null")){
+            System.out.println("Invalid Game Input, Please Try Again");
+            return help();
+        }
 
 
         try {
