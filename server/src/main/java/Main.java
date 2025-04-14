@@ -1,4 +1,7 @@
 import chess.*;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import spark.Spark;
+import websocket.WebSocketHandler;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,6 +13,8 @@ public class Main {
         server.Server server8080 = new server.Server();
         server8080.run(port);
         System.out.println("♕ Chess Server Running on port: " + port);
+
+        Spark.webSocket("/ws", WebSocketHandler.class);
 
     }
 }
