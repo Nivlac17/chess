@@ -60,9 +60,9 @@ public class PostLogInClient {
             }
         } catch (Exception ignored){}
             params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
-        System.out.println(params[0] + " look here");
+
         if(params[0].equals("null")){
-            System.out.println("Invalid Game Input, Please Try Again");
+            System.out.println("Invalid Game Input, Game Does Not Exist Please Try Again");
             return help();
         }
 
@@ -138,6 +138,10 @@ public class PostLogInClient {
         try {
             setListNumberInterpreter(authToken);
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
+            if(params[1].equals("null")){
+                System.out.println("Invalid Game Input, Game Does Not Exist Please Try Again");
+                return help();
+            }
         } catch (Exception ignored){}
 
 
