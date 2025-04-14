@@ -2,19 +2,21 @@ package ui.repl;
 
 import ui.client.GamePlayClient;
 import ui.client.PreLogInClient;
+import ui.websocket.NotificationHandler;
+import websocket.messages.Notification;
 
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 import static ui.client.PreLogInClient.authToken;
 
-public class GamePlayRepl {
+public class GamePlayRepl implements NotificationHandler {
 
     private final GamePlayClient client;
     private final String serverUrl;
 
     public GamePlayRepl(String serverUrl) {
-        client = new GamePlayClient(serverUrl /*, this ----- notification handler*/);
+        client = new GamePlayClient(serverUrl, this);
         this.serverUrl = serverUrl;
     }
 
@@ -45,6 +47,10 @@ public class GamePlayRepl {
     }
 
 
+    public void notify(Notification notification) {
+        System.out.println(SET_TEXT_COLOR_RED + notification.message());
+        printPrompt();
+    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);

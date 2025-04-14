@@ -1,6 +1,7 @@
 package ui.client;
 
 import ui.ServerFacade;
+import ui.websocket.NotificationHandler;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,10 +9,14 @@ import java.util.HashMap;
 public class GamePlayClient {
     private ServerFacade server;
     private String serverUrl;
+    private final NotificationHandler notificationHandler;
 
-    public  GamePlayClient(String serverUrl){
+
+
+    public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input, String authToken) {

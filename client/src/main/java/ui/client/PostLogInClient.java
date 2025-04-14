@@ -6,13 +6,20 @@ import model.GameID;
 import model.GameList;
 import ui.DrawBoard;
 import ui.ServerFacade;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 
 import java.util.*;
 
 public class PostLogInClient {
+    private WebSocketFacade ws;
+
+
     public static Map<Integer, Integer> listNumberInterpreter;
     private ServerFacade server;
     private String serverUrl;
+
+
 
     public  PostLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
@@ -134,7 +141,6 @@ public class PostLogInClient {
             System.out.println("Invalid Game Input, Please Try Again");
             return help();
         }
-
         try {
             setListNumberInterpreter(authToken);
             params[1] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[1])));
@@ -144,16 +150,16 @@ public class PostLogInClient {
             }
         } catch (Exception ignored){}
 
-
-
-
         try {
             String result = server.joinGame(authToken, params);
-
             GameData gameInfo = server.getGame(authToken, params[1]);
             DrawBoard.draw(gameInfo.game().getBoard(), params[0]);
+
             if (Objects.equals(result, " Game Joined Successfully ")){
+
+
                 return " Game Joined Successfully! ";
+
             } else if(Objects.equals(result, "Invalid Color Given, please try again")){
                 return "Invalid Color Given, please try again";
             }
@@ -162,6 +168,8 @@ public class PostLogInClient {
         }
         return "Failure to Join Game ";
     }
+
+
 
 
     private String logOut(String authToken) {

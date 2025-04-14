@@ -1,9 +1,11 @@
 package websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 @WebSocket
 public class WebSocketHandler {
@@ -27,5 +29,11 @@ public class WebSocketHandler {
 //            ex.printstackTrace();
 //            sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
 //        }
+
+
+//        ServerMessage message = new NotificationMessage("Opponent has joined!");
+//        String json = new Gson().toJson(message);
+//        session.getRemote().sendString(json);
+
     }
 }
