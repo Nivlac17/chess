@@ -14,7 +14,6 @@ public class Main {
         server8080.run(port);
         System.out.println("♕ Chess Server Running on port: " + port);
 
-        Spark.webSocket("/ws", WebSocketHandler.class);
 
     }
 }

@@ -21,16 +21,21 @@ public class DrawBoard {
     public static void draw(ChessBoard board, String perspective) {
         DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        drawHeaders(out);
+        drawHeaders(out, perspective);
         drawChessBoard(out, perspective);
-        drawHeaders(out);
+        drawHeaders(out, perspective);
     }
 
 
-    private static void drawHeaders(PrintStream out) {
+    private static void drawHeaders(PrintStream out, String perspective) {
         setBlack(out);
         out.print("     ");
-        String[] headers = {  "A", "B", "C", "D", "E", "F", "G", "H" };
+        String[] headers = {};
+        if (perspective.equals("white")) {
+            headers = new String[]{"A", "B", "C", "D", "E", "F", "G", "H"};
+        } else {
+            headers = new String[]{"H", "G", "F", "E", "D", "C", "B", "A"};
+        }
         for (String header : headers) {
             drawHeader(out, header);
         }
@@ -75,6 +80,7 @@ public class DrawBoard {
     private static String setPieceType(int row, int col, ChessBoard board){
         ChessPiece piece = null;
         piece = board.getPiece(new ChessPosition(row, col));
+//        System.out.println(piece.getTeamColor());
         if (piece == null){
             return null;
         }
@@ -96,11 +102,11 @@ public class DrawBoard {
             String piece;
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             if((row + boardCol) % 2 == 1) {
-                setWhite(out);
-            }else{
                 setGrey(out);
+            }else{
+                setWhite(out);
             }
-            piece = setPieceType(row + 1, boardCol + 1, board);
+            piece = setPieceType(row + 1, 8 - boardCol, board);
             if (piece == null){
                 out.print(SET_TEXT_COLOR_GREEN);
                 out.print(("   "));
@@ -122,11 +128,11 @@ public class DrawBoard {
         String piece;
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             if((row + boardCol) % 2 == 1) {
-                setWhite(out);
-            }else{
                 setGrey(out);
+            }else{
+                setWhite(out);
             }
-            piece = setPieceType(8 - row, 8 - boardCol, board);
+            piece = setPieceType(8 - row, boardCol + 1, board);
             if (piece == null){
                 out.print(SET_TEXT_COLOR_GREEN);
                 out.print(("   "));
