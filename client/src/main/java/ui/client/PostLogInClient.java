@@ -18,6 +18,7 @@ public class PostLogInClient {
     public static Map<Integer, Integer> listNumberInterpreter;
     private ServerFacade server;
     private String serverUrl;
+    public GameID gameID = new GameID(0);
 
 
 
@@ -25,6 +26,10 @@ public class PostLogInClient {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         listNumberInterpreter = new HashMap<>();
+    }
+
+    public GameID getGameID() {
+        return this.gameID;
     }
 
     public String eval(String input, String authToken) {
@@ -153,6 +158,7 @@ public class PostLogInClient {
         try {
             String result = server.joinGame(authToken, params);
             GameData gameInfo = server.getGame(authToken, params[1]);
+            this.gameID = new GameID(gameInfo.gameID());
             DrawBoard.draw(gameInfo.game().getBoard(), params[0]);
 
             if (Objects.equals(result, " Game Joined Successfully ")){

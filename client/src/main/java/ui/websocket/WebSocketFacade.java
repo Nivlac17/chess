@@ -4,9 +4,8 @@ package ui.websocket;
 import com.google.gson.Gson;
 
 import exception.ResponseException;
-import websocket.commands.UserGameCommand;
+import model.GameID;
 import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -49,4 +48,6 @@ public class WebSocketFacade extends Endpoint{
 
 
 
+    public void joinGame(String authToken, GameID gameID) {
+    }
 }

@@ -1,7 +1,8 @@
 package ui.repl;
 
+import exception.ResponseException;
+import model.GameID;
 import ui.client.GamePlayClient;
-import ui.client.PreLogInClient;
 import ui.websocket.NotificationHandler;
 import websocket.messages.Notification;
 
@@ -14,13 +15,20 @@ public class GamePlayRepl implements NotificationHandler {
 
     private final GamePlayClient client;
     private final String serverUrl;
+    private final GameID gameID;
 
-    public GamePlayRepl(String serverUrl) {
+    public GamePlayRepl(String serverUrl, GameID gameID){
         client = new GamePlayClient(serverUrl, this);
         this.serverUrl = serverUrl;
+        this.gameID = gameID;
     }
 
-    public void run() {
+    public void run() throws ResponseException {
+
+        client.joinGame(authToken, gameID);
+
+
+
         System.out.println(SET_TEXT_COLOR_MAGENTA + "Welcome to Game Play");
         System.out.print(client.help());
 
