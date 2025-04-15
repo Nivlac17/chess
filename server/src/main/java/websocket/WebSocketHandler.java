@@ -61,7 +61,7 @@ public class WebSocketHandler {
             view = " an Observer.";
         }
         var message = String.format("%s has joined the game as %s", username, view);
-        var notification = new Notification (Notification.Type.JOIN_GAME, message);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message) ;
         connections.broadcast(username, notification, command.getGameID());
     }
 }

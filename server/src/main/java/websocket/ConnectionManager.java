@@ -26,7 +26,7 @@ public class ConnectionManager {
             connections.remove(gameID);
         }
 
-        public void broadcast(String excludeUsername, Notification notification, int gameID){
+        public void broadcast(String excludeUsername, ServerMessage notification, int gameID){
             var removeList = new ArrayList<String>();
             var connectionList = connections.get(gameID);
             if(connectionList == null){
@@ -40,7 +40,8 @@ public class ConnectionManager {
 
                 if (!username.equals(excludeUsername)) {
                     try {
-                        connection.send(notification.message());
+                        Gson gson = new Gson();
+                        connection.send(gson.toJson(notification));
                     } catch (IOException e) {
                         removeList.add(username);
                     }

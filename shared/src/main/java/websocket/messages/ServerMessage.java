@@ -1,6 +1,5 @@
 package websocket.messages;
 
-import com.google.gson.annotations.SerializedName;
 import model.GameData;
 
 import java.util.Objects;
@@ -12,9 +11,9 @@ import java.util.Objects;
  * methods.
  */
 public class ServerMessage {
-    @SerializedName("game")
-    GameData gameData;
+    GameData game;
     ServerMessageType serverMessageType;
+    String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -23,9 +22,16 @@ public class ServerMessage {
     }
 
     public ServerMessage(ServerMessageType type, GameData game) {
-        this.gameData = game;
+        this.game = game;
         this.serverMessageType = type;
+        this.message = null;
     }
+    public ServerMessage(ServerMessageType type, String message) {
+        this.serverMessageType = type;
+        this.message = message;
+        this.game = null;  // No game data for notifications
+    }
+
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
