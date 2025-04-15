@@ -5,9 +5,12 @@ import model.GameID;
 import ui.ServerFacade;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.messages.Notification;
 
 import java.util.Arrays;
 import java.util.HashMap;
+
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class GamePlayClient {
     private ServerFacade server;
@@ -47,7 +50,6 @@ public class GamePlayClient {
         ws = new WebSocketFacade(serverUrl, notificationHandler);
         ws.joinGame(authToken, gameID);
     }
-
 
 
 

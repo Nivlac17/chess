@@ -60,7 +60,7 @@ public class WebSocketHandler {
         }else {
             view = " an Observer.";
         }
-        var message = new Notification(Notification.Type.JOIN_GAME,String.format("%s has joined the game as %s", username, view));
+        var message = new Notification(Notification.Type.JOIN_GAME, String.format("%s has joined the game as %s", username, view));
         Gson gson = new Gson();
 
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message));

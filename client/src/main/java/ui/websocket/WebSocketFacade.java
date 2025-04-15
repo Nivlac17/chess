@@ -36,13 +36,12 @@ public class WebSocketFacade extends Endpoint{
                     Gson gson = new Gson();
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
-                    switch (serverMessage.getServerMessageType()) {
-                        case NOTIFICATION -> {
-                            Notification notification = gson.fromJson(
-                                    gson.toJson(serverMessage.getServerMessage()), Notification.class
-                            );
-                            notificationHandler.notify(notification);
-                        }
+                    if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
+                        String json = (String) serverMessage.getServerMessage();
+                        Notification notification = gson.fromJson(json, Notification.class);
+                        notificationHandler.notify(notification);
+                    }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME){
+                        System.out.println("halla");
                     }
                 }
             });

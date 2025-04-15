@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 public record Notification(Type type, String message) {
     public enum Type {
+        GEN,
         JOIN_GAME,
         OBSERVE_GAME,
         MOVE_MADE,
@@ -16,4 +17,9 @@ public record Notification(Type type, String message) {
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    public String getMessage() {
+        return message;
+    }
+
 }
