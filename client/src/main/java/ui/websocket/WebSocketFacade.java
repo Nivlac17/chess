@@ -33,10 +33,22 @@ public class WebSocketFacade extends Endpoint{
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
+                    Gson gson = new Gson();
+                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+
+                    switch (serverMessage.getServerMessageType()) {
+                        case NOTIFICATION -> {
+                            Notification notification = gson.fromJson(
+                                    gson.toJson(serverMessage.getServerMessage()), Notification.class
+                            );
+                            notificationHandler.notify(notification);
+                        }
+                    }
                 }
             });
+
+
+
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());
         }

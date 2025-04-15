@@ -41,7 +41,8 @@ public class ConnectionManager {
                 if (!username.equals(excludeUsername)) {
                     try {
                         Gson gson = new Gson();
-                        connection.send(gson.toJson(notification));
+                        String message = gson.toJson(notification);
+                        connection.send( message );
                     } catch (IOException e) {
                         removeList.add(username);
                     }
@@ -57,7 +58,7 @@ public class ConnectionManager {
         }
 
 
-    public void send(ServerMessage serverMessage, GameData gameData, String username, int gameID) throws IOException {
+    public void send(ServerMessage serverMessage, String username, int gameID) throws IOException {
         Gson gson = new Gson();
         System.out.println(serverMessage);
         String game = gson.toJson(serverMessage);

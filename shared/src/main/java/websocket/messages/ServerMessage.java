@@ -21,20 +21,18 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, GameData game) {
+    public ServerMessage(ServerMessageType type, GameData game, String message) {
         this.game = game;
         this.serverMessageType = type;
-        this.message = null;
-    }
-    public ServerMessage(ServerMessageType type, String message) {
-        this.serverMessageType = type;
         this.message = message;
-        this.game = null;  // No game data for notifications
     }
 
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
+    }
+    public Object getServerMessage() {
+        return this.message;
     }
 
     @Override

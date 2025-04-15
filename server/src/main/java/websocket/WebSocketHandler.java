@@ -49,8 +49,8 @@ public class WebSocketHandler {
         String view;
         GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
 
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData);
-        connections.send(serverMessage, gameData, username, command.getGameID());
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null);
+        connections.send(serverMessage, username, command.getGameID());
 
 
         if (gameData.whiteUsername().equals(username)){
@@ -60,8 +60,10 @@ public class WebSocketHandler {
         }else {
             view = " an Observer.";
         }
-        var message = String.format("%s has joined the game as %s", username, view);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message) ;
+        var message = new Notification(Notification.Type.JOIN_GAME,String.format("%s has joined the game as %s", username, view));
+        Gson gson = new Gson();
+
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message));
         connections.broadcast(username, notification, command.getGameID());
     }
 }
