@@ -6,6 +6,7 @@ import ui.ServerFacade;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class GamePlayClient {
@@ -33,7 +34,7 @@ public class GamePlayClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-//                case "l", "list" -> listGames(authToken);
+                case "m", "move", "make" -> makeMove(authToken, params);
 
                 case "quit", "q" -> "quit";
                 default -> help();
@@ -48,14 +49,21 @@ public class GamePlayClient {
         ws.joinGame(authToken, gameID);
     }
 
+    public String makeMove(String authToken, String... params) throws ResponseException, IOException {
+        ws.makeMove(authToken, params);
+        return "";
+    }
 
 
 
     public String help(){
         return   """
-                        Options:
-                        Let's play Ball boys!!
-                                
+                Options:
+                        Highlight legal moves: "hl", "highlight"  ‹position> (e.g. f5)
+                        Make a move: "m", "move", "make"    ‹source> ‹destination› ‹optional promotion› (e.g. f5 e4 q)
+                        Redraw Chess Board: "r", "redraw"
+                        Resign from game: "res", "resign"
+                        Leave game: "leave"
                 """;
 
     }

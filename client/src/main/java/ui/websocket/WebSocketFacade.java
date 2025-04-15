@@ -1,6 +1,9 @@
 package ui.websocket;
 
 
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 
 import exception.ResponseException;
@@ -8,6 +11,7 @@ import model.GameData;
 import model.GameID;
 import ui.DrawBoard;
 import ui.client.PostLogInClient;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -82,6 +86,54 @@ public class WebSocketFacade extends Endpoint{
             throw new ResponseException(500, ex.getMessage());
         }
     }
+
+
+
+    public int[] parsePosition(String position) {
+        String[] cr = position.split("");
+        char rowNumber = position.charAt(1);
+
+        int col = 1;//colLetter - 'a';
+        int row = 8 - Character.getNumericValue(rowNumber); // 8 - 7 = 1
+
+        return new int[]{row, col};
+    }
+
+    public ChessPiece.PieceType parsePromotion(String promotion){
+        return switch (promotion) {
+            case "q", "queen" -> ChessPiece.PieceType.QUEEN;
+            case "b", "bishop" ->  ChessPiece.PieceType.BISHOP;
+            case "r", "rook" -> ChessPiece.PieceType.ROOK;
+            case "k", "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> null;
+
+        };
+
+    }
+
+    public void makeMove(String authToken, String... params) throws ResponseException, IOException {
+        try{
+            ChessPiece.PieceType piece;
+            if(params.length == 3) {
+            piece = parsePromotion(params[2]);
+            }else if (params.length != 2){
+                throw new ResponseException (500, "server error");
+            }
+            piece = null;
+
+            int[] start = parsePosition(params[0]);
+            int[] end = parsePosition(params[1]);
+            ChessPosition startPosition = new ChessPosition(start[0],start[1]);
+            ChessPosition endPosition = new ChessPosition(end[0], end[1]);
+            ChessMove move = new ChessMove(startPosition,endPosition,piece);
+            MakeMoveCommand connectCommand = new MakeMoveCommand( authToken, null, move);
+
+            this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
+        } catch (IOException ex) {
+        throw new ResponseException(500, ex.getMessage());
+        }
+        }
+
 
 //    update game:
 //            var action = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);

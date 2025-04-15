@@ -160,7 +160,7 @@ public class ChessService {
 
     }
 
-    public String updateGame(String token, GameData updateGameRequest) throws DataAccessException {
+    public static String updateGame(String token, GameData updateGameRequest) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(token);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);

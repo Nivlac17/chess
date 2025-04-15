@@ -22,6 +22,7 @@ public class UserGameCommand {
         this.gameID = gameID;
     }
 
+
     public enum CommandType {
         CONNECT,
         MAKE_MOVE,
@@ -40,6 +41,7 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
+
 
     @Override
     public boolean equals(Object o) {
