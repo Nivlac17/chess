@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 
 import exception.ResponseException;
 import model.GameID;
+import websocket.commands.UserGameCommand;
 import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -48,6 +50,19 @@ public class WebSocketFacade extends Endpoint{
 
 
 
-    public void joinGame(String authToken, GameID gameID) {
+    public void joinGame(String authToken, GameID gameID) throws ResponseException {
+        try {
+            UserGameCommand connectCommand = new UserGameCommand(
+                    UserGameCommand.CommandType.CONNECT, authToken, gameID.gameID());
+            this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
+
+//    update game:
+//            var action = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+
+
 }
