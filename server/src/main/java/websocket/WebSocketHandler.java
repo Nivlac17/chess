@@ -44,10 +44,15 @@ public class WebSocketHandler {
 
 
 
-    private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
+    private void connect(Session session, String username, UserGameCommand command) throws DataAccessException, IOException {
         connections.addConnection(username, command.getGameID(), session);
         String view;
         GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData);
+        connections.send(serverMessage, gameData, username, command.getGameID());
+
+
         if (gameData.whiteUsername().equals(username)){
             view = "WHITE";
         }else if (gameData.blackUsername().equals(username)){
