@@ -2,6 +2,8 @@ package websocket;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import model.GameData;
+import model.GameID;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -42,10 +44,18 @@ public class WebSocketHandler {
 
 
 
-    private void connect(Session session, String username, UserGameCommand command) throws IOException {
+    private void connect(Session session, String username, UserGameCommand command) throws IOException, DataAccessException {
         connections.addConnection(username, command.getGameID(), session);
-
-        var message = String.format("%s has joined the game", username);
+        String view;
+        GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+        if (gameData.whiteUsername().equals(username)){
+            view = "WHITE";
+        }else if (gameData.blackUsername().equals(username)){
+            view = "BLACK";
+        }else {
+            view = " an Observer.";
+        }
+        var message = String.format("%s has joined the game as %s", username, view);
         var notification = new Notification (Notification.Type.JOIN_GAME, message);
         connections.broadcast(username, notification);
     }
