@@ -35,7 +35,7 @@ public class GamePlayClient {
             return switch (cmd) {
 //                case "l", "list" -> listGames(authToken);
 
-                case "quit" -> "quit";
+                case "quit", "q" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {

@@ -9,36 +9,45 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-        public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Set<String>> gamePlayersYViewers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection> > connections = new ConcurrentHashMap<>();
 
 
     public void addConnection(String username, int gameID, Session session) {
-            var connection = new Connection(username, (org.eclipse.jetty.websocket.api.Session) session);
-            connections.put(username, connection);
-            gamePlayersYViewers.computeIfAbsent(gameID, user -> ConcurrentHashMap.newKeySet()).add(username);
+            var connection = new Connection(username, session);
+            connections.computeIfAbsent(gameID, id -> new ConcurrentHashMap<>()).put(username, connection);
 
     }
 
-        public void remove(String username) {
-            connections.remove(username);
+        public void remove(int gameID) {
+            connections.remove(gameID);
         }
 
-        public void broadcast(String excludeUsername, Notification notification) throws IOException {
-            var removeList = new ArrayList<Connection>();
-            for (var c : connections.values()) {
-                if (c.session.isOpen()) {
-                    if (!c.username.equals(excludeUsername)) {
-                        c.send(notification.toString());
-                    }
-                } else {
-                    removeList.add(c);
-                }
+        public void broadcast(String excludeUsername, Notification notification, int gameID){
+            var removeList = new ArrayList<String>();
+            var connectionList = connections.get(gameID);
+            if(connectionList == null){
+                System.out.println("I'm dying!!!!!");
+                return;
             }
+            for (var entry : connectionList.entrySet()) {
+                String username = entry.getKey();
+                System.out.println(username);
+                Connection connection = entry.getValue();
 
-            // Clean up any connections that were left open.
-            for (var c : removeList) {
-                connections.remove(c.username);
+                if (!username.equals(excludeUsername)) {
+                    try {
+                        connection.send(notification.message());
+                    } catch (IOException e) {
+                        removeList.add(username);
+                    }
+                }
+
+            }
+            for (String userToRemove : removeList) {
+                connectionList.remove(userToRemove);
+            }
+            if (connectionList.isEmpty()) {
+                remove(gameID);
             }
         }
 

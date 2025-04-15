@@ -59,7 +59,7 @@ public class DrawBoard {
 
     private static void drawChessBoard(PrintStream out, String perspective) {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-            if (perspective.equals("white")){
+            if (perspective.equals("white") || perspective.equals("observer")){
                 drawRowOfSquaresPerspectiveWhite(out, boardRow);
             }else {
                 drawRowOfSquaresPerspectiveBLack(out, boardRow);

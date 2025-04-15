@@ -81,7 +81,7 @@ public class PostLogInClient {
 
         try {
             GameData result = server.getGame(authToken, "1");
-            DrawBoard.draw(result.game().getBoard(), "white");
+            DrawBoard.draw(result.game().getBoard(), "observer");
             return " Game Joined Successfully! ";
         } catch (ResponseException e) {
             return " Failure to Join Game " ;

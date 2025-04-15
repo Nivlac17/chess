@@ -57,6 +57,6 @@ public class WebSocketHandler {
         }
         var message = String.format("%s has joined the game as %s", username, view);
         var notification = new Notification (Notification.Type.JOIN_GAME, message);
-        connections.broadcast(username, notification);
+        connections.broadcast(username, notification, command.getGameID());
     }
 }
