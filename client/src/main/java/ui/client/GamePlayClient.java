@@ -2,7 +2,9 @@ package ui.client;
 
 import exception.ResponseException;
 import model.GameID;
+import ui.DrawBoard;
 import ui.ServerFacade;
+import ui.websocket.LoadGameHandler;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 import websocket.messages.Notification;
@@ -16,6 +18,7 @@ public class GamePlayClient {
     private ServerFacade server;
     private String serverUrl;
     private final NotificationHandler notificationHandler;
+    private final LoadGameHandler loadGameHandler;
     private WebSocketFacade ws;
 
 
@@ -23,11 +26,12 @@ public class GamePlayClient {
 
 
 
-    public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler) {
+    public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler, LoadGameHandler loadGameHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
 
+        this.loadGameHandler = loadGameHandler;
     }
 
     public String eval(String input, String authToken) {
@@ -47,7 +51,7 @@ public class GamePlayClient {
     }
 
     public void joinGame(String authToken, GameID gameID) throws ResponseException {
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws = new WebSocketFacade(serverUrl, notificationHandler, loadGameHandler);
         ws.joinGame(authToken, gameID);
     }
 

@@ -4,7 +4,10 @@ package ui.websocket;
 import com.google.gson.Gson;
 
 import exception.ResponseException;
+import model.GameData;
 import model.GameID;
+import ui.DrawBoard;
+import ui.client.PostLogInClient;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -17,10 +20,13 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint{
     Session session;
     NotificationHandler notificationHandler;
+    LoadGameHandler loadGameHandler;
+
+    GameID gameID;
 
 
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, LoadGameHandler loadGameHandler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -40,8 +46,13 @@ public class WebSocketFacade extends Endpoint{
                         String json = (String) serverMessage.getServerMessage();
                         Notification notification = gson.fromJson(json, Notification.class);
                         notificationHandler.notify(notification);
-                    }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME){
+                    }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
                         System.out.println("halla");
+                        String json = (String) serverMessage.getServerMessage();
+                        GameData gameData = gson.fromJson(json, GameData.class);
+                        loadGameHandler.drawBoard(gameData);
+                    }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+
                     }
                 }
             });

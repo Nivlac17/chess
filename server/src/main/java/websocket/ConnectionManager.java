@@ -2,6 +2,8 @@ package websocket;
 
 import com.google.gson.Gson;
 import model.GameData;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
+import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
 
 import org.eclipse.jetty.websocket.api.Session;
@@ -64,7 +66,6 @@ public class ConnectionManager {
 
     public void send(ServerMessage serverMessage, String username, int gameID) throws IOException {
         Gson gson = new Gson();
-        System.out.println(serverMessage);
         String game = gson.toJson(serverMessage);
 
         var connectionList = connections.get(gameID);
@@ -73,5 +74,15 @@ public class ConnectionManager {
 
 
         connection.send(game);
+    }
+
+
+    public void sendError(RemoteEndpoint session, ErrorMessage errorMessage) throws IOException {
+        Gson gson = new Gson();
+        String error = gson.toJson(errorMessage);
+        ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null, gson.toJson(error));
+        String serverMessage = gson.toJson(message);
+
+        session.sendString(serverMessage);
     }
 }

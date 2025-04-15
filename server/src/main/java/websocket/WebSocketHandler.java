@@ -9,10 +9,12 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.ChessService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+
 
 @WebSocket
 public class WebSocketHandler {
@@ -23,6 +25,7 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             // Throws a custom UnauthorizedException. Yours may work differently.
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
+
             connections.addConnection(username, command.getGameID(), session);
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
@@ -30,14 +33,10 @@ public class WebSocketHandler {
 //                case LEAVE -> leaveGame(session, username, (LeaveGameCommand) command);
 //                case RESIGN -> resign(session, username, (ResignCommand) command);
             }
-//        } catch (UnauthorizedException ex) {
-//            // Serializes and sends the error message
-//            sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
-//        } catch (Exception ex) {
-//            ex.printstackTrace();
-//            sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (DataAccessException ex) {
+            // Serializes and sends the error message
+            connections.sendError(session.getRemote(), new ErrorMessage("Error: unauthorized"));
+
         }
     }
 
@@ -49,7 +48,7 @@ public class WebSocketHandler {
         String view;
         GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
 
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null);
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
         connections.send(serverMessage, username, command.getGameID());
 
 
@@ -63,7 +62,7 @@ public class WebSocketHandler {
         var message = new Notification(Notification.Type.JOIN_GAME, String.format("%s has joined the game as %s", username, view));
         Gson gson = new Gson();
 
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message));
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message), null);
         connections.broadcast(username, notification, command.getGameID());
     }
 }

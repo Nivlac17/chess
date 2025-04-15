@@ -19,6 +19,7 @@ public class PostLogInClient {
     private ServerFacade server;
     private String serverUrl;
     public GameID gameID = new GameID(0);
+    public  static String color;
 
 
 
@@ -32,6 +33,7 @@ public class PostLogInClient {
         return this.gameID;
     }
 
+
     public String eval(String input, String authToken) {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -43,7 +45,7 @@ public class PostLogInClient {
                 case "j", "join" -> joinGame(authToken, params);
                 case "w", "watch" -> watchGame(authToken, params);
                 case "logout" -> logOut(authToken);
-                case "quit" -> "quit";
+                case "quit", "q" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {
@@ -159,7 +161,7 @@ public class PostLogInClient {
             String result = server.joinGame(authToken, params);
             GameData gameInfo = server.getGame(authToken, params[1]);
             this.gameID = new GameID(gameInfo.gameID());
-            DrawBoard.draw(gameInfo.game().getBoard(), params[0]);
+            this.color = params[0];
 
             if (Objects.equals(result, " Game Joined Successfully ")){
 

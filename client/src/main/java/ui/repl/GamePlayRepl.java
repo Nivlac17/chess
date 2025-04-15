@@ -1,8 +1,12 @@
 package ui.repl;
 
 import exception.ResponseException;
+import model.GameData;
 import model.GameID;
+import ui.DrawBoard;
 import ui.client.GamePlayClient;
+import ui.client.PostLogInClient;
+import ui.websocket.LoadGameHandler;
 import ui.websocket.NotificationHandler;
 import websocket.messages.Notification;
 
@@ -11,14 +15,14 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 import static ui.client.PreLogInClient.authToken;
 
-public class GamePlayRepl implements NotificationHandler {
+public class GamePlayRepl implements NotificationHandler, LoadGameHandler {
 
     private final GamePlayClient client;
     private final String serverUrl;
     private final GameID gameID;
 
     public GamePlayRepl(String serverUrl, GameID gameID){
-        client = new GamePlayClient(serverUrl, this);
+        client = new GamePlayClient(serverUrl, this, this::drawBoard);
         this.serverUrl = serverUrl;
         this.gameID = gameID;
     }
@@ -57,6 +61,11 @@ public class GamePlayRepl implements NotificationHandler {
 
     public void notify(Notification notification) {
         System.out.println(SET_TEXT_COLOR_RED + notification.getMessage());
+        printPrompt();
+    }
+
+    public void drawBoard(GameData gamedata) {
+        DrawBoard.draw(gamedata.game().getBoard(), PostLogInClient.color);
         printPrompt();
     }
 

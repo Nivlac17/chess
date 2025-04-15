@@ -14,6 +14,7 @@ public class ServerMessage {
     GameData game;
     ServerMessageType serverMessageType;
     Object message;
+    Object errorMessage;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -21,10 +22,11 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, GameData game, Object message) {
+    public ServerMessage(ServerMessageType type, GameData game, Object message, Object errorMessage) {
         this.game = game;
         this.serverMessageType = type;
         this.message = message;
+        this.errorMessage = errorMessage;
     }
 
 
