@@ -2,36 +2,29 @@ package ui.client;
 
 import exception.ResponseException;
 import model.GameID;
-import ui.DrawBoard;
 import ui.ServerFacade;
-import ui.websocket.LoadGameHandler;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
-import websocket.messages.Notification;
 
 import java.util.Arrays;
-import java.util.HashMap;
-
-import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class GamePlayClient {
     private ServerFacade server;
     private String serverUrl;
     private final NotificationHandler notificationHandler;
-    private final LoadGameHandler loadGameHandler;
     private WebSocketFacade ws;
+    String color;
 
 
 
 
 
 
-    public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler, LoadGameHandler loadGameHandler) {
+    public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
 
-        this.loadGameHandler = loadGameHandler;
     }
 
     public String eval(String input, String authToken) {
@@ -51,7 +44,7 @@ public class GamePlayClient {
     }
 
     public void joinGame(String authToken, GameID gameID) throws ResponseException {
-        ws = new WebSocketFacade(serverUrl, notificationHandler, loadGameHandler);
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
         ws.joinGame(authToken, gameID);
     }
 

@@ -13,7 +13,7 @@ public class PostLogInRepl {
     private final PostLogInClient client;
     private final String serverUrl;
 
-    public PostLogInRepl(String serverUrl, String authToken) {
+    public PostLogInRepl(String serverUrl,  String authToken) {
         client = new PostLogInClient(serverUrl /*, this ----- notification handler*/);
         this.serverUrl = serverUrl;
         this.authToken = authToken;

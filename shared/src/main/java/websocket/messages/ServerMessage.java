@@ -11,7 +11,7 @@ import java.util.Objects;
  * methods.
  */
 public class ServerMessage {
-    GameData game;
+    Object game;
     ServerMessageType serverMessageType;
     Object message;
     Object errorMessage;
@@ -22,7 +22,7 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, GameData game, Object message, Object errorMessage) {
+    public ServerMessage(ServerMessageType type, Object game, Object message, Object errorMessage) {
         this.game = game;
         this.serverMessageType = type;
         this.message = message;
@@ -35,6 +35,12 @@ public class ServerMessage {
     }
     public Object getServerMessage() {
         return this.message;
+    }
+    public Object getErrorMessage(){
+        return this.errorMessage;
+    }
+    public Object getGame(){
+        return this.game;
     }
 
     @Override

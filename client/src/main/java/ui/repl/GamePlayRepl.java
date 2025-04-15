@@ -1,12 +1,8 @@
 package ui.repl;
 
 import exception.ResponseException;
-import model.GameData;
 import model.GameID;
-import ui.DrawBoard;
 import ui.client.GamePlayClient;
-import ui.client.PostLogInClient;
-import ui.websocket.LoadGameHandler;
 import ui.websocket.NotificationHandler;
 import websocket.messages.Notification;
 
@@ -15,23 +11,21 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 import static ui.client.PreLogInClient.authToken;
 
-public class GamePlayRepl implements NotificationHandler, LoadGameHandler {
+public class GamePlayRepl implements NotificationHandler {
 
     private final GamePlayClient client;
     private final String serverUrl;
     private final GameID gameID;
 
     public GamePlayRepl(String serverUrl, GameID gameID){
-        client = new GamePlayClient(serverUrl, this, this::drawBoard);
+
+        client = new GamePlayClient(serverUrl, this);
         this.serverUrl = serverUrl;
         this.gameID = gameID;
     }
 
     public void run() throws ResponseException {
-
         client.joinGame(authToken, gameID);
-
-
 
         System.out.println(SET_TEXT_COLOR_MAGENTA + "Welcome to Game Play");
         System.out.print(client.help());
@@ -48,8 +42,6 @@ public class GamePlayRepl implements NotificationHandler, LoadGameHandler {
                 if (result.equals("finished gameplay 09k")) {
                     break;
                 }
-
-
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -60,14 +52,10 @@ public class GamePlayRepl implements NotificationHandler, LoadGameHandler {
 
 
     public void notify(Notification notification) {
-        System.out.println(SET_TEXT_COLOR_RED + notification.getMessage());
+        System.out.println(SET_TEXT_COLOR_RED + "\t"+notification.getMessage());
         printPrompt();
     }
 
-    public void drawBoard(GameData gamedata) {
-        DrawBoard.draw(gamedata.game().getBoard(), PostLogInClient.color);
-        printPrompt();
-    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);

@@ -71,16 +71,13 @@ public class ConnectionManager {
         var connectionList = connections.get(gameID);
         var connection = connectionList.get(username);
 
-
-
         connection.send(game);
     }
 
 
     public void sendError(RemoteEndpoint session, ErrorMessage errorMessage) throws IOException {
         Gson gson = new Gson();
-        String error = gson.toJson(errorMessage);
-        ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null, gson.toJson(error));
+        ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null, gson.toJson(errorMessage));
         String serverMessage = gson.toJson(message);
 
         session.sendString(serverMessage);
