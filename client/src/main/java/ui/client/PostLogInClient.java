@@ -6,6 +6,7 @@ import model.GameID;
 import model.GameList;
 import ui.DrawBoard;
 import ui.ServerFacade;
+import ui.websocket.LoadBoard;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 
@@ -82,8 +83,8 @@ public class PostLogInClient {
 
 
         try {
-            GameData result = server.getGame(authToken, "1");
-            DrawBoard.draw(result.game().getBoard(), "observer");
+            server.getGame(authToken, "1");
+
             return " Game Joined Successfully! ";
         } catch (ResponseException e) {
             return " Failure to Join Game " ;

@@ -13,6 +13,9 @@ public class Connection {
     }
 
     public void send(String msg) throws IOException {
-        session.getRemote().sendString(msg);
-    }
+        if (session.isOpen()) {
+            session.getRemote().sendString(msg);
+        } else {
+            System.out.printf("Session for %s is closed or null. Message not sent.%n", username);
+        }    }
 }

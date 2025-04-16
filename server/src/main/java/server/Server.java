@@ -35,6 +35,7 @@ public class Server {
 
         Spark.webSocket("/ws", WebSocketHandler.class);
 
+
         // Register your endpoints and handle exceptions here.
         String stringVarToSatisfyQualityCode = "/game";
         Spark.post("/user", this::registerUser);

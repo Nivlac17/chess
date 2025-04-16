@@ -18,7 +18,7 @@ public class DrawBoard {
     private static ChessBoard board;
 
 
-    public static void draw(ChessBoard board, String perspective) {
+    public void draw(ChessBoard board, String perspective) {
         System.out.println("\n");
         DrawBoard.board = board;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);

@@ -24,6 +24,8 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint{
     Session session;
     NotificationHandler notificationHandler;
+    LoadBoard board = new LoadBoard();
+
 
 
 
@@ -43,12 +45,12 @@ public class WebSocketFacade extends Endpoint{
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
                     if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
-                        Notification notification = (Notification) serverMessage.getServerMessage();
+                        String notification = (String) serverMessage.getServerMessage();
                         notificationHandler.notify(notification);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
-                        GameData gameData = (GameData) serverMessage.getGame();
-                        DrawBoard.draw(gameData.game().getBoard(), PostLogInClient.color);
-                        System.out.println();
+                        GameData gameData = serverMessage.getGame();
+                        System.out.println("---------1234567");
+                        board.loadBoard(gameData, PostLogInClient.color);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
 
                     }

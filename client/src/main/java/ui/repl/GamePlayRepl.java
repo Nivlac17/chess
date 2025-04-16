@@ -51,8 +51,8 @@ public class GamePlayRepl implements NotificationHandler {
     }
 
 
-    public void notify(Notification notification) {
-        System.out.println(SET_TEXT_COLOR_RED + "\t"+notification.getMessage());
+    public void notify(String notification) {
+        System.out.println(SET_TEXT_COLOR_RED + "\t"+notification);
         printPrompt();
     }
 

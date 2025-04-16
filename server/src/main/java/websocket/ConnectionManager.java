@@ -75,11 +75,15 @@ public class ConnectionManager {
     }
 
 
-    public void sendError(RemoteEndpoint session, ErrorMessage errorMessage) throws IOException {
+    public void sendError(RemoteEndpoint session, String errorMessage) {
         Gson gson = new Gson();
         ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null, gson.toJson(errorMessage));
         String serverMessage = gson.toJson(message);
 
-        session.sendString(serverMessage);
+        try {
+            session.sendString(serverMessage);
+        } catch (IOException e) {
+            System.out.println("Error: system produced error printing error message");
+        }
     }
 }
