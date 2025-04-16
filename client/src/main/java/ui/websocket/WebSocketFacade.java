@@ -36,7 +36,6 @@ public class WebSocketFacade extends Endpoint{
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
@@ -44,18 +43,12 @@ public class WebSocketFacade extends Endpoint{
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
                     if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
-                        String json = (String) serverMessage.getServerMessage();
-                        Notification notification = gson.fromJson(json, Notification.class);
+                        Notification notification = (Notification) serverMessage.getServerMessage();
                         notificationHandler.notify(notification);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
-                        String json = String.valueOf(serverMessage.getGame());
-                        GameData gameData = gson.fromJson(json, GameData.class);
-
+                        GameData gameData = (GameData) serverMessage.getGame();
                         DrawBoard.draw(gameData.game().getBoard(), PostLogInClient.color);
-                        System.out.println("halla");
-                        System.out.println("halla");
-
-
+                        System.out.println();
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
 
                     }
@@ -81,7 +74,8 @@ public class WebSocketFacade extends Endpoint{
         try {
             UserGameCommand connectCommand = new UserGameCommand(
                     UserGameCommand.CommandType.CONNECT, authToken, gameID.gameID());
-            this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
+            String json = new Gson().toJson(connectCommand);
+            this.session.getBasicRemote().sendText(json);
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
@@ -91,12 +85,25 @@ public class WebSocketFacade extends Endpoint{
 
     public int[] parsePosition(String position) {
         String[] cr = position.split("");
-        char rowNumber = position.charAt(1);
+        int rowNumber = Integer.parseInt(cr[1]);
+        String column2 = cr[0];
+        int column;
+        switch (column2) {
+                case "a" -> column = 1;
+                case "b" -> column = 2;
+                case "c" -> column = 3;
+                case "d" -> column = 4;
+                case "e" -> column = 5;
+                case "f" -> column = 6;
+                case "g" -> column = 7;
+                case "h" -> column = 8;
+                default -> column = 0;
+            }
 
-        int col = 1;//colLetter - 'a';
-        int row = 8 - Character.getNumericValue(rowNumber); // 8 - 7 = 1
 
-        return new int[]{row, col};
+
+
+        return new int[]{rowNumber, column};
     }
 
     public ChessPiece.PieceType parsePromotion(String promotion){
@@ -114,12 +121,12 @@ public class WebSocketFacade extends Endpoint{
     public void makeMove(String authToken, String... params) throws ResponseException, IOException {
         try{
             ChessPiece.PieceType piece;
+            piece = null;
             if(params.length == 3) {
             piece = parsePromotion(params[2]);
             }else if (params.length != 2){
                 throw new ResponseException (500, "server error");
             }
-            piece = null;
 
             int[] start = parsePosition(params[0]);
             int[] end = parsePosition(params[1]);
@@ -133,11 +140,6 @@ public class WebSocketFacade extends Endpoint{
         throw new ResponseException(500, ex.getMessage());
         }
         }
-
-
-//    update game:
-//            var action = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
 
 
 }

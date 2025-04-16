@@ -6,6 +6,7 @@ import dataaccess.DataAccessException;
 import model.GameData;
 import model.GameID;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -50,6 +51,18 @@ public class WebSocketHandler {
     }
 
 
+    @OnWebSocketError
+    public void onError(Session session, Throwable throwable) {
+        System.err.println("WebSocket Error for session " + session + ": " + throwable.getMessage());
+        throwable.printStackTrace();
+    }
+
+    @OnWebSocketClose
+    public void onClose(Session session, int statusCode, String reason) {
+        System.out.println("WebSocket Closed. Code: " + statusCode + ", Reason: " + reason);
+    }
+
+
 
 
 
@@ -70,47 +83,37 @@ public class WebSocketHandler {
             view = " an Observer.";
         }
         var message = new Notification(Notification.Type.JOIN_GAME, String.format("%s has joined the game as %s", username, view));
-        Gson gson = new Gson();
-
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message), null);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
         connections.broadcast(username, notification, command.getGameID());
     }
 
 
+    private String getColumnLetter(int col) {
+        return switch (col) {
+            case 1 -> "a";
+            case 2 -> "b";
+            case 3 -> "c";
+            case 4 -> "d";
+            case 5 -> "e";
+            case 6 -> "f";
+            case 7 -> "g";
+            case 8 -> "h";
+            default -> "?";
+        };
+    }
 
     private void makeMove(Session session, String username, MakeMoveCommand command) throws DataAccessException, IOException, InvalidMoveException {
         GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().startPosition);
         ChessMove chessMove = command.getMove();
         int startCol = command.getMove().getStartPosition().getColumn();
-        int EndCol = command.getMove().getEndPosition().getColumn();
+        int endCol = command.getMove().getEndPosition().getColumn();
 
-        String startColumn;
-        switch (startCol){
-            case 1 -> startColumn = "a";
-            case 2 -> startColumn = "b";
-            case 3 -> startColumn = "c";
-            case 4 -> startColumn = "d";
-            case 5 -> startColumn = "e";
-            case 6 -> startColumn = "f";
-            case 7 -> startColumn = "g";
-            case 8 -> startColumn = "h";
-            default -> startColumn = "";
-        }
+        String startColumn = getColumnLetter( startCol);
 
-        String endColumn;
-        switch (EndCol){
-            case 1 -> endColumn = "a";
-            case 2 -> endColumn = "b";
-            case 3 -> endColumn = "c";
-            case 4 -> endColumn = "d";
-            case 5 -> endColumn = "e";
-            case 6 -> endColumn = "f";
-            case 7 -> endColumn = "g";
-            case 8 -> endColumn = "h";
-            default -> endColumn = "";
 
-        }
+        String endColumn = getColumnLetter( endCol);
+
 
         if (validMoves.contains(chessMove)){
             gameData.game().makeMove(chessMove);
@@ -155,11 +158,19 @@ public class WebSocketHandler {
                 var message = new Notification(Notification.Type.MOVE_MADE, String.format("%s has moved %s to position %s",
                         username,
                         startColumn + command.getMove().getStartPosition().getRow(),
-                        endColumn + +command.getMove().getEndPosition().getRow())
+                        endColumn + command.getMove().getEndPosition().getRow())
                 );
-                Gson gson = new Gson();
-                var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, gson.toJson(message), null);
+                var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
                 connections.broadcast(username, notification, command.getGameID());
+                if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
+                    var checkMessage = new Notification(Notification.Type.MOVE_MADE, "BLACK is in check");
+                    var checkNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, checkMessage, null);
+                    connections.broadcast(username, checkNotification, command.getGameID());
+                } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
+                    var checkMessage = new Notification(Notification.Type.MOVE_MADE, "WHITE is in check");
+                    var checkNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, checkMessage, null);
+                    connections.broadcast(username, checkNotification, command.getGameID());
+                }
             }
         }
     }

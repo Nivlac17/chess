@@ -14,7 +14,7 @@ public class GamePlayClient {
     private String serverUrl;
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
-    String color;
+
 
 
 
