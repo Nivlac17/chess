@@ -32,7 +32,7 @@ public class WebSocketHandler {
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
             connections.addConnection(username, command.getGameID(), session);
             MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-
+System.out.println(command.getGameID());
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
                 case MAKE_MOVE -> makeMove(session, username, moveCommand);
@@ -74,6 +74,7 @@ public class WebSocketHandler {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
             connections.sendError(session.getRemote(), "Error: GameData is unusable");
+            return;
         }
 
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
@@ -81,6 +82,7 @@ public class WebSocketHandler {
             connections.send(serverMessage, username, command.getGameID());
         } catch (IOException e) {
             connections.sendError(session.getRemote(), "Error: GameData is unusable");
+            return;
         }
 
 
@@ -113,12 +115,12 @@ public class WebSocketHandler {
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
 
-        GameData gameData = null;
+        GameData gameData;
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
             connections.sendError(session.getRemote(), "Error: GameData is unusable");
-
+            return;
         }
         Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().startPosition);
         ChessMove chessMove = command.getMove();
