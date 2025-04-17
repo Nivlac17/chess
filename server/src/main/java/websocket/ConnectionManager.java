@@ -66,11 +66,11 @@ public class ConnectionManager {
 
     public void send(ServerMessage serverMessage, String username, int gameID) throws IOException {
         Gson gson = new Gson();
-        String game = gson.toJson(serverMessage);
+        String game = gson.toJson(serverMessage, ServerMessage.class);
 
         var connectionList = connections.get(gameID);
         var connection = connectionList.get(username);
-
+System.out.println("message being sent: " + game);
         connection.send(game);
     }
 

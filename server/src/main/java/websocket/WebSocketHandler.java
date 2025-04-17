@@ -21,6 +21,7 @@ import java.util.Collection;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    private boolean gaveOverlogic = false;
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
 
@@ -69,11 +70,11 @@ System.out.println(command.getGameID());
     private void connect(Session session, String username, UserGameCommand command) {
         connections.addConnection(username, command.getGameID(), session);
         String view;
-        GameData gameData = null;
+        GameData gameData;
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
-            connections.sendError(session.getRemote(), "Error: GameData is unusable");
+            connections.sendError(session.getRemote(), "Error: GameData is unusable 1");
             return;
         }
 
@@ -81,7 +82,7 @@ System.out.println(command.getGameID());
         try {
             connections.send(serverMessage, username, command.getGameID());
         } catch (IOException e) {
-            connections.sendError(session.getRemote(), "Error: GameData is unusable");
+            connections.sendError(session.getRemote(), "Error: GameData is unusable 2");
             return;
         }
 
@@ -113,8 +114,14 @@ System.out.println(command.getGameID());
         };
     }
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) {
 
+
+
+    private void makeMove(Session session, String username, MakeMoveCommand command) {
+        if (gaveOverlogic){
+            connections.sendError(session.getRemote(), "Error: Gave Over");
+            return;
+        }
         GameData gameData;
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
@@ -122,6 +129,7 @@ System.out.println(command.getGameID());
             connections.sendError(session.getRemote(), "Error: GameData is unusable");
             return;
         }
+
         Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().startPosition);
         ChessMove chessMove = command.getMove();
         int startCol = command.getMove().getStartPosition().getColumn();
@@ -133,14 +141,15 @@ System.out.println(command.getGameID());
         String endColumn = getColumnLetter( endCol);
 
 
+        ServerMessage gameOver = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, " Game Over ", null);
         if (validMoves.contains(chessMove)){
             try {
-                gameData.game().makeMove(chessMove);
-            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-            existingGame.setGame(gameData.game());
-            ChessService.updateGame(command.getAuthToken(), existingGame);
+//            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+//            existingGame.setGame(gameData.game());
+            gameData.game().makeMove(chessMove);
+            ChessService.updateGame(command.getAuthToken(), gameData);
             } catch (InvalidMoveException | DataAccessException e) {
-                connections.sendError(session.getRemote(), "Error: GameData is unusable or could not update game");
+                connections.sendError(session.getRemote(), "Error: could not update game or invalid move");
                 return;
             }
             //            Broadcast Loaded game to User
@@ -152,6 +161,8 @@ System.out.println(command.getGameID());
                 connections.sendError(session.getRemote(), "Error: could not send Notification");
                 return;
             }
+            System.out.println("+++++++++++++++++++" );
+
 //            Broadcast loaded game to everyone else
             var gameUpdate = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
             connections.broadcast(username, gameUpdate, command.getGameID());
@@ -165,12 +176,14 @@ System.out.println(command.getGameID());
                                 null, message, null);
                 try {
                     connections.send(victoryMessage, username, command.getGameID());
+                    connections.send(gameOver, username, command.getGameID());
                 } catch (IOException e) {
                     connections.sendError(session.getRemote(), "Error: could not send Notification");
                     return;
                 }
 
                 connections.broadcast(username, victoryMessage, command.getGameID());
+
 
             }else if(gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
                 var message =
@@ -180,12 +193,15 @@ System.out.println(command.getGameID());
                                 null, message, null);
                 try {
                     connections.send(victoryMessage, username, command.getGameID());
+                    gaveOverlogic = true;
                 } catch (IOException e) {
                     connections.sendError(session.getRemote(), "Error: could not send Notification");
                     return;
                 }
 
                 connections.broadcast(username, victoryMessage, command.getGameID());
+                gaveOverlogic = true;
+
 
             }else {
                 var message = String.format("%s has moved %s to position %s",

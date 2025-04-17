@@ -17,6 +17,7 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,16 +44,21 @@ public class WebSocketFacade extends Endpoint{
                 public void onMessage(String message) {
                     Gson gson = new Gson();
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-
+                    System.out.println("message type: " + serverMessage.getServerMessageType());
                     if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
                         String notification = (String) serverMessage.getServerMessage();
                         notificationHandler.notify(notification);
+                        if ( notification.equals(" Game Over ")){
+//                            String fakeInput = "q\n";
+//                            ByteArrayInputStream quit = new ByteArrayInputStream(fakeInput.getBytes());
+//                            System.setIn(quit);
+                        }
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
-                        GameData gameData = serverMessage.getGame();
                         System.out.println("---------1234567");
+                        GameData gameData = serverMessage.getGame();
                         board.loadBoard(gameData, PostLogInClient.color);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
-
+                        System.out.println(serverMessage.getErrorMessage());
                     }
                 }
             });
