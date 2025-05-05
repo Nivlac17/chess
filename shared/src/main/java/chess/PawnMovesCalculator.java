@@ -11,6 +11,7 @@ public class PawnMovesCalculator implements PieceMoveCalculatorInterface {
         ChessPiece currentPiece = board.getPiece(myPosition);
         boolean isWhite = currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE;
         int futureRow;
+        int futureCol;
         if (isWhite) {
             futureRow = row + 1;
         } else {
@@ -36,15 +37,41 @@ public class PawnMovesCalculator implements PieceMoveCalculatorInterface {
                         }
                     }
                 }
-
-
             }
         }
-        return moves;
+        if (isWhite) {
+            futureRow = row + 1;
+            futureCol = col + 1;
+        } else {
+            futureRow = row - 1;
+            futureCol = col + 1;
+        }
+        if (!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
+            ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
+            ChessPiece futurePiece = board.getPiece(futurePosition);
+            if (futurePiece != null && futurePiece.pieceColor != currentPiece.pieceColor) {
+                promotionPieceAdd(moves, myPosition, futurePosition, futureRow);
+            }
+        }
+        if (isWhite) {
+            futureRow = row + 1;
+            futureCol = col - 1;
+        } else {
+            futureRow = row - 1;
+            futureCol = col - 1;
+        }
+        if (!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
+            ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
+            ChessPiece futurePiece = board.getPiece(futurePosition);
+            if (futurePiece != null && futurePiece.pieceColor != currentPiece.pieceColor) {
+                promotionPieceAdd(moves, myPosition, futurePosition, futureRow);
+            }
+        }
+            return moves;
     }
 
 
-    
+
     private void promotionPieceAdd(
             Collection<ChessMove> moves, ChessPosition myPosition, ChessPosition futurePosition, int futureRow){
         if (futureRow == 8 || futureRow == 1){
