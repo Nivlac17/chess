@@ -56,6 +56,8 @@ public class ChessPiece {
         switch (getPieceType()) {
             case BISHOP -> moves = new BishopMovesCalculator();
             case ROOK -> moves = new RookMovesCalculator();
+            case QUEEN -> moves = new QueenMovesCalculator();
+
             default -> {
                 return Collections.emptyList();
             }
