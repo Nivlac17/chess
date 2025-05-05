@@ -58,6 +58,7 @@ public class ChessPiece {
             case ROOK -> moves = new RookMovesCalculator();
             case QUEEN -> moves = new QueenMovesCalculator();
             case KING -> moves = new KingMovesCalculator();
+            case KNIGHT -> moves = new KnightMovesCalculator();
 
             default -> {
                 return Collections.emptyList();
