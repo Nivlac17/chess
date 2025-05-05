@@ -15,15 +15,18 @@ public class BishopMovesCalculator implements PieceMoveCalculatorInterface{
             ChessPiece currentPiece = board.getPiece(myPosition);
             boolean blocked = false;
             while(!blocked){
-                if(futureRow >= 0 || futureRow < 8 || futureCol >= 0 || futureCol < 8) {
+                if(!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
                     ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
                     ChessPiece futurePiece = board.getPiece(futurePosition);
                     if (futurePiece != null) {
                         if(futurePiece.pieceColor != currentPiece.pieceColor){
                             moves.add(new ChessMove(myPosition, futurePosition, null));
                         }
-                    } else {
                         blocked = true;
+                    } else {
+                        moves.add(new ChessMove(myPosition, futurePosition, null));
+                        futureRow += direction[0];
+                        futureCol += direction[1];
                     }
                 } else {
                     blocked = true;
