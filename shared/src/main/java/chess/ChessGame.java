@@ -199,7 +199,22 @@ public class ChessGame {
             }
             return true;
         }
-        return false;    }
+        return false;
+    }
+
+
+    boolean isValidMove(int i, int j, TeamColor teamColor){
+        ChessPiece pieceToCheck = thisBoard.getPiece(new ChessPosition(i, j));
+        if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
+            Collection<ChessMove> protectKingMoves = pieceToCheck.pieceMoves(thisBoard, new ChessPosition(i,j));
+            for (ChessMove protectKingMove : protectKingMoves) {
+                if (!placesKingInCheck(protectKingMove)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
@@ -209,7 +224,32 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)){
+            for (int i = 1; i <= 8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    if (isFreshMove(i,j,teamColor)){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    boolean isFreshMove(int i, int j, TeamColor teamColor) {
+        ChessPosition location = new ChessPosition(i, j);
+        ChessPiece pieceToCheck = thisBoard.getPiece(location);
+        if (pieceToCheck != null && pieceToCheck.getTeamColor() == teamColor) {
+            Collection<ChessMove> protectKingMoves = validMoves(location);
+            for (ChessMove protectKingMove : protectKingMoves) {
+                if (!placesKingInCheck(protectKingMove)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

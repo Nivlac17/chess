@@ -12,11 +12,11 @@ import java.util.Objects;
  */
 public class ChessPiece implements Cloneable{
     ChessGame.TeamColor pieceColor;
-    ChessPiece.PieceType type;
+    ChessPiece.PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
-        this.type = type;
+        this.pieceType = type;
     }
 
     @Override
@@ -28,12 +28,12 @@ public class ChessPiece implements Cloneable{
             return false;
         }
         ChessPiece piece = (ChessPiece) o;
-        return pieceColor == piece.pieceColor && type == piece.type;
+        return pieceColor == piece.pieceColor && pieceType == piece.pieceType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pieceColor, type);
+        return Objects.hash(pieceColor, pieceType);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ChessPiece implements Cloneable{
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return this.type;
+        return this.pieceType;
     }
 
     /**
