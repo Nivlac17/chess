@@ -57,8 +57,33 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece currentPiece = thisBoard.getPiece(startPosition);
+        if ( currentPiece != null ) {
+//            for move in possibleMoves, if move not placesKingInCheck add to returned collection
+            Collection<ChessMove> tempMovesHolder = currentPiece.pieceMoves(thisBoard,startPosition);
+            Collection<ChessMove> movesHolder = new ArrayList<>();
+            for (ChessMove singleMove : tempMovesHolder){
+                if (!placesKingInCheck(singleMove)){
+                    movesHolder.add(singleMove);
+                }
+            }
+            return movesHolder;
+        }else{return new ArrayList<>();}
     }
+
+
+    @Override
+    public ChessGame clone(){
+        try{
+            ChessGame clone = (ChessGame) super.clone();
+            clone.thisBoard = thisBoard.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
     /**
      * Makes a move in a chess game
