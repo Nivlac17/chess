@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -83,6 +84,24 @@ public class ChessGame {
         }
 
     }
+
+    public boolean placesKingInCheck(ChessMove move) {
+
+//        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean is king in check
+        ChessGame tempGame = this.clone();
+        ChessBoard tempBoard = this.thisBoard.clone();
+        ChessPiece movePiece = tempBoard.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() == null) {
+            tempGame.thisBoard.addPiece(move.getEndPosition(), movePiece);
+        } else {
+            tempGame.thisBoard.addPiece(move.getEndPosition(), new ChessPiece(movePiece.getTeamColor(),move.getPromotionPiece()));
+        }
+        tempGame.thisBoard.addPiece(move.getStartPosition(), null);
+        return tempGame.isInCheck(movePiece.getTeamColor());
+    }
+
+
+
 
 
     /**
