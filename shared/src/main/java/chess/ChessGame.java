@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -9,7 +10,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame implements Cloneable{
     ChessBoard thisBoard = new ChessBoard();
     int turnTracker = 0;
 
@@ -40,6 +41,23 @@ public class ChessGame {
         }else{
             turnTracker = 1;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return turnTracker == chessGame.turnTracker && Objects.equals(thisBoard, chessGame.thisBoard);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(thisBoard, turnTracker);
     }
 
     /**
@@ -258,7 +276,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.thisBoard = board;
     }
 
     /**
@@ -267,6 +285,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return thisBoard;
     }
 }
