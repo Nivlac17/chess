@@ -116,9 +116,6 @@ public class ChessGame implements Cloneable{
     }
 
 
-
-
-
     /**
      * Makes a move in a chess game
      *
@@ -168,12 +165,10 @@ public class ChessGame implements Cloneable{
         for (int i = 1; i <= 8; i++){
             for (int j = 1; j <= 8; j++){
                 king = thisBoard.getPiece(new ChessPosition(i, j));
-                if (king != null){
-                    if (king.pieceType == ChessPiece.PieceType.KING && king.getTeamColor() == teamColor){
+                if (king != null && (king.pieceType == ChessPiece.PieceType.KING && king.getTeamColor() == teamColor)){
                         kingPosition = new ChessPosition(i,j);
                         foundKingBool = true;
                         break;
-                    }
                 }
             }
             if (foundKingBool) {break;}
@@ -251,8 +246,7 @@ public class ChessGame implements Cloneable{
         }
         return false;
     }
-
-
+    
     boolean isFreshMove(int i, int j, TeamColor teamColor) {
         ChessPosition location = new ChessPosition(i, j);
         ChessPiece pieceToCheck = thisBoard.getPiece(location);
