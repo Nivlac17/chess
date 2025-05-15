@@ -9,10 +9,10 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard implements Cloneable{
-    public ChessPiece[][] squares = new ChessPiece[8][8];
+     ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {
-
+// Blank method
     }
 
     /**
