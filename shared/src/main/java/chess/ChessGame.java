@@ -78,7 +78,6 @@ public class ChessGame implements Cloneable{
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = thisBoard.getPiece(startPosition);
         if ( currentPiece != null ) {
-//            for move in possibleMoves, if move not placesKingInCheck add to returned collection
             Collection<ChessMove> tempMovesHolder = currentPiece.pieceMoves(thisBoard,startPosition);
             Collection<ChessMove> movesHolder = new ArrayList<>();
             for (ChessMove singleMove : tempMovesHolder){
@@ -104,8 +103,6 @@ public class ChessGame implements Cloneable{
     }
 
     public boolean placesKingInCheck(ChessMove move) {
-
-//        thoughts: clone chess game w/ chess board makeMove (Deep Copy!!!!!!!. return boolean is king in check
         ChessGame tempGame = this.clone();
         ChessBoard tempBoard = this.thisBoard.clone();
         ChessPiece movePiece = tempBoard.getPiece(move.getStartPosition());
