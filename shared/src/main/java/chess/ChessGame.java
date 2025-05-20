@@ -246,7 +246,7 @@ public class ChessGame implements Cloneable{
         }
         return false;
     }
-    
+
     boolean isFreshMove(int i, int j, TeamColor teamColor) {
         ChessPosition location = new ChessPosition(i, j);
         ChessPiece pieceToCheck = thisBoard.getPiece(location);
