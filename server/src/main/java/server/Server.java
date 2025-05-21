@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessInterface;
+import dataaccess.MemoryDataAccessMethods;
 import model.GameData;
 import model.JoinGame;
 import service.ChessService;
@@ -14,15 +15,8 @@ import java.util.Map;
 
 public class Server {
 
-    DataAccessInterface dataAccess;
+    DataAccessInterface dataAccess = new MemoryDataAccessMethods();
 
-    {
-        try {
-            dataAccess = new MemoryDataAccessMethods();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     ChessService service = new ChessService(dataAccess);
 
