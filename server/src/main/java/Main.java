@@ -7,11 +7,10 @@ public class Main {
 
 
 
-
         int port = 8080;
         server.Server server8080 = new server.Server();
         server8080.run(port);
         System.out.println("♕ Chess Server Running on port: " + port);
-        
+
     }
 }
