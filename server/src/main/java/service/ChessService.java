@@ -14,7 +14,7 @@ public class ChessService {
     private static DataAccessInterface dataAccess;
 
     public ChessService(DataAccessInterface dataAccess) {
-        this.dataAccess = dataAccess;
+        ChessService.dataAccess = dataAccess;
     }
 
 
@@ -126,14 +126,16 @@ public class ChessService {
         switch (joinGameRequest.playerColor()) {
             case "WHITE":
                 if (game.whiteUsername() == null) {
-                    dataAccess.updateGame(game.gameID(), authData.username(), null, null, null);
+                    dataAccess.updateGame(game.gameID(),
+                            authData.username(), null, null, null);
                 } else {
                     throw new DataAccessException("Error: already taken", 403);
                 }
                 break;
             case "BLACK":
                 if (game.blackUsername() == null) {
-                    dataAccess.updateGame(game.gameID(), null, authData.username(), null, null);
+                    dataAccess.updateGame(game.gameID(),
+                            null, authData.username(), null, null);
                 } else {
                     throw new DataAccessException("Error: already taken", 403);
                 }
@@ -175,19 +177,11 @@ public class ChessService {
             throw new DataAccessException("Error: bad request", 400);
         }
 
-        dataAccess.updateGame(updateGameRequest.gameID(), null, null, null, updateGameRequest.game());
+        dataAccess.updateGame(updateGameRequest.gameID(), null,
+                null, null, updateGameRequest.game());
         return "success updating game";
     }
 
-
-
-    public static AuthData getAuthData(String token) throws DataAccessException {
-        AuthData authData = dataAccess.getAuth(token);
-        if (authData == null) {
-            throw new DataAccessException("Error: unauthorized", 401);
-        }
-        return authData;
-    }
 }
 
 
