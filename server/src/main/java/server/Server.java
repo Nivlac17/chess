@@ -18,7 +18,7 @@ public class Server {
 
     {
         try {
-            dataAccess = new MySQLDataAccessMethods();
+            dataAccess = new MemoryDataAccessMethods();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
