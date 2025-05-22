@@ -23,50 +23,22 @@ public class PawnMovesCalculator implements PieceMoveCalculatorInterface {
             if (futurePiece == null) {
                 promotionPieceAdd(moves, myPosition,futurePosition, futureRow);
 
-                if ((isWhite && row == 2) || (!isWhite && row == 7)) {
-                    if (isWhite) {
-                        futureRow += 1;
-                    } else {
-                        futureRow -= 1;
-                    }
-                    if (!(futureRow <= 0 || futureRow > 8)) {
-                        futurePosition = new ChessPosition(futureRow, col);
-                        futurePiece = board.getPiece(futurePosition);
-                        if (futurePiece == null) {
-                            promotionPieceAdd(moves, myPosition,futurePosition, futureRow);
-                        }
-                    }
-                }
+                movePawnForward2IfStart(row, futureRow, col, isWhite, myPosition, board, moves);
             }
         }
+        futureCol = col + 1;
+        futureRow = row - 1;
+
         if (isWhite) {
             futureRow = row + 1;
-            futureCol = col + 1;
-        } else {
-            futureRow = row - 1;
-            futureCol = col + 1;
         }
-        if (!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
-            ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
-            ChessPiece futurePiece = board.getPiece(futurePosition);
-            if (futurePiece != null && futurePiece.pieceColor != currentPiece.pieceColor) {
-                promotionPieceAdd(moves, myPosition, futurePosition, futureRow);
-            }
-        }
+        diagonalKill(futureRow, futureCol, board, currentPiece, moves, myPosition);
+        futureCol = col - 1;
+        futureRow = row - 1;
         if (isWhite) {
             futureRow = row + 1;
-            futureCol = col - 1;
-        } else {
-            futureRow = row - 1;
-            futureCol = col - 1;
         }
-        if (!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
-            ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
-            ChessPiece futurePiece = board.getPiece(futurePosition);
-            if (futurePiece != null && futurePiece.pieceColor != currentPiece.pieceColor) {
-                promotionPieceAdd(moves, myPosition, futurePosition, futureRow);
-            }
-        }
+        diagonalKill(futureRow, futureCol, board, currentPiece, moves, myPosition);
             return moves;
     }
 
@@ -81,6 +53,38 @@ public class PawnMovesCalculator implements PieceMoveCalculatorInterface {
             moves.add(new ChessMove(myPosition, futurePosition, ChessPiece.PieceType.ROOK));
         }else {
             moves.add(new ChessMove(myPosition, futurePosition, null));
+        }
+    }
+
+    void movePawnForward2IfStart(int row, int futureRow, int col,
+                                 boolean isWhite, ChessPosition myPosition,
+                                 ChessBoard board, Collection<ChessMove> moves){
+
+        if ((isWhite && row == 2) || (!isWhite && row == 7)) {
+            if (isWhite) {
+                futureRow += 1;
+            } else {
+                futureRow -= 1;
+            }
+            if (!(futureRow <= 0 || futureRow > 8)) {
+                ChessPosition futurePosition = new ChessPosition(futureRow, col);
+                ChessPiece futurePiece = board.getPiece(futurePosition);
+                if (futurePiece == null) {
+                    promotionPieceAdd(moves, myPosition,futurePosition, futureRow);
+                }
+            }
+        }
+    }
+
+
+    void diagonalKill(int futureRow, int futureCol, ChessBoard board,
+                      ChessPiece currentPiece, Collection<ChessMove> moves, ChessPosition myPosition){
+        if (!(futureRow <= 0 || futureRow > 8 || futureCol <= 0 || futureCol > 8)) {
+            ChessPosition futurePosition = new ChessPosition(futureRow, futureCol);
+            ChessPiece futurePiece = board.getPiece(futurePosition);
+            if (futurePiece != null && futurePiece.pieceColor != currentPiece.pieceColor) {
+                promotionPieceAdd(moves, myPosition, futurePosition, futureRow);
+            }
         }
     }
 
