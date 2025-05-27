@@ -29,7 +29,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             executeUpdate("TRUNCATE TABLE GameData");
             executeUpdate("TRUNCATE TABLE UserData");
         } catch (DataAccessException e) {
-            throw new DataAccessException("Error: " + e.getMessage(), 500);
+            throw new DataAccessException(e.getMessage(), 500);
         }
         return "";
     }
@@ -80,7 +80,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
     public void createUser(UserData userData) throws DataAccessException {
 //    create user object, add to db
         if (userData.username() == null || userData.password() == null || userData.email() == null) {
-            throw new DataAccessException("Error: Bad data internal server error creating user", 500);
+            throw new DataAccessException("Bad data internal server error creating user", 500);
         }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), hashPassword(userData.password()), userData.email());
@@ -88,7 +88,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
     public void createAuth(AuthData authData) throws DataAccessException {
         if (authData.username() == null || authData.authToken() == null) {
-            throw new DataAccessException("Error: Bad data internal server error creating auth", 500);
+            throw new DataAccessException(" Bad data internal server error creating auth", 500);
         }
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authData.authToken(), authData.username());
