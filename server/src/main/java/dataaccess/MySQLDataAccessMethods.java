@@ -103,7 +103,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                     if (rs.next()) {
                         return new AuthData(rs.getString("authToken"), rs.getString("username"));
                     } else {
-                        throw new DataAccessException("Error: unauthorized log out", 401);
+                        throw new DataAccessException(" unauthorized log out", 401);
                     }
                 }
             }
@@ -115,7 +115,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
     public void deleteAuth(String token) throws DataAccessException {
         if (token == null || token.isEmpty()) {
-            throw new DataAccessException("Error: Bad data internal server error", 500);
+            throw new DataAccessException(" Bad data internal server error", 500);
         }
         var statement = "DELETE FROM AuthData WHERE authToken=?";
         executeUpdate(statement, token);
@@ -146,7 +146,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
 
     public void createGame(int gameID, String gameName, ChessGame game) throws DataAccessException {
         if (gameName.isEmpty() || game == null) {
-            throw new DataAccessException("Error: Bad data internal server error", 500);
+            throw new DataAccessException(" Bad data internal server error", 500);
         }
         var gameJson = new Gson().toJson(game);
         var statement =
@@ -172,7 +172,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                         ChessGame game = new Gson().fromJson(thisGameJson, ChessGame.class);
                         return new GameData(thisGameID, thisWhiteUsername, thisBlackUsername, thisGameName, game);
                     } else {
-                        throw new DataAccessException("Error: You dumb from get game", 400);
+                        throw new DataAccessException(" You dumb from get game", 400);
                         // or throw an exception if preferred
                     }
                 }
