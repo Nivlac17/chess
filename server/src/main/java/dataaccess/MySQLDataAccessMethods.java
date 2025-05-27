@@ -29,7 +29,7 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             executeUpdate("TRUNCATE TABLE GameData");
             executeUpdate("TRUNCATE TABLE UserData");
         } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage(), 401);
+            throw new DataAccessException("Error: " + e.getMessage(), 500);
         }
         return "";
     }
