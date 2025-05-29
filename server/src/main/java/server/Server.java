@@ -170,7 +170,7 @@ public class Server {
             return returnErrorHelper(response,e);
         }
     }
-    
+
     public void stop() {
         Spark.stop();
         Spark.awaitStop();

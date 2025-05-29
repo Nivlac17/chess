@@ -88,7 +88,6 @@ public class ChessPiece implements Cloneable{
             case KING -> moves = new KingMovesCalculator();
             case KNIGHT -> moves = new KnightMovesCalculator();
             case PAWN -> moves = new PawnMovesCalculator();
-
             default -> {
                 return Collections.emptyList();
             }
