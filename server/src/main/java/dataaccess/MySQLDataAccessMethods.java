@@ -168,7 +168,6 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
                         String thisBlackUsername = rs.getString("blackUsername");
                         String thisGameName = rs.getString("gameName");
                         String thisGameJson = rs.getString("gameJson");
-
                         ChessGame game = new Gson().fromJson(thisGameJson, ChessGame.class);
                         return new GameData(thisGameID, thisWhiteUsername, thisBlackUsername, thisGameName, game);
                     } else {
@@ -210,8 +209,6 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
     }
 
 
-
-
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS UserData (
@@ -234,7 +231,6 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             """
     };
 
-
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
@@ -247,7 +243,6 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
             throw new DataAccessException(e.getMessage(), 500);
         }
     }
-
 
 }
 

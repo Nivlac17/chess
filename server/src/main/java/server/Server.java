@@ -16,8 +16,6 @@ import java.util.Map;
 
 public class Server {
     DataAccessInterface dataAccess;
-
-
     {
         try {
             dataAccess = new MySQLDataAccessMethods();
@@ -25,12 +23,10 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
     ChessService service = new ChessService(dataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
@@ -111,8 +107,6 @@ public class Server {
         }
     }
 
-
-
     private Object listGames(Request request, Response response) {
         Gson serializer = new Gson();
         JsonObject jsonSerializer = new JsonObject();
@@ -122,8 +116,6 @@ public class Server {
             JsonArray arrayOfGames = serializer.toJsonTree(listGamesResult).getAsJsonArray();
             jsonSerializer.add("games", arrayOfGames);
             return serializer.toJson(jsonSerializer);
-
-
         } catch (DataAccessException e ) {
             return returnErrorHelper(response,e);
         }
@@ -133,7 +125,6 @@ public class Server {
         Gson serializer = new Gson();
         String token = request.headers(authStringVarToSatisfyQualityCode);
         JoinGame joinGameRequest = serializer.fromJson(request.body(), model.JoinGame.class);
-
         try {
             service.joinGame(token, joinGameRequest);
             return "";
@@ -179,10 +170,7 @@ public class Server {
             return returnErrorHelper(response,e);
         }
     }
-
-
-
-
+    
     public void stop() {
         Spark.stop();
         Spark.awaitStop();

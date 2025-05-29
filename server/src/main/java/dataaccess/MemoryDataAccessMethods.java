@@ -28,7 +28,6 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
         return "";
     }
 
-
     public UserData getUser(String username) {
 //        search DB for username
         return registeredUsers.get(username);
