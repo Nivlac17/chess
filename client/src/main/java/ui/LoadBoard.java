@@ -1,10 +1,6 @@
 package ui;
 
 import model.GameData;
-//import ui.DrawBoard;
-//import ui.client.PostLogInClient;
-//import websocket.messages.Notification;
-
 
 public class LoadBoard {
     GameData gameData;
