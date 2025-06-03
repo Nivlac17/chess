@@ -156,13 +156,13 @@ LoadBoard board = new LoadBoard();
 
         try {
             String result = server.joinGame(authToken, params);
-            GameData gameInfo = server.getGame(authToken, params[1]);
-            this.color = params[0];
-            board.loadBoard(gameInfo, this.color);
-            this.gameID = new GameID(gameInfo.gameID());
+
 
             if (Objects.equals(result, " Game Joined Successfully ")){
-
+                GameData gameInfo = server.getGame(authToken, params[1]);
+                this.color = params[0];
+                board.loadBoard(gameInfo, this.color);
+                this.gameID = new GameID(gameInfo.gameID());
 
                 return " Game Joined Successfully! ";
 
