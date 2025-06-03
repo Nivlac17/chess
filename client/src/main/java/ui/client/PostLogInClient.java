@@ -83,11 +83,14 @@ LoadBoard board = new LoadBoard();
         }
 
 
-//        try {
+        try {
+            GameData gameInfo = server.getGame(authToken, params[0]);
+            this.color = "white";
+            board.loadBoard(gameInfo, this.color);
             return " Game Joined Successfully! ";
-//        } catch (ResponseException e) {
-//            return " Failure to Join Game " ;
-//        }
+        } catch (ResponseException e) {
+            return " Failure to Join Game " ;
+        }
     }
 
 
