@@ -33,7 +33,6 @@ public class PreLogInRepl {
                     postLoginRepl.run();
                 }
 
-
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -41,8 +40,6 @@ public class PreLogInRepl {
         }
         System.out.println();
     }
-
-
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);

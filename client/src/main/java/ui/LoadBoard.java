@@ -1,8 +1,8 @@
 package ui;
 
 import model.GameData;
-import ui.DrawBoard;
-import ui.client.PostLogInClient;
+//import ui.DrawBoard;
+//import ui.client.PostLogInClient;
 //import websocket.messages.Notification;
 
 
@@ -18,10 +18,5 @@ public class LoadBoard {
         drawBoard.draw(gameData.game().getBoard(), color);
     }
 
-    public GameData getGameData() {
-        return gameData;
-    }
 
-    public void redrawBoard(){
-        drawBoard.draw(gameData.game().getBoard(), color);    }
 }

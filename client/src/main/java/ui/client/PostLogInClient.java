@@ -7,9 +7,7 @@ import model.GameList;
 import ui.DrawBoard;
 import ui.LoadBoard;
 import ui.ServerFacade;
-//import ui.websocket.LoadBoard;
-//import ui.websocket.NotificationHandler;
-//import ui.websocket.WebSocketFacade;
+
 
 import java.util.*;
 
@@ -24,7 +22,6 @@ LoadBoard board = new LoadBoard();
     public  static String color;
 
 
-
     public  PostLogInClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
@@ -34,7 +31,6 @@ LoadBoard board = new LoadBoard();
     public GameID getGameID() {
         return this.gameID;
     }
-
 
     public String eval(String input, String authToken) {
         try {
@@ -69,7 +65,6 @@ LoadBoard board = new LoadBoard();
             System.out.println("Invalid Game Input, Please Try Again");
             return help();
         }
-
         try {
             if(listNumberInterpreter == null){
                 setListNumberInterpreter(authToken);
@@ -81,7 +76,6 @@ LoadBoard board = new LoadBoard();
             System.out.println("Invalid Game Input, Game Does Not Exist Please Try Again");
             return help();
         }
-
 
         try {
             GameData gameInfo = server.getGame(authToken, params[0]);
@@ -182,8 +176,6 @@ LoadBoard board = new LoadBoard();
     }
 
 
-
-
     private String logOut(String authToken) {
 
         try {
@@ -195,7 +187,6 @@ LoadBoard board = new LoadBoard();
         }
         return "Failure to Join Game ";
     }
-
 
 
     public String help(){
