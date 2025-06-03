@@ -5,6 +5,7 @@ import model.GameData;
 import model.GameID;
 import model.GameList;
 import ui.DrawBoard;
+import ui.LoadBoard;
 import ui.ServerFacade;
 //import ui.websocket.LoadBoard;
 //import ui.websocket.NotificationHandler;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class PostLogInClient {
 //    private WebSocketFacade ws;
-
+LoadBoard board = new LoadBoard();
 
     public static Map<Integer, Integer> listNumberInterpreter;
     private ServerFacade server;
@@ -82,13 +83,11 @@ public class PostLogInClient {
         }
 
 
-        try {
-            server.getGame(authToken, "1");
-
+//        try {
             return " Game Joined Successfully! ";
-        } catch (ResponseException e) {
-            return " Failure to Join Game " ;
-        }
+//        } catch (ResponseException e) {
+//            return " Failure to Join Game " ;
+//        }
     }
 
 
@@ -161,8 +160,9 @@ public class PostLogInClient {
         try {
             String result = server.joinGame(authToken, params);
             GameData gameInfo = server.getGame(authToken, params[1]);
-            this.gameID = new GameID(gameInfo.gameID());
             this.color = params[0];
+            board.loadBoard(gameInfo, this.color);
+            this.gameID = new GameID(gameInfo.gameID());
 
             if (Objects.equals(result, " Game Joined Successfully ")){
 
