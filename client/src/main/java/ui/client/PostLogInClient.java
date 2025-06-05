@@ -5,21 +5,23 @@ import model.GameData;
 import model.GameID;
 import model.GameList;
 import ui.DrawBoard;
-import ui.LoadBoard;
 import ui.ServerFacade;
-
+import ui.LoadBoard;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 
 import java.util.*;
 
 public class PostLogInClient {
-//    private WebSocketFacade ws;
-LoadBoard board = new LoadBoard();
+    private WebSocketFacade ws;
+
 
     public static Map<Integer, Integer> listNumberInterpreter;
     private ServerFacade server;
     private String serverUrl;
     public GameID gameID = new GameID(0);
     public  static String color;
+
 
 
     public  PostLogInClient(String serverUrl){
@@ -31,6 +33,7 @@ LoadBoard board = new LoadBoard();
     public GameID getGameID() {
         return this.gameID;
     }
+
 
     public String eval(String input, String authToken) {
         try {
@@ -65,6 +68,7 @@ LoadBoard board = new LoadBoard();
             System.out.println("Invalid Game Input, Please Try Again");
             return help();
         }
+
         try {
             if(listNumberInterpreter == null){
                 setListNumberInterpreter(authToken);
@@ -77,10 +81,10 @@ LoadBoard board = new LoadBoard();
             return help();
         }
 
+
         try {
-            GameData gameInfo = server.getGame(authToken, params[0]);
-            this.color = "white";
-            board.loadBoard(gameInfo, this.color);
+            server.getGame(authToken, "1");
+
             return " Game Joined Successfully! ";
         } catch (ResponseException e) {
             return " Failure to Join Game " ;
@@ -156,13 +160,12 @@ LoadBoard board = new LoadBoard();
 
         try {
             String result = server.joinGame(authToken, params);
-
+            GameData gameInfo = server.getGame(authToken, params[1]);
+            this.gameID = new GameID(gameInfo.gameID());
+            this.color = params[0];
 
             if (Objects.equals(result, " Game Joined Successfully ")){
-                GameData gameInfo = server.getGame(authToken, params[1]);
-                this.color = params[0];
-                board.loadBoard(gameInfo, this.color);
-                this.gameID = new GameID(gameInfo.gameID());
+
 
                 return " Game Joined Successfully! ";
 
@@ -176,6 +179,8 @@ LoadBoard board = new LoadBoard();
     }
 
 
+
+
     private String logOut(String authToken) {
 
         try {
@@ -187,6 +192,7 @@ LoadBoard board = new LoadBoard();
         }
         return "Failure to Join Game ";
     }
+
 
 
     public String help(){

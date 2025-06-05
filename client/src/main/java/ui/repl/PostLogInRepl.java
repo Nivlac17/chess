@@ -34,8 +34,8 @@ public class PostLogInRepl {
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
                 if (result.equals(" Game Joined Successfully! ")) {
                     System.out.println(SET_TEXT_COLOR_BLUE + "Gameplay has started");
-//                    GamePlayRepl gamePlayRepl = new GamePlayRepl(this.serverUrl, client.getGameID());
-//                    gamePlayRepl.run();
+                    GamePlayRepl gamePlayRepl = new GamePlayRepl(this.serverUrl, client.getGameID());
+                    gamePlayRepl.run();
                 }
                 if (result.equals(" GOODBYE!!! ")) {
                     break;
