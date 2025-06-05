@@ -10,6 +10,7 @@ import exception.ResponseException;
 import model.GameData;
 import model.GameID;
 import ui.DrawBoard;
+import ui.LoadBoard;
 import ui.client.PostLogInClient;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
