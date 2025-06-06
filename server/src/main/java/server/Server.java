@@ -11,6 +11,7 @@ import model.GameData;
 import model.JoinGame;
 import service.ChessService;
 import spark.*;
+import websocket.WebSocketHandler;
 
 import java.util.Map;
 
@@ -28,6 +29,8 @@ public class Server {
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
+        Spark.webSocket("/ws", WebSocketHandler.class);
+
 
         // Register your endpoints and handle exceptions here.
         String stringVarToSatisfyQualityCode = "/game";

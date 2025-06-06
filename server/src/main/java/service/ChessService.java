@@ -14,7 +14,7 @@ public class ChessService {
     private static DataAccessInterface dataAccess;
 
     public ChessService(DataAccessInterface dataAccess) {
-        ChessService.dataAccess = dataAccess;
+        this.dataAccess = dataAccess;
     }
 
 
@@ -46,9 +46,10 @@ public class ChessService {
 
 
     public static AuthData logIn(UserData logInRequest) throws DataAccessException {
-        if (logInRequest.username()== null || logInRequest.password()==null) {
+        if (logInRequest.username().isEmpty() || logInRequest.password().isEmpty()) {
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
+
         UserData userData = dataAccess.getUser(logInRequest.username());
         if (userData == null) {
             throw new DataAccessException("Error: Invalid User", 401);
@@ -70,6 +71,7 @@ public class ChessService {
         return "";
     }
 
+
     public static Object listGames(String token) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(token);
         if (authData == null) {
@@ -78,18 +80,22 @@ public class ChessService {
         return dataAccess.listGames();
     }
 
+
     public static int createGame(String token, GameData createGameRequest) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(token);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
+
         String gameName = createGameRequest.gameName();
-        if (gameName == null) {
+        if (gameName.isEmpty()) {
             throw new DataAccessException("Error: bad request, no game name", 400);
         }
+
         ChessGame game = new ChessGame();
         int gameID = generateGameID();
         dataAccess.createGame(gameID, gameName, game);
+
         return gameID;
     }
 
@@ -120,16 +126,14 @@ public class ChessService {
         switch (joinGameRequest.playerColor()) {
             case "WHITE":
                 if (game.whiteUsername() == null) {
-                    dataAccess.updateGame(game.gameID(),
-                            authData.username(), null, null, null);
+                    dataAccess.updateGame(game.gameID(), authData.username(), null, null, null);
                 } else {
                     throw new DataAccessException("Error: already taken", 403);
                 }
                 break;
             case "BLACK":
                 if (game.blackUsername() == null) {
-                    dataAccess.updateGame(game.gameID(),
-                            null, authData.username(), null, null);
+                    dataAccess.updateGame(game.gameID(), null, authData.username(), null, null);
                 } else {
                     throw new DataAccessException("Error: already taken", 403);
                 }
@@ -140,15 +144,18 @@ public class ChessService {
         }
     }
 
+
     public static GameData getGame(String token, GameID getGameRequest) throws DataAccessException {
         AuthData authData = dataAccess.getAuth(token);
         if (authData == null) {
             throw new DataAccessException("Error: unauthorized", 401);
         }
+
         GameData game = dataAccess.getGame(getGameRequest.gameID());
         if (game == null) {
             throw new DataAccessException("Error: bad request", 400);
         }
+
         return game;
 
     }
@@ -168,11 +175,19 @@ public class ChessService {
             throw new DataAccessException("Error: bad request", 400);
         }
 
-        dataAccess.updateGame(updateGameRequest.gameID(), null,
-                null, null, updateGameRequest.game());
+        dataAccess.updateGame(updateGameRequest.gameID(), null, null, null, updateGameRequest.game());
         return "success updating game";
     }
 
+
+
+    public static AuthData getAuthData(String token) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        return authData;
+    }
 }
 
 
