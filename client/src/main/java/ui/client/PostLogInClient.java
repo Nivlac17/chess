@@ -160,13 +160,13 @@ public class PostLogInClient {
 
         try {
             String result = server.joinGame(authToken, params);
-            GameData gameInfo = server.getGame(authToken, params[1]);
-            this.gameID = new GameID(gameInfo.gameID());
-            this.color = params[0];
+
 
             if (Objects.equals(result, " Game Joined Successfully ")){
 
-
+                GameData gameInfo = server.getGame(authToken, params[1]);
+                this.gameID = new GameID(gameInfo.gameID());
+                this.color = params[0];
                 return " Game Joined Successfully! ";
 
             } else if(Objects.equals(result, "Invalid Color Given, please try again")){
