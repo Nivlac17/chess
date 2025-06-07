@@ -21,7 +21,7 @@ import java.util.Collection;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-    private boolean gameOverlogic = false;
+    private boolean gameOverLogic = false;
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
 
@@ -118,7 +118,7 @@ public class WebSocketHandler {
 
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
-        if (gameOverlogic){
+        if (gameOverLogic){
             connections.sendError(session.getRemote(), "Error: Gave Over");
             return;
         }
@@ -193,14 +193,14 @@ public class WebSocketHandler {
                                 null, message, null);
                 try {
                     connections.send(victoryMessage, username, command.getGameID());
-                    gameOverlogic = true;
+                    gameOverLogic = true;
                 } catch (IOException e) {
                     connections.sendError(session.getRemote(), "Error: could not send Notification");
                     return;
                 }
 
                 connections.broadcast(username, victoryMessage, command.getGameID());
-                gameOverlogic = true;
+                gameOverLogic = true;
 
 
             }else {
