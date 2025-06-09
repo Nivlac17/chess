@@ -2,6 +2,8 @@ package websocket;
 
 import chess.*;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.DataAccessException;
 import model.GameData;
 import model.GameID;
@@ -24,32 +26,32 @@ public class WebSocketHandler {
     private boolean gameOverLogic = false;
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
-
         try {
 
-            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            System.out.println(command.toString());
-            // Throws a custom UnauthorizedException. Yours may work differently.
-            String username = (ChessService.getAuthData(command.getAuthToken())).username();
-            connections.addConnection(username, command.getGameID(), session);
-            MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-            System.out.println(command.getGameID());
-            switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, command);
-                case MAKE_MOVE -> makeMove(session, username, moveCommand);
+            JsonObject json = JsonParser.parseString(message).getAsJsonObject();
+            String commandType = json.get("commandType").getAsString();
+            System.out.println("WebsocketHandler on message: " + commandType);
+//            System.out.println("Line -------------------- working till here");
+
+            switch (commandType) {
+                case "CONNECT":
+                    UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+                    connect(session, command);
+                    break;
+                case "MAKE_MOVE":
+                    MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+                    makeMove(session, moveCommand);
+                    break;
 
 //                case LEAVE -> leaveGame(session, username, (LeaveGameCommand) command);
 //                case RESIGN -> resign(session, username, (ResignCommand) command);
-
             }
         } catch (DataAccessException ex) {
             // Serializes and sends the error message
-
             connections.sendError(session.getRemote(), "Error: unauthorized");
-
-
         }
     }
+
 
 
     @OnWebSocketError
@@ -67,17 +69,19 @@ public class WebSocketHandler {
 
 
 
-    private void connect(Session session, String username, UserGameCommand command) {
+
+    private void connect(Session session, UserGameCommand command) throws DataAccessException {
+        String username = (ChessService.getAuthData(command.getAuthToken())).username();
         connections.addConnection(username, command.getGameID(), session);
         String view;
         GameData gameData;
+        System.out.println("Game ID: " + command.getGameID());
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
             connections.sendError(session.getRemote(), "Error: GameData is unusable 1");
             return;
         }
-
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
         try {
             connections.send(serverMessage, username, command.getGameID());
@@ -85,8 +89,6 @@ public class WebSocketHandler {
             connections.sendError(session.getRemote(), "Error: GameData is unusable 2");
             return;
         }
-
-
         if (gameData.whiteUsername().equals(username)){
             view = "WHITE";
         }else if (gameData.blackUsername().equals(username)){
@@ -98,6 +100,7 @@ public class WebSocketHandler {
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
         connections.broadcast(username, notification, command.getGameID());
     }
+
 
 
     private String getColumnLetter(int col) {
@@ -117,12 +120,15 @@ public class WebSocketHandler {
 
 
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) {
+    private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
+        String username = (ChessService.getAuthData(command.getAuthToken())).username();
+
         if (gameOverLogic){
             connections.sendError(session.getRemote(), "Error: Gave Over");
             return;
         }
         GameData gameData;
+        System.out.println("Game data lines: ");
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
@@ -136,16 +142,14 @@ public class WebSocketHandler {
         int endCol = command.getMove().getEndPosition().getColumn();
 
         String startColumn = getColumnLetter( startCol);
-
-
         String endColumn = getColumnLetter( endCol);
 
 
         ServerMessage gameOver = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, " Game Over ", null);
         if (validMoves.contains(chessMove)){
             try {
-//            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-//            existingGame.setGame(gameData.game());
+            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+            existingGame.setGame(gameData.game());
                 gameData.game().makeMove(chessMove);
                 ChessService.updateGame(command.getAuthToken(), gameData);
             } catch (InvalidMoveException | DataAccessException e) {
@@ -158,7 +162,7 @@ public class WebSocketHandler {
             try {
                 connections.send(serverMessage, username, command.getGameID());
             } catch (IOException e) {
-                connections.sendError(session.getRemote(), "Error: could not send Notification");
+                connections.sendError(session.getRemote(), "Error:  could not send Notification");
                 return;
             }
             System.out.println("+++++++++++++++++++" );

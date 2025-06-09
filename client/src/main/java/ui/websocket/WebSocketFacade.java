@@ -27,12 +27,14 @@ public class WebSocketFacade extends Endpoint{
     Session session;
     NotificationHandler notificationHandler;
     LoadBoard board = new LoadBoard();
+    GameID gameID;
 
 
 
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, GameID gameID) throws ResponseException {
         try {
+            this.gameID = gameID;
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
@@ -47,6 +49,7 @@ public class WebSocketFacade extends Endpoint{
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                     System.out.println("message type: " + serverMessage.getServerMessageType());
                     if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
+                        System.out.println("---------7777777");
                         String notification = (String) serverMessage.getServerMessage();
                         notificationHandler.notify(notification);
                         if ( notification.equals(" Game Over ")){
@@ -59,6 +62,7 @@ public class WebSocketFacade extends Endpoint{
                         GameData gameData = serverMessage.getGame();
                         board.loadBoard(gameData, PostLogInClient.color);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
+                        System.out.println("----------555555555555");
                         System.out.println(serverMessage.getErrorMessage());
                     }
                 }
@@ -142,7 +146,7 @@ public class WebSocketFacade extends Endpoint{
             ChessPosition startPosition = new ChessPosition(start[0],start[1]);
             ChessPosition endPosition = new ChessPosition(end[0], end[1]);
             ChessMove move = new ChessMove(startPosition,endPosition,piece);
-            MakeMoveCommand connectCommand = new MakeMoveCommand( authToken, null, move);
+            MakeMoveCommand connectCommand = new MakeMoveCommand( authToken, gameID.gameID(), move);
 
             this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
         } catch (IOException ex) {

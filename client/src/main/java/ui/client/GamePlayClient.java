@@ -45,7 +45,7 @@ public class GamePlayClient {
     }
 
     public void joinGame(String authToken, GameID gameID) throws ResponseException {
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws = new WebSocketFacade(serverUrl, notificationHandler, gameID);
         ws.joinGame(authToken, gameID);
     }
 
