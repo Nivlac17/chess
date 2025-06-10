@@ -14,5 +14,11 @@ public class LoadBoard {
         drawBoard.draw(gameData.game().getBoard(), color);
     }
 
+    public GameData getGameData() {
+        return gameData;
+    }
 
+    public void redrawBoard(){
+        drawBoard.draw(gameData.game().getBoard(), color);
+    }
 }

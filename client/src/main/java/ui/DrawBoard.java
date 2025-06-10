@@ -112,7 +112,7 @@ public class DrawBoard {
                 out.print(SET_TEXT_COLOR_GREEN);
                 out.print(("   "));
             }else{
-                out.print(setPieceColor(row + 1, boardCol + 1, board));
+                out.print(setPieceColor(row + 1, 8 - boardCol, board));
                 out.print((" " +  piece + " "));
             }
         }
@@ -138,7 +138,7 @@ public class DrawBoard {
                 out.print(SET_TEXT_COLOR_GREEN);
                 out.print(("   "));
             }else{
-                out.print(setPieceColor(8 - row, 8 - boardCol, board));
+                out.print(setPieceColor(8 - row, boardCol + 1, board));
                 out.print((" " +  piece + " "));
             }
         }
