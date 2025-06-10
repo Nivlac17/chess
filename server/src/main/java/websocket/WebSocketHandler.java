@@ -151,11 +151,18 @@ public class WebSocketHandler {
         if (validMoves.contains(chessMove)){
             try {
             GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-            existingGame.setGame(gameData.game());
+                ChessGame.TeamColor teamColor =
+                        gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
+                if( (teamColor == ChessGame.TeamColor.BLACK &&  !gameData.blackUsername().equals(username)) ||
+                        (teamColor == ChessGame.TeamColor.WHITE &&  !gameData.whiteUsername().equals(username))) {
+                    connections.sendError(session.getRemote(), "Error: Not your turn!");
+                    return;
+                }
+                    existingGame.setGame(gameData.game());
                 gameData.game().makeMove(chessMove);
                 ChessService.updateGame(command.getAuthToken(), gameData);
             } catch (InvalidMoveException | DataAccessException e) {
-                connections.sendError(session.getRemote(), "Error: could not update game or invalid move");
+                connections.sendError(session.getRemote(), "Error: Not your turn!");
                 return;
             }
             //            Broadcast Loaded game to User
