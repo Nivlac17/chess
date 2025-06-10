@@ -17,12 +17,16 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+
 
 
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    boolean resigned = false;
+
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
@@ -42,7 +46,9 @@ public class WebSocketHandler {
                     break;
 //                case "LEAVE":
 //                    leaveGame(session, LeaveGameCommand command);
-//                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case "RESIGN":
+                    UserGameCommand resignCommand = new Gson().fromJson(message, UserGameCommand.class);
+                    resign(session, resignCommand);
             }
         } catch (DataAccessException ex) {
             // Serializes and sends the error message
@@ -136,7 +142,14 @@ public class WebSocketHandler {
             return;
         }
 
+
+
         Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
+
+        if (resigned == true){
+            validMoves = new ArrayList<>();
+        }
+
         ChessMove chessMove = command.getMove();
         int startCol = command.getMove().getStartPosition().getColumn();
         int endCol = command.getMove().getEndPosition().getColumn();
@@ -182,14 +195,39 @@ public class WebSocketHandler {
                         endColumn + command.getMove().getEndPosition().getRow());
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
             connections.broadcast(username, notification, command.getGameID());
+
+            if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+                var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
+                notifyEveryone(username, session, command, checkmateMessage);
+            } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
+                notifyEveryone(username, session, command, checkmateMessage);
+            } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
+                var checkmateMessage = "WHITE is in Check.";
+                notifyEveryone(username, session, command, checkmateMessage);
+            }else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
+                var checkmateMessage = "BLACK is in Check.";
+                notifyEveryone(username, session, command, checkmateMessage);
+            }
+
+
         } else{
             connections.sendError(session.getRemote(), "Error: invalid move");
         }
     }
 
-//    private void leaveGame(Session session, LeaveGameCommand command){
-//
-//    }
+    private void notifyEveryone(String username, Session session, UserGameCommand command, String message){
+        var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+        try {
+            connections.send(checkmateNotification, username, command.getGameID());
+            connections.broadcast(username, checkmateNotification, command.getGameID());
+        } catch (IOException e) {
+            connections.sendError(session.getRemote(), "Error:  could not send Notification 2257");
+        }
+    }
+    private void resign(Session session, UserGameCommand command){
+        this.resigned = true;
+    }
 
 
 
