@@ -23,7 +23,6 @@ import java.util.Collection;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-//    private boolean gameOverLogic = false;
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
@@ -31,7 +30,6 @@ public class WebSocketHandler {
             JsonObject json = JsonParser.parseString(message).getAsJsonObject();
             String commandType = json.get("commandType").getAsString();
             System.out.println("WebsocketHandler on message: " + commandType);
-//            System.out.println("Line -------------------- working till here");
 
             switch (commandType) {
                 case "CONNECT":
@@ -42,8 +40,8 @@ public class WebSocketHandler {
                     MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                     makeMove(session, moveCommand);
                     break;
-
-//                case LEAVE -> leaveGame(session, username, (LeaveGameCommand) command);
+//                case "LEAVE":
+//                    leaveGame(session, LeaveGameCommand command);
 //                case RESIGN -> resign(session, username, (ResignCommand) command);
             }
         } catch (DataAccessException ex) {
@@ -89,10 +87,10 @@ public class WebSocketHandler {
             connections.sendError(session.getRemote(), "Error: GameData is unusable 2");
             return;
         }
-        if (gameData.whiteUsername().equals(username)){
-            view = "WHITE";
-        }else if (gameData.blackUsername().equals(username)){
+        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
             view = "BLACK";
+        }else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
+            view = "WHITE";
         }else {
             view = " an Observer.";
         }
@@ -131,7 +129,6 @@ public class WebSocketHandler {
     private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
         String username = (ChessService.getAuthData(command.getAuthToken())).username();
         GameData gameData;
-        System.out.println("Game data lines: ");
         try {
             gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         } catch (DataAccessException e) {
@@ -153,8 +150,8 @@ public class WebSocketHandler {
             GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
                 ChessGame.TeamColor teamColor =
                         gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
-                if( (teamColor == ChessGame.TeamColor.BLACK &&  !gameData.blackUsername().equals(username)) ||
-                        (teamColor == ChessGame.TeamColor.WHITE &&  !gameData.whiteUsername().equals(username))) {
+                if( (teamColor == ChessGame.TeamColor.WHITE &&  !gameData.whiteUsername().equals(username)) ||
+                        (teamColor == ChessGame.TeamColor.BLACK &&  !gameData.blackUsername().equals(username))) {
                     connections.sendError(session.getRemote(), "Error: Not your turn!");
                     return;
                 }
@@ -189,4 +186,11 @@ public class WebSocketHandler {
             connections.sendError(session.getRemote(), "Error: invalid move");
         }
     }
+
+//    private void leaveGame(Session session, LeaveGameCommand command){
+//
+//    }
+
+
+
 }
