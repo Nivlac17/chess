@@ -203,11 +203,11 @@ public class WebSocketHandler {
                 var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
                 notifyEveryone(username, session, command, checkmateMessage);
             } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
-                var checkmateMessage = "WHITE is in Check.";
-                notifyEveryone(username, session, command, checkmateMessage);
+                var checkMessage = "WHITE is in Check.";
+                notifyEveryone(username, session, command, checkMessage);
             }else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
-                var checkmateMessage = "BLACK is in Check.";
-                notifyEveryone(username, session, command, checkmateMessage);
+                var checkMessage = "BLACK is in Check.";
+                notifyEveryone(username, session, command, checkMessage);
             }
 
 
