@@ -35,6 +35,7 @@ public class GamePlayClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "m", "move", "make" -> makeMove(authToken, params);
+                case "r", "redraw" -> redrawBoard(authToken);
 
                 case "quit", "q" -> "quit";
                 default -> help();
@@ -54,6 +55,10 @@ public class GamePlayClient {
         return "";
     }
 
+    public String redrawBoard(String authToken){
+        ws.redrawBoard(authToken);
+        return "";
+    }
 
 
     public String help(){

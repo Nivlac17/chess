@@ -225,8 +225,11 @@ public class WebSocketHandler {
             connections.sendError(session.getRemote(), "Error:  could not send Notification 2257");
         }
     }
+
+
     private void resign(Session session, UserGameCommand command){
         this.resigned = true;
+
     }
 
 

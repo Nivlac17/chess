@@ -151,4 +151,10 @@ public class WebSocketFacade extends Endpoint{
     }
 
 
+    public void redrawBoard(String authToken){
+        System.out.println("This is a print statement in redraw board");
+        board.redrawBoard();
+    }
+
+
 }
