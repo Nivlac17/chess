@@ -44,11 +44,14 @@ public class WebSocketHandler {
                     MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                     makeMove(session, moveCommand);
                     break;
-//                case "LEAVE":
-//                    leaveGame(session, LeaveGameCommand command);
+                case "LEAVE":
+                    UserGameCommand leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
+                    leaveGame(session, leaveCommand);
+                    break;
                 case "RESIGN":
                     UserGameCommand resignCommand = new Gson().fromJson(message, UserGameCommand.class);
                     resign(session, resignCommand);
+                    break;
             }
         } catch (DataAccessException ex) {
             // Serializes and sends the error message
@@ -229,17 +232,26 @@ public class WebSocketHandler {
 
     private void resign(Session session, UserGameCommand command) throws DataAccessException {
         if (!this.resigned) {
+            System.out.println("resign log -- resign was called");
+
+
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
             String victor;
             GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+            System.out.println("White Username: " + gameData.whiteUsername());
+            System.out.println("Black Username: " + gameData.blackUsername());
+            System.out.println("Username: " + username);
+
 
             if (gameData.whiteUsername().equals(username)) {
+                System.out.println("resign log -- white resign");
                 this.resigned = true;
                 victor = "BLACK";
                 var resignMessage = String.format("%s has resigned%n %s Wins!",
                         username, victor);
                 notifyEveryone(username, session, command, resignMessage);
             } else if (gameData.blackUsername().equals(username)) {
+                System.out.println("resign log -- black resign");
                 this.resigned = true;
                 victor = "WHITE";
                 var resignMessage = String.format("%s has resigned%n %s Wins!",
@@ -252,6 +264,34 @@ public class WebSocketHandler {
         }
     }
 
+    private String leaveGame(Session session, UserGameCommand command) throws DataAccessException {
+        String username = (ChessService.getAuthData(command.getAuthToken())).username();
+        GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+        var message = username + " left the game" ;
 
+        if (username.equals(existingGame.whiteUsername())){
+            GameData gameData = new GameData(existingGame.gameID(),null, existingGame.blackUsername(), existingGame.gameName(),existingGame.game());
+            ChessService.updateGame(command.getAuthToken(), gameData);
+            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+            connections.broadcast(username, checkmateNotification, command.getGameID());
+            connections.removePlayer(command.getGameID(), username);
 
-}
+        } else if (username.equals(existingGame.blackUsername())){
+            GameData gameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), null, existingGame.gameName(),existingGame.game());
+            ChessService.updateGame(command.getAuthToken(), gameData);
+            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+            connections.broadcast(username, checkmateNotification, command.getGameID());
+            connections.removePlayer(command.getGameID(), username);
+
+        } else {
+            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+            connections.removePlayer(command.getGameID(), username);
+            connections.broadcast(username, checkmateNotification, command.getGameID());
+
+        }
+
+        return "";
+
+    }
+
+    }

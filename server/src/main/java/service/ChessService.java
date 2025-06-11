@@ -176,6 +176,7 @@ public class ChessService {
         }
 
         dataAccess.updateGame(updateGameRequest.gameID(), null, null, null, updateGameRequest.game());
+        System.out.println("success updating game");
         return "success updating game";
     }
 

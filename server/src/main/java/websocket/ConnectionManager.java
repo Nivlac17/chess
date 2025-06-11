@@ -28,6 +28,13 @@ public class ConnectionManager {
         connections.remove(gameID);
     }
 
+    public void removePlayer(int gameID, String player) {
+        ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
+        if (gameConnections != null) {
+            gameConnections.remove(player);
+        }
+    }
+
     public void broadcast(String excludeUsername, ServerMessage notification, int gameID){
         System.out.println("Broadcast is runnign for "+excludeUsername);
         var removeList = new ArrayList<String>();
