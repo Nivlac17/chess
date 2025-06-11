@@ -36,6 +36,7 @@ public class GamePlayClient {
             return switch (cmd) {
                 case "m", "move", "make" -> makeMove(authToken, params);
                 case "r", "redraw" -> redrawBoard(authToken);
+                case "resign" -> resign(authToken);
 
                 case "quit", "q" -> "quit";
                 default -> help();
@@ -60,6 +61,17 @@ public class GamePlayClient {
         return "";
     }
 
+    public String resign(String authToken) throws ResponseException {
+        System.out.println("Are you sure you want to resign? Y/N: ");
+        String input = new java.util.Scanner(System.in).nextLine();
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+        if (cmd.equals("y")||cmd.equals("yes")) {
+            ws.resign(authToken);
+        }
+        return "";
+    }
+
 
     public String help(){
         return   """
@@ -67,7 +79,7 @@ public class GamePlayClient {
                         Highlight legal moves: "hl", "highlight"  ‹position> (e.g. f5)
                         Make a move: "m", "move", "make"    ‹source> ‹destination› ‹optional promotion› (e.g. f5 e4 q)
                         Redraw Chess Board: "r", "redraw"
-                        Resign from game: "res", "resign"
+                        Resign from game: "resign"
                         Leave game: "leave"
                 """;
 

@@ -152,9 +152,18 @@ public class WebSocketFacade extends Endpoint{
 
 
     public void redrawBoard(String authToken){
-        System.out.println("This is a print statement in redraw board");
         board.redrawBoard();
     }
 
-
+    public void resign(String authToken) throws ResponseException {
+        System.out.println("This is a print statement in resign board");
+        try {
+            UserGameCommand connectCommand = new UserGameCommand(
+                    UserGameCommand.CommandType.RESIGN, authToken, gameID.gameID());
+            String json = new Gson().toJson(connectCommand);
+            this.session.getBasicRemote().sendText(json);
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 }

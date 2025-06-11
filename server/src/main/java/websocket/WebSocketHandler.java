@@ -227,9 +227,29 @@ public class WebSocketHandler {
     }
 
 
-    private void resign(Session session, UserGameCommand command){
-        this.resigned = true;
+    private void resign(Session session, UserGameCommand command) throws DataAccessException {
+        if (!this.resigned) {
+            String username = (ChessService.getAuthData(command.getAuthToken())).username();
+            String victor;
+            GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
 
+            if (gameData.whiteUsername().equals(username)) {
+                this.resigned = true;
+                victor = "BLACK";
+                var resignMessage = String.format("%s has resigned%n %s Wins!",
+                        username, victor);
+                notifyEveryone(username, session, command, resignMessage);
+            } else if (gameData.blackUsername().equals(username)) {
+                this.resigned = true;
+                victor = "WHITE";
+                var resignMessage = String.format("%s has resigned%n %s Wins!",
+                        username, victor);
+                notifyEveryone(username, session, command, resignMessage);
+            } else {
+                connections.sendError(session.getRemote(), "Error:  You Are an Observer, NOT a Playa!");
+            }
+
+        }
     }
 
 
