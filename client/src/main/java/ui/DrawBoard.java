@@ -39,7 +39,7 @@ public class DrawBoard {
         setBlack(out);
         out.print("     ");
         String[] headers = {};
-        if (perspective.equals("white")) {
+        if (perspective.equals("white")|| perspective.equals("observer")) {
             headers = new String[]{"A", "B", "C", "D", "E", "F", "G", "H"};
         } else {
             headers = new String[]{"H", "G", "F", "E", "D", "C", "B", "A"};

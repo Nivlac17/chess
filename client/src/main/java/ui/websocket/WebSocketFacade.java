@@ -50,7 +50,11 @@ public class WebSocketFacade extends Endpoint{
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
                         GameData gameData = serverMessage.getGame();
                         board = new LoadBoard();
-                        board.loadBoard(gameData, PostLogInClient.color);
+                        if (PostLogInClient.color == null){
+                            board.loadBoard(gameData, "observer");
+                        }else {
+                            board.loadBoard(gameData, PostLogInClient.color);
+                        }
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
                         System.out.println(serverMessage.getErrorMessage());
                     }
