@@ -38,8 +38,8 @@ public class GamePlayClient {
                 case "r", "redraw" -> redrawBoard(authToken);
                 case "resign" -> resign(authToken);
                 case "leave" -> leave(authToken);
-
-                case "quit", "q" -> "quit";
+                case "hl", "highlight" -> highlight(authToken, params);
+                    case "quit", "q" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {
@@ -78,10 +78,15 @@ public class GamePlayClient {
         return "quit";
     }
 
+    public String highlight(String authToken, String... params) throws ResponseException {
+        ws.highlight(authToken, params[0]);
+        return "";
+    }
 
 
 
-    public String help(){
+
+        public String help(){
         return   """
                 Options:
                         Highlight legal moves: "hl", "highlight"  ‹position> (e.g. f5)

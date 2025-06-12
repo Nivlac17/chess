@@ -178,4 +178,10 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
+    public void highlight(String authToken, String piecePosition){
+        int [] parsedPiecePosition = parsePosition(piecePosition);
+        ChessPosition position = new ChessPosition(parsedPiecePosition[0], parsedPiecePosition[1]);
+        board.drawHighlightedBoard(position);
+    }
+
     }

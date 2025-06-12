@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessPosition;
 import model.GameData;
 
 public class LoadBoard {
@@ -20,5 +21,9 @@ public class LoadBoard {
 
     public void redrawBoard(){
         drawBoard.draw(gameData.game().getBoard(), color);
+    }
+
+    public void drawHighlightedBoard(ChessPosition position) {
+        drawBoard.drawHighlighted(gameData.game().getBoard(), color, position, gameData.game());
     }
 }

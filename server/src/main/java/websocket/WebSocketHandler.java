@@ -138,7 +138,6 @@ public class WebSocketHandler {
     private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
         System.out.println("Making Move");
         synchronized (connections) {
-
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
             GameData gameData;
             try {
@@ -147,21 +146,15 @@ public class WebSocketHandler {
                 connections.sendError(session.getRemote(), "Error: GameData is unusable");
                 return;
             }
-
-
             Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
-
-            if (resigned == true) {
+            if (resigned) {
                 validMoves = new ArrayList<>();
             }
-
             ChessMove chessMove = command.getMove();
             int startCol = command.getMove().getStartPosition().getColumn();
             int endCol = command.getMove().getEndPosition().getColumn();
-
             String startColumn = getColumnLetter(startCol);
             String endColumn = getColumnLetter(endCol);
-
 
             if (validMoves.contains(chessMove)) {
                 try {
@@ -214,8 +207,6 @@ public class WebSocketHandler {
                     var checkMessage = "BLACK is in Check.";
                     notifyEveryone(username, session, command, checkMessage);
                 }
-
-
             } else {
                 connections.sendError(session.getRemote(), "Error: invalid move");
             }
@@ -237,16 +228,9 @@ public class WebSocketHandler {
 
             if (!this.resigned) {
                 System.out.println("resign log -- resign was called");
-
-
                 String username = (ChessService.getAuthData(command.getAuthToken())).username();
                 String victor;
                 GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-                System.out.println("White Username: " + gameData.whiteUsername());
-                System.out.println("Black Username: " + gameData.blackUsername());
-                System.out.println("Username: " + username);
-
-
                 if (gameData.whiteUsername().equals(username)) {
                     System.out.println("resign log -- white resign");
                     this.resigned = true;
@@ -302,8 +286,6 @@ public class WebSocketHandler {
             }
         }
         return "";
-
     }
-
 
 }
