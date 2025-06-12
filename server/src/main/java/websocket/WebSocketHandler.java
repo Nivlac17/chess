@@ -23,9 +23,6 @@ import java.util.Collection;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-    private final Object resignLock = new Object();
-    private final Object moveLock = new Object();
-    private final Object connectLock = new Object();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
@@ -78,7 +75,6 @@ public class WebSocketHandler {
 
 
     private void connect(Session session, UserGameCommand command) throws DataAccessException {
-        synchronized (connectLock) {
             connections.resigned.put(command.getGameID(), false);
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
             connections.addConnection(username, command.getGameID(), session);
@@ -108,7 +104,7 @@ public class WebSocketHandler {
             var message = String.format("%s has joined the game as %s", username, view);
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
             connections.broadcast(username, notification, command.getGameID());
-        }
+
     }
 
 
@@ -139,8 +135,6 @@ public class WebSocketHandler {
 
 
     private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
-        synchronized (moveLock) {
-
             System.out.println("Making Move");
             synchronized (connections) {
                 String username = (ChessService.getAuthData(command.getAuthToken())).username();
@@ -167,7 +161,7 @@ public class WebSocketHandler {
                     connections.sendError(session.getRemote(), "Error: invalid move");
                 }
             }
-        }
+
     }
 
     private void updateGameWMove(String username, MakeMoveCommand command, ChessMove chessMove,
@@ -235,8 +229,6 @@ public class WebSocketHandler {
     }
 
     private void resign(Session session, UserGameCommand command) throws DataAccessException {
-        synchronized (resignLock) {
-
             if (!connections.resigned.get(command.getGameID())) {
                 System.out.println("resign log -- resign was called");
                 String username = (ChessService.getAuthData(command.getAuthToken())).username();
@@ -262,7 +254,7 @@ public class WebSocketHandler {
             } else {
                 connections.sendError(session.getRemote(), "Error:  User Already Resigned");
             }
-        }
+        
     }
 
     private void leaveGame(UserGameCommand command) throws DataAccessException {
