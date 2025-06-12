@@ -32,7 +32,6 @@ public class ConnectionManager {
 
         public void removePlayer ( int gameID, String player){
         synchronized (connections) {
-
             ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
             if (gameConnections != null) {
                 gameConnections.remove(player);
@@ -41,42 +40,39 @@ public class ConnectionManager {
     }
 
         public void broadcast (String excludeUsername, ServerMessage notification,int gameID){
-            synchronized (connections) {
+            System.out.println("Broadcast is runnign for " + excludeUsername);
+            var removeList = new ArrayList<String>();
+            var connectionList = connections.get(gameID);
+            if (connectionList == null) {
+                System.out.println("I'm dying!!!!!");
+                return;
+            }
+            for (var entry : connectionList.entrySet()) {
+                synchronized (connections) {
+                    String username = entry.getKey();
+                    System.out.println(username + " in connection list");
+                    Connection connection = entry.getValue();
 
-                System.out.println("Broadcast is runnign for " + excludeUsername);
-                var removeList = new ArrayList<String>();
-                var connectionList = connections.get(gameID);
-                if (connectionList == null) {
-                    System.out.println("I'm dying!!!!!");
-                    return;
-                }
-                for (var entry : connectionList.entrySet()) {
-                    synchronized (connections) {
-                        String username = entry.getKey();
-                        System.out.println(username + " in connection list");
-                        Connection connection = entry.getValue();
+                    if (!username.equals(excludeUsername)) {
+                        try {
+                            Gson gson = new Gson();
+                            String message = gson.toJson(notification);
+                            System.out.println("message to be sent: " + message);
+                            connection.send(message);
+                            System.out.println("message was sent to all but: " + excludeUsername);
 
-                        if (!username.equals(excludeUsername)) {
-                            try {
-                                Gson gson = new Gson();
-                                String message = gson.toJson(notification);
-                                System.out.println("message to be sent: " + message);
-                                connection.send(message);
-                                System.out.println("message was sent to all but: " + excludeUsername);
-
-                            } catch (IOException e) {
-                                removeList.add(username);
-                            }
+                        } catch (IOException e) {
+                            removeList.add(username);
                         }
                     }
                 }
+            }
 
-                for (String userToRemove : removeList) {
-                    connectionList.remove(userToRemove);
-                }
-                if (connectionList.isEmpty()) {
-                    remove(gameID);
-                }
+            for (String userToRemove : removeList) {
+                connectionList.remove(userToRemove);
+            }
+            if (connectionList.isEmpty()) {
+                remove(gameID);
             }
     }
 
