@@ -27,8 +27,6 @@ public class WebSocketHandler {
     private final Object moveLock = new Object();
     private final Object connectLock = new Object();
 
-    boolean resigned = false;
-
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
@@ -81,7 +79,7 @@ public class WebSocketHandler {
 
     private void connect(Session session, UserGameCommand command) throws DataAccessException {
         synchronized (connectLock) {
-
+            connections.resigned.put(command.getGameID(), false);
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
             connections.addConnection(username, command.getGameID(), session);
             String view;
@@ -154,6 +152,7 @@ public class WebSocketHandler {
                     return;
                 }
                 Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
+                Boolean resigned = connections.resigned.get(command.getGameID());
                 if (resigned) {
                     validMoves = new ArrayList<>();
                 }
@@ -238,21 +237,21 @@ public class WebSocketHandler {
     private void resign(Session session, UserGameCommand command) throws DataAccessException {
         synchronized (resignLock) {
 
-            if (!this.resigned) {
+            if (!connections.resigned.get(command.getGameID())) {
                 System.out.println("resign log -- resign was called");
                 String username = (ChessService.getAuthData(command.getAuthToken())).username();
                 String victor;
                 GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
                 if (gameData.whiteUsername().equals(username)) {
                     System.out.println("resign log -- white resign");
-                    this.resigned = true;
+                    connections.resigned.put(command.getGameID(), true);
                     victor = "BLACK";
                     var resignMessage = String.format("%s has resigned%n %s Wins!",
                             username, victor);
                     notifyEveryone(username, session, command, resignMessage);
                 } else if (gameData.blackUsername().equals(username)) {
                     System.out.println("resign log -- black resign");
-                    this.resigned = true;
+                    connections.resigned.put(command.getGameID(), true);
                     victor = "WHITE";
                     var resignMessage = String.format("%s has resigned%n %s Wins!",
                             username, victor);

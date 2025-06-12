@@ -16,7 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
 
-        private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection> > connections = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> connections = new ConcurrentHashMap<>();
+        public ConcurrentHashMap<Integer, Boolean> resigned = new ConcurrentHashMap<>();
 
         public void addConnection (String username,int gameID, Session session){
                 var connection = new Connection(username, session);
