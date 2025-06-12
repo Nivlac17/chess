@@ -46,6 +46,9 @@ public class ChessService {
 
 
     public static AuthData logIn(UserData logInRequest) throws DataAccessException {
+        if (logInRequest.username() == null || logInRequest.password() == null) {
+            throw new DataAccessException("Error: Incomplete Information!!!", 400);
+        }
         if (logInRequest.username().isEmpty() || logInRequest.password().isEmpty()) {
             throw new DataAccessException("Error: Incomplete Information!!!", 400);
         }
@@ -88,7 +91,7 @@ public class ChessService {
         }
 
         String gameName = createGameRequest.gameName();
-        if (gameName.isEmpty()) {
+        if (gameName == null || gameName.isEmpty()) {
             throw new DataAccessException("Error: bad request, no game name", 400);
         }
 

@@ -78,13 +78,13 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
         System.out.println("update game running");
 
         GameData origonalGameData = createdGames.get(gameID);
-        if(whiteUsername.equals("username")){
-            origonalGameData = origonalGameData.setWhiteUsername(null);
+        if(whiteUsername != null){
+            origonalGameData = origonalGameData.setWhiteUsername(whiteUsername);
             System.out.println("white set to null");
 
         }
-        if(blackUsername.equals("username")){
-            origonalGameData = origonalGameData.setBlackUsername(null);
+        if(blackUsername != null){
+            origonalGameData = origonalGameData.setBlackUsername(blackUsername);
             System.out.println("black set to null");
         }
         if(gameName != null){
