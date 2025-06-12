@@ -23,6 +23,10 @@ import java.util.Collection;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    private final Object resignLock = new Object();
+    private final Object moveLock = new Object();
+    private final Object connectLock = new Object();
+
     boolean resigned = false;
 
     @OnWebSocketMessage
@@ -76,34 +80,37 @@ public class WebSocketHandler {
 
 
     private void connect(Session session, UserGameCommand command) throws DataAccessException {
-        String username = (ChessService.getAuthData(command.getAuthToken())).username();
-        connections.addConnection(username, command.getGameID(), session);
-        String view;
-        GameData gameData;
-        System.out.println("Game ID: " + command.getGameID());
-        try {
-            gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-        } catch (DataAccessException e) {
-            connections.sendError(session.getRemote(), "Error: GameData is unusable 1");
-            return;
+        synchronized (connectLock) {
+
+            String username = (ChessService.getAuthData(command.getAuthToken())).username();
+            connections.addConnection(username, command.getGameID(), session);
+            String view;
+            GameData gameData;
+            System.out.println("Game ID: " + command.getGameID());
+            try {
+                gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+            } catch (DataAccessException e) {
+                connections.sendError(session.getRemote(), "Error: GameData is unusable 1");
+                return;
+            }
+            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
+            try {
+                connections.send(serverMessage, username, command.getGameID());
+            } catch (IOException e) {
+                connections.sendError(session.getRemote(), "Error: GameData is unusable 2");
+                return;
+            }
+            if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
+                view = "BLACK";
+            } else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
+                view = "WHITE";
+            } else {
+                view = " an Observer.";
+            }
+            var message = String.format("%s has joined the game as %s", username, view);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+            connections.broadcast(username, notification, command.getGameID());
         }
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
-        try {
-            connections.send(serverMessage, username, command.getGameID());
-        } catch (IOException e) {
-            connections.sendError(session.getRemote(), "Error: GameData is unusable 2");
-            return;
-        }
-        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)){
-            view = "BLACK";
-        }else if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)){
-            view = "WHITE";
-        }else {
-            view = " an Observer.";
-        }
-        var message = String.format("%s has joined the game as %s", username, view);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-        connections.broadcast(username, notification, command.getGameID());
     }
 
 
@@ -134,29 +141,32 @@ public class WebSocketHandler {
 
 
     private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
-        System.out.println("Making Move");
-        synchronized (connections) {
-            String username = (ChessService.getAuthData(command.getAuthToken())).username();
-            GameData gameData;
-            try {
-                gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-            } catch (DataAccessException e) {
-                connections.sendError(session.getRemote(), "Error: GameData is unusable");
-                return;
-            }
-            Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
-            if (resigned) {
-                validMoves = new ArrayList<>();
-            }
-            ChessMove chessMove = command.getMove();
-            int startCol = command.getMove().getStartPosition().getColumn();
-            int endCol = command.getMove().getEndPosition().getColumn();
-            String[] columns = {getColumnLetter(startCol), getColumnLetter(endCol)};
+        synchronized (moveLock) {
 
-            if (validMoves.contains(chessMove)) {
-                updateGameWMove(username, command, chessMove, session, gameData, columns);
-            } else {
-                connections.sendError(session.getRemote(), "Error: invalid move");
+            System.out.println("Making Move");
+            synchronized (connections) {
+                String username = (ChessService.getAuthData(command.getAuthToken())).username();
+                GameData gameData;
+                try {
+                    gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+                } catch (DataAccessException e) {
+                    connections.sendError(session.getRemote(), "Error: GameData is unusable");
+                    return;
+                }
+                Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
+                if (resigned) {
+                    validMoves = new ArrayList<>();
+                }
+                ChessMove chessMove = command.getMove();
+                int startCol = command.getMove().getStartPosition().getColumn();
+                int endCol = command.getMove().getEndPosition().getColumn();
+                String[] columns = {getColumnLetter(startCol), getColumnLetter(endCol)};
+
+                if (validMoves.contains(chessMove)) {
+                    updateGameWMove(username, command, chessMove, session, gameData, columns);
+                } else {
+                    connections.sendError(session.getRemote(), "Error: invalid move");
+                }
             }
         }
     }
@@ -226,7 +236,7 @@ public class WebSocketHandler {
     }
 
     private void resign(Session session, UserGameCommand command) throws DataAccessException {
-        synchronized (connections) {
+        synchronized (resignLock) {
 
             if (!this.resigned) {
                 System.out.println("resign log -- resign was called");
