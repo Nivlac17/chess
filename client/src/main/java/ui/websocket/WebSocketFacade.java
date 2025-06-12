@@ -9,16 +9,13 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameData;
 import model.GameID;
-import ui.DrawBoard;
 import ui.LoadBoard;
 import ui.client.PostLogInClient;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,18 +44,14 @@ public class WebSocketFacade extends Endpoint{
                 public void onMessage(String message) {
                     Gson gson = new Gson();
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-                    System.out.println("message type: " + serverMessage.getServerMessageType());
                     if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
-                        System.out.println("---------7777777");
                         String notification = (String) serverMessage.getServerMessage();
                         notificationHandler.notify(notification);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
-                        System.out.println("---------1234567");
                         GameData gameData = serverMessage.getGame();
                         board = new LoadBoard();
                         board.loadBoard(gameData, PostLogInClient.color);
                     }else if (serverMessage.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
-                        System.out.println("----------555555555555");
                         System.out.println(serverMessage.getErrorMessage());
                     }
                 }
@@ -134,7 +127,6 @@ public class WebSocketFacade extends Endpoint{
             if(params.length == 3) {
                     piece = parsePromotion(params[2]);
                     if (piece == null){
-//                        System.out.println("Invalid Promotional Piece");
                         return "Invalid Promotional Piece";
                     }
             }else if (params.length != 2){
@@ -150,7 +142,6 @@ public class WebSocketFacade extends Endpoint{
             ChessPosition endPosition = new ChessPosition(end[0], end[1]);
             ChessMove move = new ChessMove(startPosition,endPosition,piece);
             MakeMoveCommand connectCommand = new MakeMoveCommand( authToken, gameID.gameID(), move);
-
             this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
@@ -164,7 +155,6 @@ public class WebSocketFacade extends Endpoint{
     }
 
     public void resign(String authToken) throws ResponseException {
-//        System.out.println("This is a print statement in resign board");
         try {
             UserGameCommand connectCommand = new UserGameCommand(
                     UserGameCommand.CommandType.RESIGN, authToken, gameID.gameID());

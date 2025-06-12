@@ -12,8 +12,6 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import service.ChessService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -46,7 +44,7 @@ public class WebSocketHandler {
                     break;
                 case "LEAVE":
                     UserGameCommand leaveCommand = new Gson().fromJson(message, UserGameCommand.class);
-                    leaveGame(session, leaveCommand);
+                    leaveGame(leaveCommand);
                     break;
                 case "RESIGN":
                     UserGameCommand resignCommand = new Gson().fromJson(message, UserGameCommand.class);
@@ -153,63 +151,67 @@ public class WebSocketHandler {
             ChessMove chessMove = command.getMove();
             int startCol = command.getMove().getStartPosition().getColumn();
             int endCol = command.getMove().getEndPosition().getColumn();
-            String startColumn = getColumnLetter(startCol);
-            String endColumn = getColumnLetter(endCol);
+            String[] columns = {getColumnLetter(startCol), getColumnLetter(endCol)};
 
             if (validMoves.contains(chessMove)) {
-                try {
-                    GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-                    ChessGame.TeamColor teamColor =
-                            gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
-                    if ((teamColor == ChessGame.TeamColor.WHITE && !gameData.whiteUsername().equals(username)) ||
-                            (teamColor == ChessGame.TeamColor.BLACK && !gameData.blackUsername().equals(username))) {
-                        connections.sendError(session.getRemote(), "Error: Not your turn!");
-                        return;
-                    }
-                    existingGame.setGame(gameData.game());
-                    gameData.game().makeMove(chessMove);
-                    ChessService.updateGame(command.getAuthToken(), gameData);
-                } catch (InvalidMoveException | DataAccessException e) {
-                    connections.sendError(session.getRemote(), "Error: Not your turn!");
-                    return;
-                }
-                //            Broadcast Loaded game to User
-                ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
-
-                try {
-                    connections.send(serverMessage, username, command.getGameID());
-                    delayRace();
-                } catch (IOException e) {
-                    connections.sendError(session.getRemote(), "Error:  could not send Notification");
-                    return;
-                }
-//            Broadcast loaded game to everyone else
-                var gameUpdate = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
-                connections.broadcast(username, gameUpdate, command.getGameID());
-                delayRace();
-                var message = String.format("%s has moved %s to position %s",
-                        username,
-                        startColumn + command.getMove().getStartPosition().getRow(),
-                        endColumn + command.getMove().getEndPosition().getRow());
-                var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-                connections.broadcast(username, notification, command.getGameID());
-
-                if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                    var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
-                    notifyEveryone(username, session, command, checkmateMessage);
-                } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                    var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
-                    notifyEveryone(username, session, command, checkmateMessage);
-                } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-                    var checkMessage = "WHITE is in Check.";
-                    notifyEveryone(username, session, command, checkMessage);
-                } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-                    var checkMessage = "BLACK is in Check.";
-                    notifyEveryone(username, session, command, checkMessage);
-                }
+                updateGameWMove(username, command, chessMove, session, gameData, columns);
             } else {
                 connections.sendError(session.getRemote(), "Error: invalid move");
             }
+        }
+    }
+
+    private void updateGameWMove(String username, MakeMoveCommand command, ChessMove chessMove,
+                                 Session session, GameData gameData, String[] columns){
+        try {
+            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+            ChessGame.TeamColor teamColor =
+                    gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
+            if ((teamColor == ChessGame.TeamColor.WHITE && !gameData.whiteUsername().equals(username)) ||
+                    (teamColor == ChessGame.TeamColor.BLACK && !gameData.blackUsername().equals(username))) {
+                connections.sendError(session.getRemote(), "Error: Not your turn!");
+                return;
+            }
+            existingGame.setGame(gameData.game());
+            gameData.game().makeMove(chessMove);
+            ChessService.updateGame(command.getAuthToken(), gameData);
+        } catch (InvalidMoveException | DataAccessException e) {
+            connections.sendError(session.getRemote(), "Error: Not your turn!");
+            return;
+        }
+        //            Broadcast Loaded game to User
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
+
+        try {
+            connections.send(serverMessage, username, command.getGameID());
+            delayRace();
+        } catch (IOException e) {
+            connections.sendError(session.getRemote(), "Error:  could not send Notification");
+            return;
+        }
+//            Broadcast loaded game to everyone else
+        var gameUpdate = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
+        connections.broadcast(username, gameUpdate, command.getGameID());
+        delayRace();
+        var message = String.format("%s has moved %s to position %s",
+                username,
+                columns[0] + command.getMove().getStartPosition().getRow(),
+                columns[1] + command.getMove().getEndPosition().getRow());
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+        connections.broadcast(username, notification, command.getGameID());
+
+        if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
+            notifyEveryone(username, session, command, checkmateMessage);
+        } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
+            notifyEveryone(username, session, command, checkmateMessage);
+        } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+            var checkMessage = "WHITE is in Check.";
+            notifyEveryone(username, session, command, checkMessage);
+        } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            var checkMessage = "BLACK is in Check.";
+            notifyEveryone(username, session, command, checkMessage);
         }
     }
 
@@ -254,12 +256,11 @@ public class WebSocketHandler {
         }
     }
 
-    private String leaveGame(Session session, UserGameCommand command) throws DataAccessException {
+    private void leaveGame(UserGameCommand command) throws DataAccessException {
         synchronized (connections) {
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
         GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         var message = username + " left the game" ;
-        System.out.println("leaving");
             if (username.equals(existingGame.whiteUsername())) {
                 System.out.println("white username leaving");
                 GameData gameData = new GameData(existingGame.gameID(), "game", null, existingGame.gameName(), existingGame.game());
@@ -285,7 +286,6 @@ public class WebSocketHandler {
 
             }
         }
-        return "";
     }
 
 }

@@ -17,5 +17,6 @@ public class Connection {
             session.getRemote().sendString(msg);
         } else {
             System.out.printf("Session for %s is closed or null. Message not sent.%n", username);
-        }    }
+        }
+    }
 }
