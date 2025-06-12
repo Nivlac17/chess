@@ -10,19 +10,12 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class GamePlayClient {
-    private ServerFacade server;
     private String serverUrl;
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
 
 
-
-
-
-
-
     public  GamePlayClient(String serverUrl, NotificationHandler notificationHandler) {
-        server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
 
@@ -53,8 +46,12 @@ public class GamePlayClient {
     }
 
     public String makeMove(String authToken, String... params) throws ResponseException, IOException {
+        if (params.length != 2 && params.length != 3) {
+            System.out.println("Invalid Registration, Please Try Again");
+            return "help";
+        }
         ws.makeMove(authToken, params);
-        return "";
+        return ws.makeMove(authToken, params);
     }
 
     public String redrawBoard(String authToken){
@@ -78,12 +75,10 @@ public class GamePlayClient {
         return "quit";
     }
 
-    public String highlight(String authToken, String... params) throws ResponseException {
+    public String highlight(String authToken, String... params) {
         ws.highlight(authToken, params[0]);
         return "";
     }
-
-
 
 
         public String help(){

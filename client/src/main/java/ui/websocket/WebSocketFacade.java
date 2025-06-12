@@ -127,18 +127,25 @@ public class WebSocketFacade extends Endpoint{
 
     }
 
-    public void makeMove(String authToken, String... params) throws ResponseException, IOException {
+    public String makeMove(String authToken, String... params) throws ResponseException, IOException {
         try{
             ChessPiece.PieceType piece;
             piece = null;
             if(params.length == 3) {
-                piece = parsePromotion(params[2]);
+                    piece = parsePromotion(params[2]);
+                    if (piece == null){
+//                        System.out.println("Invalid Promotional Piece");
+                        return "Invalid Promotional Piece";
+                    }
             }else if (params.length != 2){
                 throw new ResponseException (500, "server error");
             }
 
             int[] start = parsePosition(params[0]);
             int[] end = parsePosition(params[1]);
+            if (start[0] < 1 || start[0] < 9 || start[1] < 1 || start[1] < 9 || end[0] < 1 || end[0] < 9 ){
+                return "Invalid Promotional Piece";
+            }
             ChessPosition startPosition = new ChessPosition(start[0],start[1]);
             ChessPosition endPosition = new ChessPosition(end[0], end[1]);
             ChessMove move = new ChessMove(startPosition,endPosition,piece);
@@ -148,6 +155,7 @@ public class WebSocketFacade extends Endpoint{
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
+        return "";
     }
 
 
