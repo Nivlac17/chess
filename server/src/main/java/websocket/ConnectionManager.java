@@ -19,11 +19,8 @@ public class ConnectionManager {
         private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection> > connections = new ConcurrentHashMap<>();
 
         public void addConnection (String username,int gameID, Session session){
-            synchronized (connections) {
-
                 var connection = new Connection(username, session);
                 connections.computeIfAbsent(gameID, id -> new ConcurrentHashMap<>()).put(username, connection);
-            }
     }
 
         public void remove ( int gameID){
@@ -51,7 +48,6 @@ public class ConnectionManager {
                     String username = entry.getKey();
                     System.out.println(username + " in connection list");
                     Connection connection = entry.getValue();
-
                     if (!username.equals(excludeUsername)) {
                         try {
                             Gson gson = new Gson();
