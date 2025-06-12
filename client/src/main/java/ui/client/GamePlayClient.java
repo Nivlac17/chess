@@ -46,9 +46,11 @@ public class GamePlayClient {
     }
 
     public String makeMove(String authToken, String... params) throws ResponseException, IOException {
-        if (params.length != 2 && params.length != 3) {
-            System.out.println("Invalid Registration, Please Try Again");
-            return "help";
+        if (params.length != 2) {
+            if(params.length != 3){
+                System.out.println("Invalid move, Please Try Again");
+                return "help";
+            }
         }
         ws.makeMove(authToken, params);
         return ws.makeMove(authToken, params);

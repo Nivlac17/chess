@@ -63,34 +63,6 @@ public class PostLogInClient {
         }
     }
 
-    private String watchGame(String authToken, String... params) {
-        if (params.length != 1){
-            System.out.println("Invalid Game Input, Please Try Again");
-            return help();
-        }
-
-        try {
-            if(listNumberInterpreter == null){
-                setListNumberInterpreter(authToken);
-            }
-        } catch (Exception ignored){}
-        params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
-
-        if(params[0].equals("null")){
-            System.out.println("Invalid Game Input, Game Does Not Exist Please Try Again");
-            return help();
-        }
-
-
-        try {
-            server.getGame(authToken, "1");
-
-            return " Game Joined Successfully! ";
-        } catch (ResponseException e) {
-            return " Failure to Join Game " ;
-        }
-    }
-
 
     private String listGames(String authToken) {
         try {
@@ -143,6 +115,37 @@ public class PostLogInClient {
         }
         return "Failure to create Game";
     }
+
+
+
+    private String watchGame(String authToken, String... params) {
+        if (params.length != 1){
+            System.out.println("Invalid Game Input, Please Try Again");
+            return help();
+        }
+
+        try {
+            if(listNumberInterpreter == null){
+                setListNumberInterpreter(authToken);
+            }
+        } catch (Exception ignored){}
+        params[0] = String.valueOf(listNumberInterpreter.get(Integer.parseInt(params[0])));
+
+        if(params[0].equals("0") || params[0] == null){
+            System.out.println("Invalid Game Input, Game Does Not Exist Please Try Again");
+            return help();
+        }
+        gameID = new GameID(Integer.parseInt(params[0]));
+
+        try {
+            server.getGame(authToken, params[0]);
+
+            return " Game Joined Successfully! ";
+        } catch (ResponseException e) {
+            return " Failure to Join Game " ;
+        }
+    }
+
 
     private String joinGame(String authToken, String... params) {
         if (params.length != 2){

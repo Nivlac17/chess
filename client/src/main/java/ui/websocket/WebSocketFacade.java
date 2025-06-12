@@ -120,13 +120,17 @@ public class WebSocketFacade extends Endpoint{
 
     }
 
+    private boolean isValidPosition(int[] pos) {
+        return pos[0] >= 1 && pos[0] < 9 && pos[1] >= 1 && pos[1] < 9;
+    }
+
     public String makeMove(String authToken, String... params) throws ResponseException, IOException {
         try{
             ChessPiece.PieceType piece;
             piece = null;
             if(params.length == 3) {
                     piece = parsePromotion(params[2]);
-                    if (piece == null){
+                    if (piece != null){
                         return "Invalid Promotional Piece";
                     }
             }else if (params.length != 2){
@@ -135,7 +139,7 @@ public class WebSocketFacade extends Endpoint{
 
             int[] start = parsePosition(params[0]);
             int[] end = parsePosition(params[1]);
-            if (start[0] < 1 || start[0] < 9 || start[1] < 1 || start[1] < 9 || end[0] < 1 || end[0] < 9 ){
+            if (!isValidPosition(start) || !isValidPosition(end)) {
                 return "Invalid Promotional Piece";
             }
             ChessPosition startPosition = new ChessPosition(start[0],start[1]);
