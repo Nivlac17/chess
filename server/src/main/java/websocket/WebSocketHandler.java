@@ -264,12 +264,14 @@ public class WebSocketHandler {
                 } else {
                     connections.sendError(session.getRemote(), "Error:  You Are an Observer, NOT a Playa!");
                 }
+            } else {
+                connections.sendError(session.getRemote(), "Error:  User Already Resigned");
             }
         }
     }
 
     private String leaveGame(Session session, UserGameCommand command) throws DataAccessException {
-        synchronized (gameLock) {
+        synchronized (connections) {
             String username = (ChessService.getAuthData(command.getAuthToken())).username();
         GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         var message = username + " left the game" ;
@@ -302,8 +304,6 @@ public class WebSocketHandler {
         return "";
 
     }
-
-    private final Object gameLock = new Object();
 
 
 }
