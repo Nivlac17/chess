@@ -48,7 +48,6 @@ public class ConnectionManager {
                 return;
             }
             for (var entry : connectionList.entrySet()) {
-                synchronized (connections) {
                     String username = entry.getKey();
                     System.out.println(username + " in connection list");
                     Connection connection = entry.getValue();
@@ -64,7 +63,6 @@ public class ConnectionManager {
                         } catch (IOException e) {
                             removeList.add(username);
                         }
-                    }
                 }
             }
 
