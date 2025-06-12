@@ -15,31 +15,36 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection> > connections = new ConcurrentHashMap<>();
 
+        private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection> > connections = new ConcurrentHashMap<>();
 
-    public void addConnection(String username, int gameID, Session session) {
-        var connection = new Connection(username, session);
-        connections.computeIfAbsent(gameID, id -> new ConcurrentHashMap<>()).put(username, connection);
+        public void addConnection (String username,int gameID, Session session){
+            synchronized (connections) {
 
+                var connection = new Connection(username, session);
+                connections.computeIfAbsent(gameID, id -> new ConcurrentHashMap<>()).put(username, connection);
+            }
     }
 
-    public void remove(int gameID) {
+        public void remove ( int gameID){
         connections.remove(gameID);
     }
 
-    public void removePlayer(int gameID, String player) {
-        ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
-        if (gameConnections != null) {
-            gameConnections.remove(player);
+        public void removePlayer ( int gameID, String player){
+        synchronized (connections) {
+
+            ConcurrentHashMap<String, Connection> gameConnections = connections.get(gameID);
+            if (gameConnections != null) {
+                gameConnections.remove(player);
+            }
         }
     }
 
-    public void broadcast(String excludeUsername, ServerMessage notification, int gameID){
-        System.out.println("Broadcast is runnign for "+excludeUsername);
+        public void broadcast (String excludeUsername, ServerMessage notification,int gameID){
+        System.out.println("Broadcast is runnign for " + excludeUsername);
         var removeList = new ArrayList<String>();
         var connectionList = connections.get(gameID);
-        if(connectionList == null){
+        if (connectionList == null) {
             System.out.println("I'm dying!!!!!");
             return;
         }
@@ -53,7 +58,7 @@ public class ConnectionManager {
                     Gson gson = new Gson();
                     String message = gson.toJson(notification);
                     System.out.println("message to be sent: " + message);
-                    connection.send( message );
+                    connection.send(message);
                     System.out.println("message was sent to all but: " + excludeUsername);
 
                 } catch (IOException e) {
@@ -71,7 +76,7 @@ public class ConnectionManager {
     }
 
 
-    public void send(ServerMessage serverMessage, String username, int gameID) throws IOException {
+        public void send (ServerMessage serverMessage, String username,int gameID) throws IOException {
         Gson gson = new Gson();
         String game = gson.toJson(serverMessage, ServerMessage.class);
 
@@ -82,7 +87,7 @@ public class ConnectionManager {
     }
 
 
-    public void sendError(RemoteEndpoint session, String errorMessage) {
+        public void sendError (RemoteEndpoint session, String errorMessage){
         Gson gson = new Gson();
         ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null, gson.toJson(errorMessage));
         String serverMessage = gson.toJson(message);
@@ -92,5 +97,6 @@ public class ConnectionManager {
         } catch (IOException e) {
             System.out.println("Error: system produced error printing error message");
         }
+
     }
 }

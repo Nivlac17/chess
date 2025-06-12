@@ -75,12 +75,17 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
 
     public void updateGame(int gameID, String whiteUsername, String blackUsername,
                            String gameName, ChessGame game) {
+        System.out.println("update game running");
+
         GameData origonalGameData = createdGames.get(gameID);
-        if(whiteUsername != null){
-            origonalGameData = origonalGameData.setWhiteUsername(whiteUsername);
+        if(whiteUsername.equals("username")){
+            origonalGameData = origonalGameData.setWhiteUsername(null);
+            System.out.println("white set to null");
+
         }
-        if(blackUsername != null){
-            origonalGameData = origonalGameData.setBlackUsername(blackUsername);
+        if(blackUsername.equals("username")){
+            origonalGameData = origonalGameData.setBlackUsername(null);
+            System.out.println("black set to null");
         }
         if(gameName != null){
             origonalGameData = origonalGameData.setGameName(gameName);
@@ -92,4 +97,13 @@ public class MemoryDataAccessMethods implements DataAccessInterface{
         createdGames.put(gameID,origonalGameData);
 
     }
+
+    @Override
+    public void updateGameUsernames(int gameID, String whiteUsername, String blackUsername) throws DataAccessException {
+        System.out.println("No way jose -- " + gameID + whiteUsername + blackUsername);
+
+    }
+
+
+
 }

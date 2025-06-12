@@ -209,6 +209,26 @@ public class MySQLDataAccessMethods implements DataAccessInterface {
     }
 
 
+    public void updateGameUsernames(int gameID, String whiteUsername, String blackUsername) throws DataAccessException {
+        GameData origonalGameData = getGame(gameID);
+        if(whiteUsername != null){
+            origonalGameData = origonalGameData.setWhiteUsername(null);
+        }
+        if(blackUsername != null){
+            origonalGameData = origonalGameData.setBlackUsername(null);
+        }
+
+        var gameJson = new Gson().toJson(origonalGameData.game());
+        var statement = "UPDATE GameData SET whiteUsername=?, blackUsername=?, gameName=?, gameJson=? WHERE gameID=?";
+        executeUpdate(statement,
+                origonalGameData.whiteUsername(),
+                origonalGameData.blackUsername(),
+                origonalGameData.gameName(),
+                gameJson,
+                origonalGameData.gameID());
+    }
+
+
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS UserData (

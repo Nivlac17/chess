@@ -37,6 +37,7 @@ public class GamePlayClient {
                 case "m", "move", "make" -> makeMove(authToken, params);
                 case "r", "redraw" -> redrawBoard(authToken);
                 case "resign" -> resign(authToken);
+                case "leave" -> leave(authToken);
 
                 case "quit", "q" -> "quit";
                 default -> help();
@@ -71,6 +72,13 @@ public class GamePlayClient {
         }
         return "";
     }
+
+    public String leave(String authToken) throws ResponseException {
+        ws.leave(authToken);
+        return "quit";
+    }
+
+
 
 
     public String help(){

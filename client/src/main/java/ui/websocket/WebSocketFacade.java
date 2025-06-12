@@ -156,7 +156,7 @@ public class WebSocketFacade extends Endpoint{
     }
 
     public void resign(String authToken) throws ResponseException {
-        System.out.println("This is a print statement in resign board");
+//        System.out.println("This is a print statement in resign board");
         try {
             UserGameCommand connectCommand = new UserGameCommand(
                     UserGameCommand.CommandType.RESIGN, authToken, gameID.gameID());
@@ -166,4 +166,16 @@ public class WebSocketFacade extends Endpoint{
             throw new ResponseException(500, ex.getMessage());
         }
     }
-}
+
+    public void leave(String authToken) throws ResponseException {
+        try{
+            UserGameCommand connectCommand = new UserGameCommand(
+                    UserGameCommand.CommandType.LEAVE, authToken, gameID.gameID());
+            String json = new Gson().toJson(connectCommand);
+            this.session.getBasicRemote().sendText(json);
+        } catch (IOException ex) {
+        throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    }

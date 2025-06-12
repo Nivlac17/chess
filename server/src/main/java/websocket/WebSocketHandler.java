@@ -136,86 +136,89 @@ public class WebSocketHandler {
 
 
     private void makeMove(Session session, MakeMoveCommand command) throws DataAccessException {
-        String username = (ChessService.getAuthData(command.getAuthToken())).username();
-        GameData gameData;
-        try {
-            gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-        } catch (DataAccessException e) {
-            connections.sendError(session.getRemote(), "Error: GameData is unusable");
-            return;
-        }
+        System.out.println("Making Move");
+        synchronized (connections) {
 
-
-
-        Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
-
-        if (resigned == true){
-            validMoves = new ArrayList<>();
-        }
-
-        ChessMove chessMove = command.getMove();
-        int startCol = command.getMove().getStartPosition().getColumn();
-        int endCol = command.getMove().getEndPosition().getColumn();
-
-        String startColumn = getColumnLetter( startCol);
-        String endColumn = getColumnLetter( endCol);
-
-
-        if (validMoves.contains(chessMove)){
+            String username = (ChessService.getAuthData(command.getAuthToken())).username();
+            GameData gameData;
             try {
-            GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-                ChessGame.TeamColor teamColor =
-                        gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
-                if( (teamColor == ChessGame.TeamColor.WHITE &&  !gameData.whiteUsername().equals(username)) ||
-                        (teamColor == ChessGame.TeamColor.BLACK &&  !gameData.blackUsername().equals(username))) {
+                gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+            } catch (DataAccessException e) {
+                connections.sendError(session.getRemote(), "Error: GameData is unusable");
+                return;
+            }
+
+
+            Collection<ChessMove> validMoves = gameData.game().validMoves(command.getMove().getStartPosition());
+
+            if (resigned == true) {
+                validMoves = new ArrayList<>();
+            }
+
+            ChessMove chessMove = command.getMove();
+            int startCol = command.getMove().getStartPosition().getColumn();
+            int endCol = command.getMove().getEndPosition().getColumn();
+
+            String startColumn = getColumnLetter(startCol);
+            String endColumn = getColumnLetter(endCol);
+
+
+            if (validMoves.contains(chessMove)) {
+                try {
+                    GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+                    ChessGame.TeamColor teamColor =
+                            gameData.game().getBoard().getPiece(chessMove.getStartPosition()).getTeamColor();
+                    if ((teamColor == ChessGame.TeamColor.WHITE && !gameData.whiteUsername().equals(username)) ||
+                            (teamColor == ChessGame.TeamColor.BLACK && !gameData.blackUsername().equals(username))) {
+                        connections.sendError(session.getRemote(), "Error: Not your turn!");
+                        return;
+                    }
+                    existingGame.setGame(gameData.game());
+                    gameData.game().makeMove(chessMove);
+                    ChessService.updateGame(command.getAuthToken(), gameData);
+                } catch (InvalidMoveException | DataAccessException e) {
                     connections.sendError(session.getRemote(), "Error: Not your turn!");
                     return;
                 }
-                    existingGame.setGame(gameData.game());
-                gameData.game().makeMove(chessMove);
-                ChessService.updateGame(command.getAuthToken(), gameData);
-            } catch (InvalidMoveException | DataAccessException e) {
-                connections.sendError(session.getRemote(), "Error: Not your turn!");
-                return;
-            }
-            //            Broadcast Loaded game to User
-            ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
+                //            Broadcast Loaded game to User
+                ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
 
-            try {
-                connections.send(serverMessage, username, command.getGameID());
-                delayRace();
-            } catch (IOException e) {
-                connections.sendError(session.getRemote(), "Error:  could not send Notification");
-                return;
-            }
+                try {
+                    connections.send(serverMessage, username, command.getGameID());
+                    delayRace();
+                } catch (IOException e) {
+                    connections.sendError(session.getRemote(), "Error:  could not send Notification");
+                    return;
+                }
 //            Broadcast loaded game to everyone else
-            var gameUpdate = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
-            connections.broadcast(username, gameUpdate, command.getGameID());
-            delayRace();
-            var message = String.format("%s has moved %s to position %s",
+                var gameUpdate = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, null, null);
+                connections.broadcast(username, gameUpdate, command.getGameID());
+                delayRace();
+                var message = String.format("%s has moved %s to position %s",
                         username,
                         startColumn + command.getMove().getStartPosition().getRow(),
                         endColumn + command.getMove().getEndPosition().getRow());
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-            connections.broadcast(username, notification, command.getGameID());
+                var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+                connections.broadcast(username, notification, command.getGameID());
 
-            if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
-                var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
-                notifyEveryone(username, session, command, checkmateMessage);
-            } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
-                notifyEveryone(username, session, command, checkmateMessage);
-            } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
-                var checkMessage = "WHITE is in Check.";
-                notifyEveryone(username, session, command, checkMessage);
-            }else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
-                var checkMessage = "BLACK is in Check.";
-                notifyEveryone(username, session, command, checkMessage);
+                if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                    var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
+                    notifyEveryone(username, session, command, checkmateMessage);
+                } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
+                    notifyEveryone(username, session, command, checkmateMessage);
+                } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+                    var checkMessage = "WHITE is in Check.";
+                    notifyEveryone(username, session, command, checkMessage);
+                } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+                    var checkMessage = "BLACK is in Check.";
+                    notifyEveryone(username, session, command, checkMessage);
+                }
+
+
+            } else {
+                connections.sendError(session.getRemote(), "Error: invalid move");
             }
-
-
-        } else{
-            connections.sendError(session.getRemote(), "Error: invalid move");
         }
     }
 
@@ -229,69 +232,78 @@ public class WebSocketHandler {
         }
     }
 
-
     private void resign(Session session, UserGameCommand command) throws DataAccessException {
-        if (!this.resigned) {
-            System.out.println("resign log -- resign was called");
+        synchronized (connections) {
+
+            if (!this.resigned) {
+                System.out.println("resign log -- resign was called");
 
 
-            String username = (ChessService.getAuthData(command.getAuthToken())).username();
-            String victor;
-            GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
-            System.out.println("White Username: " + gameData.whiteUsername());
-            System.out.println("Black Username: " + gameData.blackUsername());
-            System.out.println("Username: " + username);
+                String username = (ChessService.getAuthData(command.getAuthToken())).username();
+                String victor;
+                GameData gameData = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
+                System.out.println("White Username: " + gameData.whiteUsername());
+                System.out.println("Black Username: " + gameData.blackUsername());
+                System.out.println("Username: " + username);
 
 
-            if (gameData.whiteUsername().equals(username)) {
-                System.out.println("resign log -- white resign");
-                this.resigned = true;
-                victor = "BLACK";
-                var resignMessage = String.format("%s has resigned%n %s Wins!",
-                        username, victor);
-                notifyEveryone(username, session, command, resignMessage);
-            } else if (gameData.blackUsername().equals(username)) {
-                System.out.println("resign log -- black resign");
-                this.resigned = true;
-                victor = "WHITE";
-                var resignMessage = String.format("%s has resigned%n %s Wins!",
-                        username, victor);
-                notifyEveryone(username, session, command, resignMessage);
-            } else {
-                connections.sendError(session.getRemote(), "Error:  You Are an Observer, NOT a Playa!");
+                if (gameData.whiteUsername().equals(username)) {
+                    System.out.println("resign log -- white resign");
+                    this.resigned = true;
+                    victor = "BLACK";
+                    var resignMessage = String.format("%s has resigned%n %s Wins!",
+                            username, victor);
+                    notifyEveryone(username, session, command, resignMessage);
+                } else if (gameData.blackUsername().equals(username)) {
+                    System.out.println("resign log -- black resign");
+                    this.resigned = true;
+                    victor = "WHITE";
+                    var resignMessage = String.format("%s has resigned%n %s Wins!",
+                            username, victor);
+                    notifyEveryone(username, session, command, resignMessage);
+                } else {
+                    connections.sendError(session.getRemote(), "Error:  You Are an Observer, NOT a Playa!");
+                }
             }
-
         }
     }
 
     private String leaveGame(Session session, UserGameCommand command) throws DataAccessException {
-        String username = (ChessService.getAuthData(command.getAuthToken())).username();
+        synchronized (gameLock) {
+            String username = (ChessService.getAuthData(command.getAuthToken())).username();
         GameData existingGame = ChessService.getGame(command.getAuthToken(), new GameID(command.getGameID()));
         var message = username + " left the game" ;
+        System.out.println("leaving");
+            if (username.equals(existingGame.whiteUsername())) {
+                System.out.println("white username leaving");
+                GameData gameData = new GameData(existingGame.gameID(), "game", null, existingGame.gameName(), existingGame.game());
+                ChessService.updateGameWhiteUsername(command.getAuthToken(), username, gameData.gameID());
+                var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+                connections.broadcast(username, checkmateNotification, command.getGameID());
+                connections.removePlayer(command.getGameID(), username);
 
-        if (username.equals(existingGame.whiteUsername())){
-            GameData gameData = new GameData(existingGame.gameID(),null, existingGame.blackUsername(), existingGame.gameName(),existingGame.game());
-            ChessService.updateGame(command.getAuthToken(), gameData);
-            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-            connections.broadcast(username, checkmateNotification, command.getGameID());
-            connections.removePlayer(command.getGameID(), username);
+            } else if (username.equals(existingGame.blackUsername())) {
+                System.out.println("black username leaving");
 
-        } else if (username.equals(existingGame.blackUsername())){
-            GameData gameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), null, existingGame.gameName(),existingGame.game());
-            ChessService.updateGame(command.getAuthToken(), gameData);
-            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-            connections.broadcast(username, checkmateNotification, command.getGameID());
-            connections.removePlayer(command.getGameID(), username);
+                GameData gameData = new GameData(existingGame.gameID(), null, "game", existingGame.gameName(), existingGame.game());
+                ChessService.updateGameBlackUsername(command.getAuthToken(), username, gameData.gameID());
+                var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+                connections.broadcast(username, checkmateNotification, command.getGameID());
+                connections.removePlayer(command.getGameID(), username);
 
-        } else {
-            var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
-            connections.removePlayer(command.getGameID(), username);
-            connections.broadcast(username, checkmateNotification, command.getGameID());
+            } else {
+                System.out.println("observer username leaving");
+                var checkmateNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
+                connections.broadcast(username, checkmateNotification, command.getGameID());
+                connections.removePlayer(command.getGameID(), username);
 
+            }
         }
-
         return "";
 
     }
 
-    }
+    private final Object gameLock = new Object();
+
+
+}

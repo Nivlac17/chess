@@ -117,7 +117,7 @@ public class ChessService {
         }
         GameData game = dataAccess.getGame(joinGameRequest.gameID());
         if (game == null) {
-            throw new DataAccessException("Error: bad request", 400);
+            throw new DataAccessException("Error:  bad request", 400);
         }
         if (joinGameRequest.playerColor() == null) {
             throw new DataAccessException("Error: bad request", 400);
@@ -176,8 +176,28 @@ public class ChessService {
         }
 
         dataAccess.updateGame(updateGameRequest.gameID(), null, null, null, updateGameRequest.game());
-        System.out.println("success updating game");
-        return "success updating game";
+        System.out.println("success updating game oo");
+        return "success updating game o";
+    }
+
+    public static String updateGameWhiteUsername(String token, String username, int gameID) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        dataAccess.updateGameUsernames(gameID, "username", null);
+        System.out.println("success updating game ww");
+        return "success updating game w";
+    }
+
+    public static String updateGameBlackUsername(String token, String username, int gameID) throws DataAccessException {
+        AuthData authData = dataAccess.getAuth(token);
+        if (authData == null) {
+            throw new DataAccessException("Error: unauthorized", 401);
+        }
+        dataAccess.updateGameUsernames(gameID, null, "username");
+        System.out.println("success updating game bb");
+        return "success updating game b";
     }
 
 

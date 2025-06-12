@@ -18,5 +18,7 @@ public interface DataAccessInterface {
     void createGame(int gameID, String gameName, ChessGame game) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     void updateGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException;
-    String clear() throws DataAccessException;
+    public void updateGameUsernames(int gameID, String whiteUsername, String blackUsername) throws DataAccessException;
+
+        String clear() throws DataAccessException;
 }
