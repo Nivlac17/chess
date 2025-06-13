@@ -144,7 +144,7 @@ public class WebSocketFacade extends Endpoint{
             int[] start = parsePosition(params[0]);
             int[] end = parsePosition(params[1]);
             if (!isValidPosition(start) || !isValidPosition(end)) {
-                return "Invalid Promotional Piece";
+                return "Invalid Location Input";
             }
             ChessPosition startPosition = new ChessPosition(start[0],start[1]);
             ChessPosition endPosition = new ChessPosition(end[0], end[1]);
@@ -184,10 +184,16 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
-    public void highlight(String authToken, String piecePosition){
-        int [] parsedPiecePosition = parsePosition(piecePosition);
-        ChessPosition position = new ChessPosition(parsedPiecePosition[0], parsedPiecePosition[1]);
-        board.drawHighlightedBoard(position);
+    public void highlight(String authToken, String piecePosition) {
+        int[] parsedPiecePosition = parsePosition(piecePosition);
+        if (!isValidPosition(parsedPiecePosition)) {
+            System.out.println("Invalid Location Input");
+
+        }else {
+
+            ChessPosition position = new ChessPosition(parsedPiecePosition[0], parsedPiecePosition[1]);
+            board.drawHighlightedBoard(position);
+        }
     }
 
-    }
+}

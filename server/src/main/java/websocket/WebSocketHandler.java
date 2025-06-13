@@ -154,7 +154,9 @@ public class WebSocketHandler {
                 int startCol = command.getMove().getStartPosition().getColumn();
                 int endCol = command.getMove().getEndPosition().getColumn();
                 String[] columns = {getColumnLetter(startCol), getColumnLetter(endCol)};
-
+                if (columns[0].equals("?") || columns[1].equals("?")) {
+                    connections.sendError(session.getRemote(), "bad input, try again");
+                }
                 if (validMoves.contains(chessMove)) {
                     updateGameWMove(username, command, chessMove, session, gameData, columns);
                 } else {
@@ -254,7 +256,7 @@ public class WebSocketHandler {
             } else {
                 connections.sendError(session.getRemote(), "Error:  User Already Resigned");
             }
-        
+
     }
 
     private void leaveGame(UserGameCommand command) throws DataAccessException {
