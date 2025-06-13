@@ -52,7 +52,7 @@ public class GamePlayClient {
                 return "help";
             }
         }
-        ws.makeMove(authToken, params);
+
         return ws.makeMove(authToken, params);
     }
 

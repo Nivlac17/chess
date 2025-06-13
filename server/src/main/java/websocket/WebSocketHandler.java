@@ -157,11 +157,15 @@ public class WebSocketHandler {
                 if (columns[0].equals("?") || columns[1].equals("?")) {
                     connections.sendError(session.getRemote(), "bad input, try again");
                 }
+                System.out.println(chessMove.getStartPosition().row );
+                System.out.println(chessMove.getStartPosition().col );
                 if (validMoves.contains(chessMove)) {
                     updateGameWMove(username, command, chessMove, session, gameData, columns);
                 } else {
-                    connections.sendError(session.getRemote(), "Error: invalid move");
+                    System.out.println("invalid move given error sent");
+                    connections.sendError(session.getRemote(), "Error: invalid move given");
                 }
+
             }
 
     }
@@ -181,7 +185,7 @@ public class WebSocketHandler {
             gameData.game().makeMove(chessMove);
             ChessService.updateGame(command.getAuthToken(), gameData);
         } catch (InvalidMoveException | DataAccessException e) {
-            connections.sendError(session.getRemote(), "Error: Not your turn!");
+            connections.sendError(session.getRemote(), "Error: Not your turn !");
             return;
         }
         //            Broadcast Loaded game to User
@@ -205,18 +209,28 @@ public class WebSocketHandler {
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, message, null);
         connections.broadcast(username, notification, command.getGameID());
 
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
+        System.out.println("white username: " + white);
+        System.out.println("black username: " + black);
+
+
         if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            var checkmateMessage = "!!Checkmate!! \n BLACK Wins!!!";
-            notifyEveryone(username, session, command, checkmateMessage);
+            var checkmateMessage = "!!Checkmate!! \n %s Wins!!!";
+            var finalMessage = String.format(checkmateMessage, black);
+            notifyEveryone(username, session, command, finalMessage);
         } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            var checkmateMessage = "!!Checkmate!! \n WHITE Wins!!!";
-            notifyEveryone(username, session, command, checkmateMessage);
+            var checkmateMessage = "!!Checkmate!! \n %s Wins!!!";
+            var finalMessage = String.format(checkmateMessage, white);
+            notifyEveryone(username, session, command, finalMessage);
         } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
-            var checkMessage = "WHITE is in Check.";
-            notifyEveryone(username, session, command, checkMessage);
+            var checkMessage = "%s is in Check.";
+            var finalMessage = String.format(checkMessage, white);
+            notifyEveryone(username, session, command, finalMessage);
         } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
-            var checkMessage = "BLACK is in Check.";
-            notifyEveryone(username, session, command, checkMessage);
+            var checkMessage = "%s is in Check.";
+            var finalMessage = String.format(checkMessage, black);
+            notifyEveryone(username, session, command, finalMessage);
         }
     }
 

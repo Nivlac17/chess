@@ -19,6 +19,8 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 public class WebSocketFacade extends Endpoint{
     Session session;
@@ -91,6 +93,13 @@ public class WebSocketFacade extends Endpoint{
 
     public int[] parsePosition(String position) {
         String[] cr = position.split("");
+        List<String> validLetters = Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h");
+        List<String> validNumbers = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8");
+
+        if (!validLetters.contains(cr[0]) || !validNumbers.contains(cr[1])){
+            System.out.println("Bad Position Data Given");
+            return null;
+        }
         int rowNumber = Integer.parseInt(cr[1]);
         String column2 = cr[0];
         int column;
@@ -125,6 +134,9 @@ public class WebSocketFacade extends Endpoint{
     }
 
     private boolean isValidPosition(int[] pos) {
+        if (pos == null){
+            return false;
+        }
         return pos[0] >= 1 && pos[0] < 9 && pos[1] >= 1 && pos[1] < 9;
     }
 
