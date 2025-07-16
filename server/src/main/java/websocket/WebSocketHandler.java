@@ -185,7 +185,7 @@ public class WebSocketHandler {
             gameData.game().makeMove(chessMove);
             ChessService.updateGame(command.getAuthToken(), gameData);
         } catch (InvalidMoveException | DataAccessException e) {
-            connections.sendError(session.getRemote(), "Error: Not your turn !");
+            connections.sendError(session.getRemote(), "Error: Not your turn!");
             return;
         }
         //            Broadcast Loaded game to User
