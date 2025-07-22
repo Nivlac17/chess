@@ -1,0 +1,25 @@
+  <h2>Websocket</h2>
+  <p>This section is only applicable during phase 6. Use this to test the websocket functionality of your server</p>
+  <div id="websocketConnectBox" class="box">
+    <h3>Connect to websocket</h3>
+    <button onclick="connectWs()">Connect</button>
+  </div>
+
+
+
+
+  <div id="sendWs">
+    <h2>Send Websocket Command</h2>
+    <div class="box">
+      <div class="input">
+        <label for="commandBox">Command:</label>
+        <textarea id="commandBox" name="commandBox"></textarea>
+      </div>
+
+      <button onclick="sendWs()">Send</button>
+      <button onclick="closeWs()">Close</button>
+    </div>
+  </div>
+    <div id="wsMessageBox" class="box">
+      <h3 id="wsMessageBoxLabel">Websocket Server Messages</h3>
+    </div>
