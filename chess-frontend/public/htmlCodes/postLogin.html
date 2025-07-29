@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chess Game Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #games {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #games th, #games td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #games th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        #error {
+            color: red;
+            margin-top: 20px;
+        }
+
+        #logoutBtn {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            float: right;
+            cursor: pointer;
+        }
+
+        #logoutBtn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<button id="logoutBtn" onclick="logout()">Logout</button>
+<h1>Welcome to the Chess Lobby</h1>
+<p>Here are the available games:</p>
+
+<table id="games">
+    <thead>
+    <tr>
+        <th>Game ID</th>
+        <th>Game Name</th>
+        <th>White Player</th>
+        <th>Black Player</th>
+    </tr>
+    </thead>
+    <tbody id="gamesBody">
+    <!-- Games will be populated here -->
+    </tbody>
+</table>
+
+<div id="error"></div>
+
+<script>
+
+    async function listGames() {
+        const token = localStorage.getItem("authToken");
+        const errorDiv = document.getElementById("error");
+        const gamesBody = document.getElementById("gamesBody");
+
+        if (!token) {
+            errorDiv.textContent = "Error: No authToken found. Please login again.";
+            return;
+        }
+
+        try {
+            const res = await fetch('/game', {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                errorDiv.textContent = "Error: " + (errData.message || res.statusText);
+                return;
+            }
+
+            const data = await res.json();
+
+            // Clear table body
+            gamesBody.innerHTML = "";
+
+            data.games.forEach(game => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+            <td>${game.gameID}</td>
+            <td>${game.gameName}</td>
+            <td>${game.whiteUsername || '—'}</td>
+            <td>${game.blackUsername || '—'}</td>
+          `;
+
+                gamesBody.appendChild(row);
+            });
+        } catch (err) {
+            errorDiv.textContent = "Error: " + err.message;
+        }
+    }
+
+    async function logout() {
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+            alert("You're already logged out.");
+            return;
+        }
+
+        try {
+            await fetch('/session', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            });
+        } catch (err) {
+            console.error("Logout failed:", err);
+        }
+
+        localStorage.removeItem("authToken");
+        window.location.href = "index.html"; // Redirect to homepage
+    }
+
+    // Call listGames when page loads
+    window.onload = function () {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            window.location.href = "login.html"; // or index.html
+            return;
+        }
+        listGames();
+    };
+</script>
+
+</body>
+</html>
