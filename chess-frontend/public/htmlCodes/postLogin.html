@@ -49,6 +49,34 @@
 
         #logoutBtn:hover {
             background-color: #c82333;
+
+            #createGameSection {
+                margin-top: 20px;
+            }
+
+            #gameNameInput {
+                padding: 8px;
+                font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                margin-right: 10px;
+            }
+
+            #createGameBtn {
+                background-color: #007BFF;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            #createGameBtn:hover {
+                background-color: #0056b3;
+            }
+
+
         }
     </style>
 </head>
@@ -73,6 +101,11 @@
 </table>
 
 <div id="error"></div>
+
+<div id="createGameSection">
+    <input type="text" id="gameNameInput" placeholder="Enter game name" />
+    <button id="createGameBtn" onclick="createGame()">+ Create New Game</button>
+</div>
 
 <script>
 
@@ -218,6 +251,49 @@
             errorDiv.textContent = "Error: " + err.message;
         }
     }
+
+    async function createGame() {
+        const token = localStorage.getItem("authToken");
+        const errorDiv = document.getElementById("error");
+        const gameName = document.getElementById("gameNameInput").value.trim();
+
+        if (!token) {
+            errorDiv.textContent = "Error: No authToken found. Please login again.";
+            return;
+        }
+
+        if (!gameName) {
+            errorDiv.textContent = "Error: Please enter a game name.";
+            return;
+        }
+
+        try {
+            const res = await fetch('/game', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ gameName: gameName })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                errorDiv.textContent = "Error: " + (errData.message || res.statusText);
+                return;
+            }
+
+            // Clear input after success
+            document.getElementById("gameNameInput").value = "";
+
+            // Refresh the game list
+            listGames();
+        } catch (err) {
+            errorDiv.textContent = "Error: " + err.message;
+        }
+    }
+
+
 
 </script>
 
