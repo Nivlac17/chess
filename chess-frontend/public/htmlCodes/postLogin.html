@@ -105,18 +105,49 @@
             // Clear table body
             gamesBody.innerHTML = "";
 
+
             data.games.forEach(game => {
                 const row = document.createElement("tr");
 
-                row.innerHTML = `
-            <td>${game.gameID}</td>
-            <td>${game.gameName}</td>
-            <td>${game.whiteUsername || '—'}</td>
-            <td>${game.blackUsername || '—'}</td>
-          `;
+                // Game ID
+                const gameIDCell = document.createElement("td");
+                gameIDCell.textContent = game.gameID;
+
+                // Game Name
+                const gameNameCell = document.createElement("td");
+                gameNameCell.textContent = game.gameName;
+
+                // White Player
+                const whiteCell = document.createElement("td");
+                if (game.whiteUsername) {
+                    whiteCell.textContent = game.whiteUsername;
+                } else {
+                    const joinWhiteBtn = document.createElement("button");
+                    joinWhiteBtn.textContent = "Join";
+                    joinWhiteBtn.onclick = () => joinGame(game.gameID, 'WHITE');
+                    whiteCell.appendChild(joinWhiteBtn);
+                }
+
+                // Black Player
+                const blackCell = document.createElement("td");
+                if (game.blackUsername) {
+                    blackCell.textContent = game.blackUsername;
+                } else {
+                    const joinBlackBtn = document.createElement("button");
+                    joinBlackBtn.textContent = "Join";
+                    joinBlackBtn.onclick = () => joinGame(game.gameID, 'BLACK');
+                    blackCell.appendChild(joinBlackBtn);
+                }
+
+                // Assemble row
+                row.appendChild(gameIDCell);
+                row.appendChild(gameNameCell);
+                row.appendChild(whiteCell);
+                row.appendChild(blackCell);
 
                 gamesBody.appendChild(row);
             });
+
         } catch (err) {
             errorDiv.textContent = "Error: " + err.message;
         }
@@ -142,7 +173,7 @@
         }
 
         localStorage.removeItem("authToken");
-        window.location.href = "index.html"; // Redirect to homepage
+        window.location.href = "/index.html"; // Redirect to homepage
     }
 
     // Call listGames when page loads
@@ -154,6 +185,40 @@
         }
         listGames();
     };
+
+
+    async function joinGame(gameID, color) {
+        const token = localStorage.getItem("authToken");
+        const errorDiv = document.getElementById("error");
+
+        if (!token) {
+            errorDiv.textContent = "Error: No authToken found. Please login again.";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/game/${gameID}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ playerColor: color })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                errorDiv.textContent = "Error: " + (errData.message || res.statusText);
+                return;
+            }
+
+            // Refresh the game list after joining
+            listGames();
+        } catch (err) {
+            errorDiv.textContent = "Error: " + err.message;
+        }
+    }
+
 </script>
 
 </body>

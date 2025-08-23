@@ -80,23 +80,28 @@
         try {
             const res = await fetch('/user', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password, email })
             });
 
             const data = await res.json();
+            console.log('res.ok:', res.ok);
+            console.log('data:', data);
+
             responseElement.textContent = JSON.stringify(data, null, 2);
+
+            if (res.ok && data.authToken) {
+                localStorage.setItem('authToken', data.authToken);
+                window.location.href = 'postLogin.html';
+            } else {
+                responseElement.textContent += '\nRegistration failed or missing authToken.';
+            }
+
         } catch (error) {
             responseElement.textContent = 'Error: ' + error.message;
         }
-        if (res.ok && result.authToken) {
-            localStorage.setItem('authToken', result.authToken);
-            window.location.href = 'postLogin.html';
-        }
-
     }
+
 </script>
 
 </body>
